@@ -102,6 +102,9 @@
                     case 'c':
                         unop(Math.cos);
                         break;
+                    case 'C':
+                        unop(Math.acos);
+                        break;
                     case 'E':
                         unop(Math.exp);
                         break;
@@ -134,8 +137,14 @@
                     case 's':
                         unop(Math.sin);
                         break;
+                    case 'S':
+                        unop(Math.asin);
+                        break;
                     case 't':
                         unop(Math.tan);
+                        break;
+                    case 'T':
+                        unop(Math.atan);
                         break;
                     case 'x':
                         var t = Stack[0];
