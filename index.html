@@ -51,6 +51,8 @@
                     lcd.val("");
                     Entering = true;
                 }
+                // prevent backspace from doing the back button
+                e.preventDefault();
             } else {
                 switch (c) {
                     case '\r':
