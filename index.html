@@ -1,0 +1,159 @@
+<html>
+<head>
+<title>HP 15c</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.js"></script>
+<script type="text/javascript">
+    var Stack = [0, 0, 0, 0];
+    var Entering = false;
+    var LastEnter = false;
+
+    function push(x) {
+        Stack[3] = Stack[2];
+        Stack[2] = Stack[1];
+        Stack[1] = Stack[0];
+        Stack[0] = x;
+    }
+
+    function unop(f) {
+        Stack[0] = f(Stack[0]);
+    }
+
+    function binop(f) {
+        Stack[0] = f(Stack[1], Stack[0]);
+        Stack[1] = Stack[2];
+        Stack[2] = Stack[3];
+    }
+
+    $(document).ready(function() {
+        $(document).keypress(function(e) {
+            var c = String.fromCharCode(e.which);
+            var lcd = $("#lcd");
+            if (c >= '0' && c <= '9' || c === '.' || c === 'e') {
+                if (!Entering) {
+                    if (!LastEnter) {
+                        push("");
+                    }
+                    lcd.val("");
+                    Entering = true;
+                }
+                lcd.val(lcd.val() + c);
+            } else if (c == '\b') {
+                if (Entering) {
+                    var s = lcd.val();
+                    lcd.val(s.substr(0, s.length-1));
+                } else {
+                    lcd.val("");
+                    Entering = true;
+                }
+            } else {
+                switch (c) {
+                    case '\r':
+                        push(Stack[0]);
+                        break;
+                    case '!':
+                        unop(function() {
+                            var r = 1;
+                            var x = Stack[0];
+                            while (x > 1) {
+                                r *= x;
+                                x -= 1;
+                            }
+                            return r;
+                        });
+                        break;
+                    case '+':
+                        binop(function(y, x) { return y + x });
+                        break;
+                    case '-':
+                        binop(function(y, x) { return y - x });
+                        break;
+                    case '*':
+                        binop(function(y, x) { return y * x });
+                        break;
+                    case '/':
+                        binop(function(y, x) { return y / x });
+                        break;
+                    case '%':
+                        binop(function(y, x) { return y % x });
+                        break;
+                    case '^':
+                        binop(Math.pow);
+                        break;
+                    case '?':
+                        unop(function(x) { return 1/x; });
+                        break;
+                    case '_':
+                        unop(function(x) { return -x; });
+                        break;
+                    case 'c':
+                        unop(Math.cos);
+                        break;
+                    case 'E':
+                        unop(Math.exp);
+                        break;
+                    case 'i':
+                        unop(Math.floor);
+                        break;
+                    case 'l':
+                        unop(Math.log);
+                        break;
+                    case 'p':
+                        push(Math.PI);
+                        break;
+                    case 'q':
+                        unop(Math.sqrt);
+                        break;
+                    case 'r':
+                        var t = Stack[0];
+                        Stack[0] = Stack[1];
+                        Stack[1] = Stack[2];
+                        Stack[2] = Stack[3];
+                        Stack[3] = t;
+                        break;
+                    case 'R':
+                        var t = Stack[3];
+                        Stack[3] = Stack[2];
+                        Stack[2] = Stack[1];
+                        Stack[1] = Stack[0];
+                        Stack[0] = t;
+                        break;
+                    case 's':
+                        unop(Math.sin);
+                        break;
+                    case 't':
+                        unop(Math.tan);
+                        break;
+                    case 'x':
+                        var t = Stack[0];
+                        Stack[0] = Stack[1];
+                        Stack[1] = t;
+                        break;
+                }
+                lcd.val(Stack[0]);
+                Entering = false;
+                LastEnter = (c === '\r');
+            }
+            if (Entering) {
+                Stack[0] = Number(lcd.val());
+                $("#stack_0").val(lcd.val());
+            } else {
+                lcd.val(Stack[0]);
+                $("#stack_0").val(Stack[0]);
+            }
+            for (var i = 1; i < 4; i++) {
+                $("#stack_" + i).val(Stack[i]);
+            }
+            e.stopPropagation();
+        });
+    });
+</script>
+</head>
+<body>
+<input id="stack_3"><br>
+<input id="stack_2"><br>
+<input id="stack_1"><br>
+<input id="stack_0"><br>
+<hr>
+<input id="lcd">
+</body>
+</html>
