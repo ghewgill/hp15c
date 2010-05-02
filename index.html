@@ -93,6 +93,9 @@
                     case '_':
                         unop(function(x) { return -x; });
                         break;
+                    case '@':
+                        unop(function(x) { return x * x; });
+                        break;
                     case 'a':
                         unop(Math.abs);
                         break;
