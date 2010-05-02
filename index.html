@@ -134,6 +134,9 @@
                         Stack[1] = Stack[0];
                         Stack[0] = t;
                         break;
+                    case '\x12':
+                        push(Math.random());
+                        break;
                     case 's':
                         unop(Math.sin);
                         break;
