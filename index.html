@@ -5,13 +5,103 @@
     #stack {
         float: right;
     }
+    #press {
+        position: absolute;
+        width: 39;
+        height: 34;
+        overflow: hidden;
+        display: none;
+    }
+    #presskey {
+        position: absolute;
+    }
 </style>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
 <script type="text/javascript">
 //<![CDATA[
     var Stack = [0, 0, 0, 0];
+    var Lcd;
     var Entering = false;
-    var LastEnter = false;
+    var NewEntering;
+    var AutoEnter = false;
+    var NewAutoEnter;
+    var Shift = 0;
+    var MouseDown = false;
+    var MouseR, MouseC;
+
+    var CharTable = {
+        ' ': [function() {}, function() {}, function() {}],
+        'q': [op_sqrt, op_A, op_x2],
+        'E': [op_ex, op_B, op_ln],
+        ')': [op_10x, op_C, op_log],
+        '^': [op_yx, op_D, op_pct],
+        '?': [op_1x, op_E, op_dpct],
+        '_': [op_chs, op_matrix, op_abs],
+        '7': [function() { op_input('7'); }, op_fix, op_deg],
+        '8': [function() { op_input('8'); }, op_sci, op_rad],
+        '9': [function() { op_input('9'); }, op_eng, op_grd],
+        '/': [op_div, op_solve, op_lt],
+        '': [op_sst, op_lbl, op_bst],
+        '': [op_gto, op_hyp, op_ahyp],
+        's': [op_sin, op_dim, op_asin],
+        'c': [op_cos, op_index, op_acos],
+        't': [op_tan, op_I, op_atan],
+        'e': [op_eex, op_result, op_pi],
+        '4': [function() { op_input('4'); }, op_xchg, op_sf],
+        '5': [function() { op_input('5'); }, op_dse, op_cf],
+        '6': [function() { op_input('6'); }, op_isg, op_ftest],
+        '*': [op_mul, op_integrate, op_eq],
+        '': [op_rs, op_pse, op_pr],
+        '': [op_gsb, op_clear_stat, op_rtn],
+        'r': [op_roll, op_clear_prgm, op_rollup],
+        'x': [op_xy, op_clear_reg, op_rnd],
+        '\b': [op_back, op_clear_prefix, op_clx],
+        '\r': [op_enter, op_rand, op_lastx],
+        '1': [function() { op_input('1'); }, op_to_r, op_to_p],
+        '2': [function() { op_input('2'); }, op_to_hms, op_to_h],
+        '3': [function() { op_input('3'); }, op_to_rad, op_to_deg],
+        '-': [op_sub, op_re_im, op_test],
+        '': [op_on, op_on, op_on],
+        'f': [op_f, op_f, op_f],
+        'g': [op_g, op_g, op_g],
+        '': [op_sto, op_frac, op_int],
+        '': [op_rcl, op_user, op_mem],
+        '0': [function() { op_input('0'); }, op_fact, op_mean],
+        '.': [function() { op_input('.'); }, op_yhat, op_s],
+        ';': [op_sum, op_lr, op_sumsub],
+        '+': [op_add, op_Pyx, op_Cyx],
+        '!': op_fact,
+        '@': op_x2,
+        'a': op_abs,
+        'C': op_acos,
+        'i': op_int,
+        'l': op_ln,
+        'p': op_pi,
+        'R': op_rollup,
+        '\x12': op_rand,
+        'S': op_asin,
+        'T': op_atan,
+    };
+
+    var KeyTable = [
+        ['q', 'E', ')', '^', '?', '_', '7', '8', '9', '/'],
+        [' ', ' ', 's', 'c', 't', 'e', '4', '5', '6', '*'],
+        [' ', ' ', 'r', 'x', '\b','\r','1', '2', '3', '-'],
+        [' ', 'f', 'g', ' ', ' ', '\r','0', '.', ';', '+']
+    ];
+
+    function update_display() {
+        if (Entering) {
+            Stack[0] = Number(Lcd.val());
+            $("#stack_0").val(Lcd.val());
+        } else {
+            Lcd.val(Stack[0]);
+            $("#stack_0").val(Stack[0]);
+        }
+        for (var i = 1; i < 4; i++) {
+            $("#stack_" + i).val(Stack[i]);
+        }
+    }
 
     function push(x) {
         Stack[3] = Stack[2];
@@ -30,158 +120,393 @@
         Stack[2] = Stack[3];
     }
 
+    function op_sqrt() {
+        unop(Math.sqrt);
+    }
+
+    function op_A() { }
+
+    function op_x2() {
+        unop(function(x) { return x * x; });
+    }
+    
+    function op_ex() {
+        unop(Math.exp);
+    }
+
+    function op_B() { }
+
+    function op_ln() {
+        unop(Math.log);
+    }
+
+    function op_10x() {
+        unop(function(x) { return Math.pow(10, x); });
+    }
+
+    function op_C() { }
+
+    function op_log() { }
+
+    function op_yx() {
+        binop(Math.pow);
+    }
+
+    function op_D() { }
+
+    function op_pct() { }
+
+    function op_1x() {
+        unop(function(x) { return 1 / x; });
+    }
+
+    function op_E() { }
+
+    function op_dpct() { }
+
+    function op_chs() {
+        unop(function(x) { return -x; });
+    }
+
+    function op_matrix() { }
+
+    function op_abs() {
+        unop(Math.abs);
+    }
+
+    function op_fix() { }
+
+    function op_deg() { }
+
+    function op_sci() { }
+
+    function op_rad() { }
+
+    function op_eng() { }
+
+    function op_grd() { }
+
+    function op_div() {
+        binop(function(y, x) { return y / x; });
+    }
+
+    function op_solve() { }
+
+    function op_lt() { }
+
+    function op_sst() { }
+
+    function op_lbl() { }
+
+    function op_bst() { }
+
+    function op_gto() { }
+
+    function op_hyp() { }
+
+    function op_ahyp() { }
+
+    function op_sin() {
+        unop(Math.sin);
+    }
+
+    function op_dim() { }
+
+    function op_asin() {
+        unop(Math.asin);
+    }
+
+    function op_cos() {
+        unop(Math.cos);
+    }
+
+    function op_index() { }
+
+    function op_acos() {
+        unop(Math.acos);
+    }
+
+    function op_tan() {
+        unop(Math.tan);
+    }
+
+    function op_I() { }
+
+    function op_atan() {
+        unop(Math.atan);
+    }
+
+    function op_eex() {
+        op_input('e');
+    }
+
+    function op_result() { }
+
+    function op_pi() {
+        push(Math.PI);
+    }
+
+    function op_xchg() { }
+
+    function op_sf() { }
+
+    function op_dse() { }
+
+    function op_cf() { }
+
+    function op_isg() { }
+
+    function op_ftest() { }
+
+    function op_mul() {
+        binop(function(y, x) { return y * x; });
+    }
+
+    function op_integrate() { }
+
+    function op_eq() { }
+
+    function op_rs() { }
+
+    function op_pse() { }
+
+    function op_pr() { }
+
+    function op_gsb() { }
+
+    function op_clear_stat() { }
+
+    function op_rtn() { }
+
+    function op_roll() {
+        var t = Stack[0];
+        Stack[0] = Stack[1];
+        Stack[1] = Stack[2];
+        Stack[2] = Stack[3];
+        Stack[3] = t;
+    }
+
+    function op_clear_prgm() { }
+
+    function op_rollup() {
+        var t = Stack[3];
+        Stack[3] = Stack[2];
+        Stack[2] = Stack[1];
+        Stack[1] = Stack[0];
+        Stack[0] = t;
+    }
+
+    function op_xy() {
+        var t = Stack[0];
+        Stack[0] = Stack[1];
+        Stack[1] = t;
+    }
+
+    function op_clear_reg() { }
+
+    function op_rnd() { }
+
+    function op_back() {
+        if (Entering) {
+            var s = Lcd.val();
+            Lcd.val(s.substr(0, s.length-1));
+        } else {
+            Lcd.val("");
+        }
+        NewEntering = true;
+    }
+
+    function op_clear_prefix() { }
+
+    function op_clx() {
+        Lcd.val("");
+        NewEntering = true;
+    }
+
+    function op_enter() {
+        push(Stack[0]);
+        NewAutoEnter = false;
+    }
+
+    function op_rand() {
+        push(Math.random());
+    }
+
+    function op_lastx() { }
+
+    function op_to_r() { }
+
+    function op_to_p() { }
+
+    function op_to_hms() { }
+
+    function op_to_h() { }
+
+    function op_to_rad() { }
+
+    function op_to_deg() { }
+
+    function op_sub() {
+        binop(function(y, x) { return y - x; });
+    }
+
+    function op_re_im() { }
+
+    function op_test() { }
+
+    function op_on() { }
+
+    function op_f() {
+        Shift = 1;
+    }
+
+    function op_g() {
+        Shift = 2;
+    }
+
+    function op_sto() { }
+
+    function op_frac() { }
+
+    function op_int() {
+        unop(Math.floor);
+    }
+
+    function op_rcl() { }
+
+    function op_user() { }
+
+    function op_mem() { }
+
+    function op_fact() {
+        unop(function(x) {
+            var r = 1;
+            while (x > 1) {
+                r *= x;
+                x -= 1;
+            }
+            return r;
+        });
+    }
+
+    function op_mean() { }
+
+    function op_yhat() { }
+
+    function op_s() { }
+
+    function op_sum() { }
+
+    function op_lr() { }
+
+    function op_sumsub() { }
+
+    function op_add() {
+        binop(function(y, x) { return y + x; });
+    }
+
+    function op_Pyx() { }
+
+    function op_Cyx() { }
+
+    function op_input(c) {
+        if (!Entering) {
+            if (AutoEnter) {
+                push("");
+            }
+            Lcd.val("");
+        }
+        Lcd.val(Lcd.val() + c);
+        NewEntering = true;
+    }
+
+    function key(k) {
+        var s = Shift;
+        Shift = -1;
+        NewEntering = false;
+        NewAutoEnter = true;
+        if (jQuery.isArray(CharTable[k])) {
+            CharTable[k][s]();
+        } else {
+            CharTable[k]();
+        }
+        if (Shift === -1) {
+            Shift = 0;
+        }
+        Entering = NewEntering;
+        AutoEnter = NewAutoEnter;
+        update_display();
+    }
+
     $(document).ready(function() {
+        Lcd = $("#lcd");
+        $("#calc").mousedown(function(e) {
+            var calc = $("#calc");
+            var x = e.clientX - calc.offset().left;
+            var y = e.clientY - calc.offset().top;
+            if (x >= 65 && x < 645 && y >= 155 && y < 405) {
+                var c = Math.floor((x - 65) / 57);
+                var r = Math.floor((y - 155) / 65);
+                if (c >= 0 && c < 10 && r >= 0 && r < 4) {
+                    MouseR = r;
+                    MouseC = c;
+                    MouseDown = true;
+                    var keyx = 81 + c * 57;
+                    var keyy = 169 + r * 65;
+                    var press = $("#press");
+                    var presskey = $("#presskey");
+                    press.css("left", calc.offset().left + keyx);
+                    press.css("top", calc.offset().top + keyy);
+                    presskey.css("left", -keyx);
+                    presskey.css("top", -keyy - 1);
+                    press.css("display", "block");
+                }
+            }
+            e.preventDefault();
+        });
+        $("#calc").mouseup(function(e) {
+            if (MouseDown) {
+                $("#press").css("display", "none");
+                MouseDown = false;
+            }
+        });
+        $("#press").mouseup(function(e) {
+            if (MouseDown) {
+                $("#press").css("display", "none");
+                key(KeyTable[MouseR][MouseC]);
+                MouseDown = false;
+            }
+        });
         $(document).keypress(function(e) {
             var c = String.fromCharCode(e.which);
-            var lcd = $("#lcd");
-            if (c >= '0' && c <= '9' || c === '.' || c === 'e') {
-                if (!Entering) {
-                    if (!LastEnter) {
-                        push("");
-                    }
-                    lcd.val("");
-                    Entering = true;
-                }
-                lcd.val(lcd.val() + c);
-            } else if (c == '\b') {
-                if (Entering) {
-                    var s = lcd.val();
-                    lcd.val(s.substr(0, s.length-1));
-                } else {
-                    lcd.val("");
-                    Entering = true;
-                }
-                // prevent backspace from doing the back button
+            if (c === '\b') {
                 e.preventDefault();
-            } else {
-                switch (c) {
-                    case '\r':
-                        push(Stack[0]);
-                        break;
-                    case '!':
-                        unop(function() {
-                            var r = 1;
-                            var x = Stack[0];
-                            while (x > 1) {
-                                r *= x;
-                                x -= 1;
-                            }
-                            return r;
-                        });
-                        break;
-                    case '+':
-                        binop(function(y, x) { return y + x });
-                        break;
-                    case '-':
-                        binop(function(y, x) { return y - x });
-                        break;
-                    case '*':
-                        binop(function(y, x) { return y * x });
-                        break;
-                    case '/':
-                        binop(function(y, x) { return y / x });
-                        break;
-                    case '%':
-                        binop(function(y, x) { return y % x });
-                        break;
-                    case '^':
-                        binop(Math.pow);
-                        break;
-                    case '?':
-                        unop(function(x) { return 1/x; });
-                        break;
-                    case '_':
-                        unop(function(x) { return -x; });
-                        break;
-                    case '@':
-                        unop(function(x) { return x * x; });
-                        break;
-                    case 'a':
-                        unop(Math.abs);
-                        break;
-                    case 'c':
-                        unop(Math.cos);
-                        break;
-                    case 'C':
-                        unop(Math.acos);
-                        break;
-                    case 'E':
-                        unop(Math.exp);
-                        break;
-                    case 'i':
-                        unop(Math.floor);
-                        break;
-                    case 'l':
-                        unop(Math.log);
-                        break;
-                    case 'p':
-                        push(Math.PI);
-                        break;
-                    case 'q':
-                        unop(Math.sqrt);
-                        break;
-                    case 'r':
-                        var t = Stack[0];
-                        Stack[0] = Stack[1];
-                        Stack[1] = Stack[2];
-                        Stack[2] = Stack[3];
-                        Stack[3] = t;
-                        break;
-                    case 'R':
-                        var t = Stack[3];
-                        Stack[3] = Stack[2];
-                        Stack[2] = Stack[1];
-                        Stack[1] = Stack[0];
-                        Stack[0] = t;
-                        break;
-                    case '\x12':
-                        push(Math.random());
-                        break;
-                    case 's':
-                        unop(Math.sin);
-                        break;
-                    case 'S':
-                        unop(Math.asin);
-                        break;
-                    case 't':
-                        unop(Math.tan);
-                        break;
-                    case 'T':
-                        unop(Math.atan);
-                        break;
-                    case 'x':
-                        var t = Stack[0];
-                        Stack[0] = Stack[1];
-                        Stack[1] = t;
-                        break;
-                }
-                lcd.val(Stack[0]);
-                Entering = false;
-                LastEnter = (c === '\r');
             }
-            if (Entering) {
-                Stack[0] = Number(lcd.val());
-                $("#stack_0").val(lcd.val());
-            } else {
-                lcd.val(Stack[0]);
-                $("#stack_0").val(Stack[0]);
-            }
-            for (var i = 1; i < 4; i++) {
-                $("#stack_" + i).val(Stack[i]);
+            if (CharTable[c]) {
+                key(c);
             }
             e.stopPropagation();
         });
+        update_display();
     });
 //]]>
 </script>
 </head>
 <body>
 <div id="stack">
-t <input id="stack_3"><br>
-z <input id="stack_2"><br>
-y <input id="stack_1"><br>
-x <input id="stack_0"><br>
+<table>
+<tr><td>t</td><td><input id="stack_3"></td></tr>
+<tr><td>z</td><td><input id="stack_2"></td></tr>
+<tr><td>y</td><td><input id="stack_1"></td></tr>
+<tr><td>x</td><td><input id="stack_0"></td></tr>
+</table>
 </div>
 <input id="lcd">
+<br>
+<img id="calc" src="15.jpg">
+<div id="press"><img id="presskey" src="15.jpg"></div>
+<map name="keys">
+<area shape="rect" coords="75,164,119,205" href="javascript:key('q')" title="q">
+</map>
 </body>
 </html>
