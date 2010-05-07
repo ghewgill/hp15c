@@ -15,10 +15,15 @@
     #presskey {
         position: absolute;
     }
+    .lcd {
+        position: absolute;
+        display: none;
+    }
 </style>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
 <script type="text/javascript">
 //<![CDATA[
+    var Digits = [];
     var Stack = [0, 0, 0, 0];
     var Lcd;
     var Entering = false;
@@ -92,13 +97,35 @@
     function update_display() {
         if (Entering) {
             Stack[0] = Number(Lcd.val());
-            $("#stack_0").val(Lcd.val());
         } else {
             Lcd.val(Stack[0]);
-            $("#stack_0").val(Stack[0]);
         }
-        for (var i = 1; i < 4; i++) {
+        for (var i = 0; i < 4; i++) {
             $("#stack_" + i).val(Stack[i]);
+        }
+        for (var i in Digits) {
+            Digits[i].css("display", "none");
+        }
+        var decimal = $("#decimal");
+        var neg = $("#neg");
+        decimal.css("display", "none");
+        neg.css("display", "none");
+        var s = Lcd.val();
+        var d = 0;
+        for (var i = 0; i < s.length; i++) {
+            var c = s.charAt(i);
+            if (c >= '0' && c <= '9') {
+                Digits[d].attr("src", c+".png");
+                Digits[d].css("display", "inline");
+                d++;
+            } else if (c === '.') {
+                var calc = $("#calc");
+                decimal.css("left", calc.offset().left + 170 + d * 27);
+                decimal.css("top", calc.offset().top + 92);
+                decimal.css("display", "inline");
+            } else if (c === '-') {
+                neg.css("display", "inline");
+            }
         }
     }
 
@@ -438,6 +465,16 @@
     }
 
     $(document).ready(function() {
+        var calc = $("#calc");
+        for (var i = 0; i < 10; i++) {
+            var d = $("#dig"+i);
+            d.css("left", calc.offset().left + 175 + i * 27);
+            d.css("top", calc.offset().top + 53);
+            Digits[Digits.length] = d;
+        }
+        var neg = $("#neg");
+        neg.css("left", calc.offset().left + 158);
+        neg.css("top", calc.offset().top + 66);
         Lcd = $("#lcd");
         $("#calc").mousedown(function(e) {
             var calc = $("#calc");
@@ -498,12 +535,22 @@
 <tr><td>x</td><td><input id="stack_0"></td></tr>
 </table>
 </div>
-<input id="lcd">
+<input id="lcd" type="hidden">
 <br>
 <img id="calc" src="15.jpg">
 <div id="press"><img id="presskey" src="15.jpg"></div>
-<map name="keys">
-<area shape="rect" coords="75,164,119,205" href="javascript:key('q')" title="q">
-</map>
+<br>
+<img id="dig0" class="lcd" src="0.png">
+<img id="dig1" class="lcd" src="1.png">
+<img id="dig2" class="lcd" src="2.png">
+<img id="dig3" class="lcd" src="3.png">
+<img id="dig4" class="lcd" src="4.png">
+<img id="dig5" class="lcd" src="5.png">
+<img id="dig6" class="lcd" src="6.png">
+<img id="dig7" class="lcd" src="7.png">
+<img id="dig8" class="lcd" src="8.png">
+<img id="dig9" class="lcd" src="9.png">
+<img id="decimal" class="lcd" src="decimal.png">
+<img id="neg" class="lcd" src="neg.png">
 </body>
 </html>
