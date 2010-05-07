@@ -20,7 +20,6 @@ for i in range(10):
     f = open(str(i) + ".svg", "w")
     print >>f, """<?xml version="1.0"?>
         <svg width="20" height="30">
-            <rect width="100%" height="100%" fill="#828274" />
             <g fill="black">"""
     if Digits[0][i][1] == '_': print >>f, """<path d="%s" />""" % Segments[0]
     if Digits[1][i][0] == '|': print >>f, """<path d="%s" />""" % Segments[1]
@@ -32,4 +31,4 @@ for i in range(10):
     print >>f, """ </g>
         </svg>"""
     f.close()
-    os.system("convert %d.svg %d.png" % (i, i))
+    os.system("convert -background none %d.svg %d.png" % (i, i))
