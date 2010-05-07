@@ -172,7 +172,9 @@
 
     function op_C() { }
 
-    function op_log() { }
+    function op_log() {
+        unop(function(x) { return Math.log(x) / Math.log(10); });
+    }
 
     function op_yx() {
         binop(Math.pow);
@@ -191,7 +193,16 @@
     function op_dpct() { }
 
     function op_chs() {
-        unop(function(x) { return -x; });
+        if (Entering) {
+            if (Lcd.val().charAt(0) === '-') {
+                Lcd.val(Lcd.val().substr(1));
+            } else {
+                Lcd.val('-' + Lcd.val());
+            }
+            NewEntering = true;
+        } else {
+            unop(function(x) { return -x; });
+        }
     }
 
     function op_matrix() { }
@@ -364,9 +375,31 @@
 
     function op_to_p() { }
 
-    function op_to_hms() { }
+    function op_to_hms() {
+        unop(function(x) {
+            var r = Math.floor(x);
+            x -= r;
+            x *= 60;
+            r += Math.floor(x) / 100;
+            x -= Math.floor(x);
+            x *= 60;
+            r += x / 10000;
+            return r;
+        });
+    }
 
-    function op_to_h() { }
+    function op_to_h() {
+        unop(function(x) {
+            var r = Math.floor(x);
+            x -= Math.floor(x);
+            x *= 100;
+            r += Math.floor(x) / 60;
+            x -= Math.floor(x);
+            x *= 100;
+            r += x / 3600;
+            return r;
+        });
+    }
 
     function op_to_rad() { }
 
@@ -392,7 +425,9 @@
 
     function op_sto() { }
 
-    function op_frac() { }
+    function op_frac() {
+        unop(function(x) { x - Math.floor(x); });
+    }
 
     function op_int() {
         unop(Math.floor);
