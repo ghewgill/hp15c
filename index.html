@@ -27,7 +27,6 @@
     var NewAutoEnter;
     var Shift = 0;
     var MouseDown = false;
-    var MouseR, MouseC;
 
     var CharTable = {
         ' ': [function() {}, function() {}, function() {}],
@@ -448,8 +447,6 @@
                 var c = Math.floor((x - 65) / 57);
                 var r = Math.floor((y - 155) / 65);
                 if (c >= 0 && c < 10 && r >= 0 && r < 4) {
-                    MouseR = r;
-                    MouseC = c;
                     MouseDown = true;
                     var keyx = 81 + c * 57;
                     var keyy = 169 + r * 65;
@@ -460,6 +457,7 @@
                     presskey.css("left", -keyx);
                     presskey.css("top", -keyy - 1);
                     press.css("display", "block");
+                    key(KeyTable[r][c]);
                 }
             }
             e.preventDefault();
@@ -473,7 +471,6 @@
         $("#press").mouseup(function(e) {
             if (MouseDown) {
                 $("#press").css("display", "none");
-                key(KeyTable[MouseR][MouseC]);
                 MouseDown = false;
             }
         });
