@@ -16,8 +16,9 @@ Segments = [
     "M 3 28 L 17 28 14 25 6 25 Z",
 ]
 
-for i in range(10):
-    f = open(str(i) + ".svg", "w")
+for i in range(len(Digits[0])):
+    name = "0123456789"[i]
+    f = open(name + ".svg", "w")
     print >>f, """<?xml version="1.0"?>
         <svg width="20" height="30">
             <g fill="black">"""
@@ -31,4 +32,20 @@ for i in range(10):
     print >>f, """ </g>
         </svg>"""
     f.close()
-    os.system("convert -background none %d.svg %d.png" % (i, i))
+    os.system("convert -background none %s.svg %s.png" % (name, name))
+
+f = open("decimal.svg", "w")
+print >>f, """<?xml version="1.0"?>
+    <svg width="3" height="3">
+        <rect width="100%" height="100%" fill="black" />
+    </svg>"""
+f.close()
+os.system("convert -background none decimal.svg decimal.png")
+
+f = open("neg.svg", "w")
+print >>f, """<?xml version="1.0"?>
+    <svg width="12" height="3">
+        <rect width="100%" height="100%" fill="black" />
+    </svg>"""
+f.close()
+os.system("convert -background none neg.svg neg.png")
