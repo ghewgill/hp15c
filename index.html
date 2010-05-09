@@ -401,9 +401,13 @@
         });
     }
 
-    function op_to_rad() { }
+    function op_to_rad() {
+        unop(function(x) { return x * Math.PI / 180; });
+    }
 
-    function op_to_deg() { }
+    function op_to_deg() {
+        unop(function(x) { return x * 180 / Math.PI; });
+    }
 
     function op_sub() {
         binop(function(y, x) { return y - x; });
@@ -466,9 +470,33 @@
         binop(function(y, x) { return y + x; });
     }
 
-    function op_Pyx() { }
+    function op_Pyx() {
+        binop(function(y, x) {
+            var r = 1;
+            var t = y - x;
+            while (y > t) {
+                r *= y;
+                y--;
+            }
+            return r;
+        });
+    }
 
-    function op_Cyx() { }
+    function op_Cyx() {
+        binop(function(y, x) {
+            var r = 1;
+            var t = y - x;
+            while (y > t) {
+                r *= y;
+                y--;
+            }
+            while (x > 1) {
+                r /= x;
+                x--;
+            }
+            return r;
+        });
+    }
 
     function op_input(c) {
         if (!Entering) {
