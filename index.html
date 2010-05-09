@@ -5,6 +5,10 @@
     #stack {
         float: right;
     }
+    #reg {
+        clear: right;
+        float: right;
+    }
     #press {
         position: absolute;
         width: 39;
@@ -25,6 +29,7 @@
 //<![CDATA[
     var Digits = [];
     var Stack = [0, 0, 0, 0];
+    var Reg = new Array(10);
     var Lcd;
     var Entering = false;
     var NewEntering;
@@ -102,6 +107,9 @@
         }
         for (var i = 0; i < 4; i++) {
             $("#stack_" + i).val(Stack[i]);
+        }
+        for (var i = 0; i < 10; i++) {
+            $("#reg_" + i).val(Reg[i]);
         }
         for (var i in Digits) {
             Digits[i].css("display", "none");
@@ -454,17 +462,34 @@
         });
     }
 
-    function op_mean() { }
+    function op_mean() {
+        push(Reg[5] / Reg[2]);
+        push(Reg[3] / Reg[2]);
+    }
 
     function op_yhat() { }
 
     function op_s() { }
 
-    function op_sum() { }
+    function op_sum() {
+        Reg[2] += 1;
+        Reg[3] += Stack[0];
+        Reg[4] += Stack[0] * Stack[0];
+        Reg[5] += Stack[1];
+        Reg[6] += Stack[1] * Stack[1];
+        Reg[7] += Stack[0] * Stack[1];
+    }
 
     function op_lr() { }
 
-    function op_sumsub() { }
+    function op_sumsub() {
+        Reg[2] -= 1;
+        Reg[3] -= Stack[0];
+        Reg[4] -= Stack[0] * Stack[0];
+        Reg[5] -= Stack[1];
+        Reg[6] -= Stack[1] * Stack[1];
+        Reg[7] -= Stack[0] * Stack[1];
+    }
 
     function op_add() {
         binop(function(y, x) { return y + x; });
@@ -528,6 +553,9 @@
     }
 
     $(document).ready(function() {
+        for (var i = 0; i < Reg.length; i++) {
+            Reg[i] = 0;
+        }
         var calc = $("#calc");
         for (var i = 0; i < 10; i++) {
             var d = $("#dig"+i);
@@ -596,6 +624,20 @@
 <tr><td>z</td><td><input id="stack_2"></td></tr>
 <tr><td>y</td><td><input id="stack_1"></td></tr>
 <tr><td>x</td><td><input id="stack_0"></td></tr>
+</table>
+</div>
+<div id="reg">
+<table>
+<tr><td>0</td><td><input id="reg_0"></td></tr>
+<tr><td>1</td><td><input id="reg_1"></td></tr>
+<tr><td>2</td><td><input id="reg_2"></td></tr>
+<tr><td>3</td><td><input id="reg_3"></td></tr>
+<tr><td>4</td><td><input id="reg_4"></td></tr>
+<tr><td>5</td><td><input id="reg_5"></td></tr>
+<tr><td>6</td><td><input id="reg_6"></td></tr>
+<tr><td>7</td><td><input id="reg_7"></td></tr>
+<tr><td>8</td><td><input id="reg_8"></td></tr>
+<tr><td>9</td><td><input id="reg_9"></td></tr>
 </table>
 </div>
 <input id="lcd" type="hidden">
