@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>HP 15c</title>
+<title>HP-15C</title>
 <style type="text/css">
     #stack {
         float: right;
@@ -8,6 +8,14 @@
     #reg {
         clear: right;
         float: right;
+    }
+    #frame {
+        position: relative;
+    }
+    #calc {
+        position: absolute;
+        left: 0;
+        top: 0;
     }
     #press {
         position: absolute;
@@ -127,9 +135,8 @@
                 Digits[d].css("display", "inline");
                 d++;
             } else if (c === '.') {
-                var calc = $("#calc");
-                decimal.css("left", calc.offset().left + 170 + d * 27);
-                decimal.css("top", calc.offset().top + 92);
+                decimal.css("left", 170 + d * 27);
+                decimal.css("top", 92);
                 decimal.css("display", "inline");
             } else if (c === '-') {
                 neg.css("display", "inline");
@@ -556,16 +563,15 @@
         for (var i = 0; i < Reg.length; i++) {
             Reg[i] = 0;
         }
-        var calc = $("#calc");
         for (var i = 0; i < 10; i++) {
             var d = $("#dig"+i);
-            d.css("left", calc.offset().left + 175 + i * 27);
-            d.css("top", calc.offset().top + 53);
+            d.css("left", 175 + i * 27);
+            d.css("top", 67);
             Digits[Digits.length] = d;
         }
         var neg = $("#neg");
-        neg.css("left", calc.offset().left + 158);
-        neg.css("top", calc.offset().top + 66);
+        neg.css("left", 158);
+        neg.css("top", 80);
         Lcd = $("#lcd");
         $("#calc").mousedown(function(e) {
             var calc = $("#calc");
@@ -580,8 +586,8 @@
                     var keyy = 169 + r * 65;
                     var press = $("#press");
                     var presskey = $("#presskey");
-                    press.css("left", calc.offset().left + keyx);
-                    press.css("top", calc.offset().top + keyy);
+                    press.css("left", keyx);
+                    press.css("top", keyy);
                     presskey.css("left", -keyx);
                     presskey.css("top", -keyy - 1);
                     press.css("display", "block");
@@ -618,6 +624,7 @@
 </script>
 </head>
 <body>
+<h1>HP-15C</h1>
 <div id="stack">
 <table>
 <tr><td>t</td><td><input id="stack_3"></td></tr>
@@ -641,10 +648,9 @@
 </table>
 </div>
 <input id="lcd" type="hidden">
-<br>
+<div id="frame">
 <img id="calc" src="15.jpg">
 <div id="press"><img id="presskey" src="15.jpg"></div>
-<br>
 <img id="dig0" class="lcd" src="0.png">
 <img id="dig1" class="lcd" src="1.png">
 <img id="dig2" class="lcd" src="2.png">
@@ -657,5 +663,6 @@
 <img id="dig9" class="lcd" src="9.png">
 <img id="decimal" class="lcd" src="decimal.png">
 <img id="neg" class="lcd" src="neg.png">
+</div>
 </body>
 </html>
