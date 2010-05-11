@@ -40,10 +40,10 @@
     var LastX = 0;
     var Reg = new Array(10);
     var Lcd;
-    var Entering = false;
-    var NewEntering;
-    var AutoEnter = false;
-    var NewAutoEnter;
+    var DigitEntry = false;
+    var NewDigitEntry;
+    var StackLift = false;
+    var OldStackLift, NewStackLift;
     var Shift = 0;
     var MouseDown = false;
 
@@ -109,7 +109,7 @@
     ];
 
     function update_display() {
-        if (Entering) {
+        if (DigitEntry) {
             Stack[0] = Number(Lcd.val());
         } else {
             Lcd.val(Stack[0]);
@@ -229,13 +229,13 @@
     }
 
     function op_chs() {
-        if (Entering) {
+        if (DigitEntry) {
             if (Lcd.val().charAt(0) === '-') {
                 Lcd.val(Lcd.val().substr(1));
             } else {
                 Lcd.val('-' + Lcd.val());
             }
-            NewEntering = true;
+            NewDigitEntry = true;
         } else {
             Stack[0] = -Stack[0];
         }
@@ -251,26 +251,32 @@
 
     function op_fix() {
         alert("Unimplemented: FIX");
+        StackLift = OldStackLift;
     }
 
     function op_deg() {
         alert("Unimplemented: DEG");
+        StackLift = OldStackLift;
     }
 
     function op_sci() {
         alert("Unimplemented: SCI");
+        StackLift = OldStackLift;
     }
 
     function op_rad() {
         alert("Unimplemented: RAD");
+        StackLift = OldStackLift;
     }
 
     function op_eng() {
         alert("Unimplemented: ENG");
+        StackLift = OldStackLift;
     }
 
     function op_grd() {
         alert("Unimplemented: GRD");
+        StackLift = OldStackLift;
     }
 
     function op_div() {
@@ -287,6 +293,7 @@
 
     function op_sst() {
         alert("Unimplemented: SST");
+        StackLift = OldStackLift;
     }
 
     function op_lbl() {
@@ -295,6 +302,7 @@
 
     function op_bst() {
         alert("Unimplemented: BST");
+        StackLift = OldStackLift;
     }
 
     function op_gto() {
@@ -327,6 +335,7 @@
 
     function op_index() {
         alert("Unimplemented: (i)");
+        StackLift = OldStackLift;
     }
 
     function op_acos() {
@@ -395,14 +404,17 @@
 
     function op_rs() {
         alert("Unimplemented: R/S");
+        StackLift = OldStackLift;
     }
 
     function op_pse() {
         alert("Unimplemented: PSE");
+        StackLift = OldStackLift;
     }
 
     function op_pr() {
         alert("Unimplemented: P/R");
+        StackLift = OldStackLift;
     }
 
     function op_gsb() {
@@ -411,6 +423,7 @@
 
     function op_clear_stat() {
         alert("Unimplemented: CLEAR \u2211");
+        StackLift = OldStackLift;
     }
 
     function op_rtn() {
@@ -445,6 +458,7 @@
 
     function op_clear_reg() {
         alert("Unimplemented: CLEAR REG");
+        StackLift = OldStackLift;
     }
 
     function op_rnd() {
@@ -453,27 +467,28 @@
     }
 
     function op_back() {
-        if (Entering) {
-            var s = Lcd.val();
+        var s = Lcd.val();
+        if (DigitEntry && s.length > 0) {
             Lcd.val(s.substr(0, s.length-1));
         } else {
-            Lcd.val("");
+            op_clx();
         }
-        NewEntering = true;
+        NewDigitEntry = true;
     }
 
     function op_clear_prefix() {
         alert("Unimplemented: CLEAR PREFIX");
+        StackLift = OldStackLift;
     }
 
     function op_clx() {
-        Lcd.val("");
-        NewEntering = true;
+        Stack[0] = 0;
+        NewStackLift = false;
     }
 
     function op_enter() {
         push(Stack[0]);
-        NewAutoEnter = false;
+        NewStackLift = false;
     }
 
     function op_rand() {
@@ -576,10 +591,12 @@
 
     function op_user() {
         alert("Unimplemented: USER");
+        StackLift = OldStackLift;
     }
 
     function op_mem() {
         alert("Unimplemented: MEM");
+        StackLift = OldStackLift;
     }
 
     function op_fact() {
@@ -615,6 +632,7 @@
         Reg[5] += Stack[1];
         Reg[6] += Stack[1] * Stack[1];
         Reg[7] += Stack[0] * Stack[1];
+        NewStackLift = false;
     }
 
     function op_lr() {
@@ -629,6 +647,7 @@
         Reg[5] -= Stack[1];
         Reg[6] -= Stack[1] * Stack[1];
         Reg[7] -= Stack[0] * Stack[1];
+        NewStackLift = false;
     }
 
     function op_add() {
@@ -664,21 +683,22 @@
     }
 
     function op_input(c) {
-        if (!Entering) {
-            if (AutoEnter) {
+        if (!DigitEntry) {
+            if (StackLift) {
                 push("");
             }
             Lcd.val("");
         }
         Lcd.val(Lcd.val() + c);
-        NewEntering = true;
+        NewDigitEntry = true;
     }
 
     function key(k) {
         var s = Shift;
         Shift = -1;
-        NewEntering = false;
-        NewAutoEnter = true;
+        OldStackLift = StackLift;
+        NewDigitEntry = false;
+        NewStackLift = true;
         if (jQuery.isArray(CharTable[k])) {
             CharTable[k][s]();
         } else {
@@ -687,8 +707,8 @@
         if (Shift === -1) {
             Shift = 0;
         }
-        Entering = NewEntering;
-        AutoEnter = NewAutoEnter;
+        DigitEntry = NewDigitEntry;
+        StackLift = NewStackLift;
         update_display();
     }
 
