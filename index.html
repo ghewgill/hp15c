@@ -141,10 +141,13 @@
         }
     }
 
-    function push(x) {
-        Stack[3] = Stack[2];
-        Stack[2] = Stack[1];
-        Stack[1] = Stack[0];
+    function push(x, forcelift) {
+        if (forcelift || StackLift) {
+            Stack[3] = Stack[2];
+            Stack[2] = Stack[1];
+            Stack[1] = Stack[0];
+            StackLift = false;
+        }
         Stack[0] = x;
     }
 
@@ -484,7 +487,7 @@
     }
 
     function op_enter() {
-        push(Stack[0]);
+        push(Stack[0], true);
         NewStackLift = false;
     }
 
