@@ -420,7 +420,12 @@
     }
 
     function op_clear_stat() {
-        alert("Unimplemented: CLEAR \u2211");
+        for (var i in Stack) {
+            Stack[i] = 0;
+        }
+        for (var i = 2; i <= 7; i++) {
+            Reg[i] = 0;
+        }
         StackLift = OldStackLift;
     }
 
@@ -455,7 +460,7 @@
     }
 
     function op_clear_reg() {
-        for (i in Reg) {
+        for (var i in Reg) {
             Reg[i] = 0;
         }
         StackLift = OldStackLift;
