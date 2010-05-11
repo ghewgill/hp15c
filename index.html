@@ -45,6 +45,7 @@
     var StackLift = false;
     var OldStackLift, NewStackLift;
     var Shift = 0;
+    var Prefix;
     var MouseDown = false;
 
     var CharTable = {
@@ -82,8 +83,8 @@
         '': [op_on, op_on, op_on],
         'f': [op_f, op_f, op_f],
         'g': [op_g, op_g, op_g],
-        '': [op_sto, op_frac, op_int],
-        '': [op_rcl, op_user, op_mem],
+        'S': [op_sto, op_frac, op_int],
+        'R': [op_rcl, op_user, op_mem],
         '0': [function() { op_input('0'); }, op_fact, op_mean],
         '.': [function() { op_input('.'); }, op_yhat, op_s],
         ';': [op_sum, op_lr, op_sumsub],
@@ -91,21 +92,17 @@
         '!': op_fact,
         '@': op_x2,
         'a': op_abs,
-        'C': op_acos,
         'i': op_int,
         'l': op_ln,
         'p': op_pi,
-        'R': op_rollup,
-        '\x12': op_rand,
-        'S': op_asin,
-        'T': op_atan
+        '\x12': op_rand
     };
 
     var KeyTable = [
         ['q', 'E', ')', '^', '?', '_', '7', '8', '9', '/'],
         [' ', ' ', 's', 'c', 't', 'e', '4', '5', '6', '*'],
         [' ', 'G', 'r', 'x', '\b','\r','1', '2', '3', '-'],
-        [' ', 'f', 'g', ' ', ' ', '\r','0', '.', ';', '+']
+        [' ', 'f', 'g', 'S', 'R', '\r','0', '.', ';', '+']
     ];
 
     function update_display() {
@@ -455,7 +452,9 @@
     }
 
     function op_clear_reg() {
-        alert("Unimplemented: CLEAR REG");
+        for (i in Reg) {
+            Reg[i] = 0;
+        }
         StackLift = OldStackLift;
     }
 
@@ -572,7 +571,14 @@
     }
 
     function op_sto() {
-        alert("Unimplemented: STO");
+        Prefix = function(k) {
+            if (k >= '0' && k <= '9') {
+                Reg[Number(k)] = Stack[0];
+            } else if (k === '+' || k === '-' || k === '*' || k === '/') {
+                alert("Unimplemented: STO " + k);
+            }
+            Prefix = null;
+        };
     }
 
     function op_frac() {
@@ -584,7 +590,14 @@
     }
 
     function op_rcl() {
-        alert("Unimplemented: RCL");
+        Prefix = function(k) {
+            if (k >= '0' && k <= '9') {
+                push(Reg[Number(k)]);
+            } else if (k === '+' || k === '-' || k === '*' || k === '/') {
+                alert("Unimplemented: RCL " + k);
+            }
+            Prefix = null;
+        };
     }
 
     function op_user() {
@@ -697,7 +710,9 @@
         OldStackLift = StackLift;
         NewDigitEntry = false;
         NewStackLift = true;
-        if (jQuery.isArray(CharTable[k])) {
+        if (Prefix != null) {
+            Prefix(k);
+        } else if (jQuery.isArray(CharTable[k])) {
             CharTable[k][s]();
         } else {
             CharTable[k]();
