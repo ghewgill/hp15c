@@ -39,7 +39,7 @@
     var Stack = [0, 0, 0, 0];
     var LastX = 0;
     var Reg = new Array(10);
-    var Lcd;
+    var Entry;
     var DigitEntry = false;
     var NewDigitEntry;
     var StackLift = false;
@@ -110,9 +110,7 @@
 
     function update_display() {
         if (DigitEntry) {
-            Stack[0] = Number(Lcd.val());
-        } else {
-            Lcd.val(Stack[0]);
+            Stack[0] = Number(Entry);
         }
         for (var i = 0; i < 4; i++) {
             $("#stack_" + i).val(Stack[i]);
@@ -128,7 +126,7 @@
         var neg = $("#neg");
         decimal.css("display", "none");
         neg.css("display", "none");
-        var s = Lcd.val();
+        var s = String(Stack[0]);
         var d = 0;
         for (var i = 0; i < s.length; i++) {
             var c = s.charAt(i);
@@ -230,10 +228,10 @@
 
     function op_chs() {
         if (DigitEntry) {
-            if (Lcd.val().charAt(0) === '-') {
-                Lcd.val(Lcd.val().substr(1));
+            if (Entry.charAt(0) === '-') {
+                Entry = Entry.substr(1);
             } else {
-                Lcd.val('-' + Lcd.val());
+                Entry = '-' + Entry;
             }
             NewDigitEntry = true;
         } else {
@@ -467,11 +465,11 @@
     }
 
     function op_back() {
-        var s = Lcd.val();
-        if (DigitEntry && s.length > 0) {
-            Lcd.val(s.substr(0, s.length-1));
+        if (DigitEntry && Entry.length > 0) {
+            Entry = Entry.substr(0, Entry.length-1);
         } else {
             op_clx();
+            Entry = "";
         }
         NewDigitEntry = true;
     }
@@ -687,9 +685,9 @@
             if (StackLift) {
                 push("");
             }
-            Lcd.val("");
+            Entry = "";
         }
-        Lcd.val(Lcd.val() + c);
+        Entry = Entry + c;
         NewDigitEntry = true;
     }
 
@@ -725,7 +723,6 @@
         var neg = $("#neg");
         neg.css("left", 158);
         neg.css("top", 80);
-        Lcd = $("#lcd");
         $("#calc").mousedown(function(e) {
             var calc = $("#calc");
             var x = e.clientX - calc.offset().left;
@@ -801,7 +798,6 @@
 <tr><td>9</td><td><input id="reg_9"></td></tr>
 </table>
 </div>
-<input id="lcd" type="hidden">
 <div id="frame">
 <img id="calc" src="15.jpg">
 <div id="press"><img id="presskey" src="15.jpg"></div>
