@@ -57,7 +57,7 @@
         '7': [function() { op_input('7'); }, op_fix, op_deg],
         '8': [function() { op_input('8'); }, op_sci, op_rad],
         '9': [function() { op_input('9'); }, op_eng, op_grd],
-        '/': [op_div, op_solve, op_lt],
+        '/': [op_div, op_solve, op_le],
         '': [op_sst, op_lbl, op_bst],
         '': [op_gto, op_hyp, op_ahyp],
         's': [op_sin, op_dim, op_asin],
@@ -69,7 +69,7 @@
         '6': [function() { op_input('6'); }, op_isg, op_ftest],
         '*': [op_mul, op_integrate, op_eq],
         '': [op_rs, op_pse, op_pr],
-        '': [op_gsb, op_clear_stat, op_rtn],
+        'G': [op_gsb, op_clear_stat, op_rtn],
         'r': [op_roll, op_clear_prgm, op_rollup],
         'x': [op_xy, op_clear_reg, op_rnd],
         '\b': [op_back, op_clear_prefix, op_clx],
@@ -103,7 +103,7 @@
     var KeyTable = [
         ['q', 'E', ')', '^', '?', '_', '7', '8', '9', '/'],
         [' ', ' ', 's', 'c', 't', 'e', '4', '5', '6', '*'],
-        [' ', ' ', 'r', 'x', '\b','\r','1', '2', '3', '-'],
+        [' ', 'G', 'r', 'x', '\b','\r','1', '2', '3', '-'],
         [' ', 'f', 'g', ' ', ' ', '\r','0', '.', ';', '+']
     ];
 
@@ -165,7 +165,9 @@
         unop(Math.sqrt);
     }
 
-    function op_A() { }
+    function op_A() {
+        alert("Unimplemented: A");
+    }
 
     function op_x2() {
         unop(function(x) { return x * x; });
@@ -175,7 +177,9 @@
         unop(Math.exp);
     }
 
-    function op_B() { }
+    function op_B() {
+        alert("Unimplemented: B");
+    }
 
     function op_ln() {
         unop(Math.log);
@@ -185,7 +189,9 @@
         unop(function(x) { return Math.pow(10, x); });
     }
 
-    function op_C() { }
+    function op_C() {
+        alert("Unimplemented: C");
+    }
 
     function op_log() {
         unop(function(x) { return Math.log(x) / Math.log(10); });
@@ -195,17 +201,25 @@
         binop(Math.pow);
     }
 
-    function op_D() { }
+    function op_D() {
+        alert("Unimplemented: D");
+    }
 
-    function op_pct() { }
+    function op_pct() {
+        alert("Unimplemented: %");
+    }
 
     function op_1x() {
         unop(function(x) { return 1 / x; });
     }
 
-    function op_E() { }
+    function op_E() {
+        alert("Unimplemented: E");
+    }
 
-    function op_dpct() { }
+    function op_dpct() {
+        alert("Unimplemented: \u0394%");
+    }
 
     function op_chs() {
         if (Entering) {
@@ -220,49 +234,81 @@
         }
     }
 
-    function op_matrix() { }
+    function op_matrix() {
+        alert("Unimplemented: MATRIX");
+    }
 
     function op_abs() {
         unop(Math.abs);
     }
 
-    function op_fix() { }
+    function op_fix() {
+        alert("Unimplemented: FIX");
+    }
 
-    function op_deg() { }
+    function op_deg() {
+        alert("Unimplemented: DEG");
+    }
 
-    function op_sci() { }
+    function op_sci() {
+        alert("Unimplemented: SCI");
+    }
 
-    function op_rad() { }
+    function op_rad() {
+        alert("Unimplemented: RAD");
+    }
 
-    function op_eng() { }
+    function op_eng() {
+        alert("Unimplemented: ENG");
+    }
 
-    function op_grd() { }
+    function op_grd() {
+        alert("Unimplemented: GRD");
+    }
 
     function op_div() {
         binop(function(y, x) { return y / x; });
     }
 
-    function op_solve() { }
+    function op_solve() {
+        alert("Unimplemented: SOLVE");
+    }
 
-    function op_lt() { }
+    function op_le() {
+        alert("Unimplemented: x\u2264y");
+    }
 
-    function op_sst() { }
+    function op_sst() {
+        alert("Unimplemented: SST");
+    }
 
-    function op_lbl() { }
+    function op_lbl() {
+        alert("Unimplemented: LBL");
+    }
 
-    function op_bst() { }
+    function op_bst() {
+        alert("Unimplemented: BST");
+    }
 
-    function op_gto() { }
+    function op_gto() {
+        alert("Unimplemented: GTO");
+    }
 
-    function op_hyp() { }
+    function op_hyp() {
+        alert("Unimplemented: HYP");
+    }
 
-    function op_ahyp() { }
+    function op_ahyp() {
+        alert("Unimplemented: HYP-1");
+    }
 
     function op_sin() {
         unop(Math.sin);
     }
 
-    function op_dim() { }
+    function op_dim() {
+        alert("Unimplemented: DIM");
+    }
 
     function op_asin() {
         unop(Math.asin);
@@ -272,7 +318,9 @@
         unop(Math.cos);
     }
 
-    function op_index() { }
+    function op_index() {
+        alert("Unimplemented: (i)");
+    }
 
     function op_acos() {
         unop(Math.acos);
@@ -282,7 +330,9 @@
         unop(Math.tan);
     }
 
-    function op_I() { }
+    function op_I() {
+        alert("Unimplemented: I");
+    }
 
     function op_atan() {
         unop(Math.atan);
@@ -292,43 +342,73 @@
         op_input('e');
     }
 
-    function op_result() { }
+    function op_result() {
+        alert("Unimplemented: RESULT");
+    }
 
     function op_pi() {
         push(Math.PI);
     }
 
-    function op_xchg() { }
+    function op_xchg() {
+        alert("Unimplemented: x\u2277");
+    }
 
-    function op_sf() { }
+    function op_sf() {
+        alert("Unimplemented: SF");
+    }
 
-    function op_dse() { }
+    function op_dse() {
+        alert("Unimplemented: DSE");
+    }
 
-    function op_cf() { }
+    function op_cf() {
+        alert("Unimplemented: CF");
+    }
 
-    function op_isg() { }
+    function op_isg() {
+        alert("Unimplemented: ISG");
+    }
 
-    function op_ftest() { }
+    function op_ftest() {
+        alert("Unimplemented: F?");
+    }
 
     function op_mul() {
         binop(function(y, x) { return y * x; });
     }
 
-    function op_integrate() { }
+    function op_integrate() {
+        alert("Unimplemented: \u222bxy");
+    }
 
-    function op_eq() { }
+    function op_eq() {
+        alert("Unimplemented: x=0");
+    }
 
-    function op_rs() { }
+    function op_rs() {
+        alert("Unimplemented: R/S");
+    }
 
-    function op_pse() { }
+    function op_pse() {
+        alert("Unimplemented: PSE");
+    }
 
-    function op_pr() { }
+    function op_pr() {
+        alert("Unimplemented: P/R");
+    }
 
-    function op_gsb() { }
+    function op_gsb() {
+        alert("Unimplemented: GSB");
+    }
 
-    function op_clear_stat() { }
+    function op_clear_stat() {
+        alert("Unimplemented: CLEAR \u2211");
+    }
 
-    function op_rtn() { }
+    function op_rtn() {
+        alert("Unimplemented: RTN");
+    }
 
     function op_roll() {
         var t = Stack[0];
@@ -338,7 +418,9 @@
         Stack[3] = t;
     }
 
-    function op_clear_prgm() { }
+    function op_clear_prgm() {
+        alert("Unimplemented: CLEAR PRGM");
+    }
 
     function op_rollup() {
         var t = Stack[3];
@@ -354,9 +436,13 @@
         Stack[1] = t;
     }
 
-    function op_clear_reg() { }
+    function op_clear_reg() {
+        alert("Unimplemented: CLEAR REG");
+    }
 
-    function op_rnd() { }
+    function op_rnd() {
+        alert("Unimplemented: RND");
+    }
 
     function op_back() {
         if (Entering) {
@@ -368,7 +454,9 @@
         NewEntering = true;
     }
 
-    function op_clear_prefix() { }
+    function op_clear_prefix() {
+        alert("Unimplemented: CLEAR PREFIX");
+    }
 
     function op_clx() {
         Lcd.val("");
@@ -384,11 +472,17 @@
         push(Math.random());
     }
 
-    function op_lastx() { }
+    function op_lastx() {
+        alert("Unimplemented: LST x");
+    }
 
-    function op_to_r() { }
+    function op_to_r() {
+        alert("Unimplemented: \u2192R");
+    }
 
-    function op_to_p() { }
+    function op_to_p() {
+        alert("Unimplemented: \u2192P");
+    }
 
     function op_to_hms() {
         unop(function(x) {
@@ -428,11 +522,17 @@
         binop(function(y, x) { return y - x; });
     }
 
-    function op_re_im() { }
+    function op_re_im() {
+        alert("Unimplemented: Re\u2277Im");
+    }
 
-    function op_test() { }
+    function op_test() {
+        alert("Unimplemented: TEST");
+    }
 
-    function op_on() { }
+    function op_on() {
+        alert("Unimplemented: ON");
+    }
 
     function op_f() {
         Shift = 1;
@@ -442,7 +542,9 @@
         Shift = 2;
     }
 
-    function op_sto() { }
+    function op_sto() {
+        alert("Unimplemented: STO");
+    }
 
     function op_frac() {
         unop(function(x) { x - Math.floor(x); });
@@ -452,11 +554,17 @@
         unop(Math.floor);
     }
 
-    function op_rcl() { }
+    function op_rcl() {
+        alert("Unimplemented: RCL");
+    }
 
-    function op_user() { }
+    function op_user() {
+        alert("Unimplemented: USER");
+    }
 
-    function op_mem() { }
+    function op_mem() {
+        alert("Unimplemented: MEM");
+    }
 
     function op_fact() {
         unop(function(x) {
@@ -474,9 +582,13 @@
         push(Reg[3] / Reg[2]);
     }
 
-    function op_yhat() { }
+    function op_yhat() {
+        alert("Unimplemented: y\u0302,r");
+    }
 
-    function op_s() { }
+    function op_s() {
+        alert("Unimplemented: s");
+    }
 
     function op_sum() {
         Reg[2] += 1;
@@ -487,7 +599,9 @@
         Reg[7] += Stack[0] * Stack[1];
     }
 
-    function op_lr() { }
+    function op_lr() {
+        alert("Unimplemented: L.R.");
+    }
 
     function op_sumsub() {
         Reg[2] -= 1;
