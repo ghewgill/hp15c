@@ -206,7 +206,7 @@
     }
 
     function op_pct() {
-        alert("Unimplemented: %");
+        Stack[0] = Stack[1] * Stack[0] / 100;
     }
 
     function op_1x() {
@@ -218,7 +218,9 @@
     }
 
     function op_dpct() {
-        alert("Unimplemented: \u0394%");
+        binop(function(y, x) {
+            return (x - y) / y * 100;
+        });
     }
 
     function op_chs() {
@@ -477,11 +479,17 @@
     }
 
     function op_to_r() {
-        alert("Unimplemented: \u2192R");
+        var t = Stack[1];
+        var r = Stack[0];
+        Stack[1] = r * Math.sin(t);
+        Stack[0] = r * Math.cos(t);
     }
 
     function op_to_p() {
-        alert("Unimplemented: \u2192P");
+        var y = Stack[1];
+        var x = Stack[0];
+        Stack[1] = Math.atan2(y, x);
+        Stack[0] = Math.sqrt(x*x + y*y);
     }
 
     function op_to_hms() {
