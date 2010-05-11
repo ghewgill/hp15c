@@ -37,6 +37,7 @@
 //<![CDATA[
     var Digits = [];
     var Stack = [0, 0, 0, 0];
+    var LastX = 0;
     var Reg = new Array(10);
     var Lcd;
     var Entering = false;
@@ -116,6 +117,7 @@
         for (var i = 0; i < 4; i++) {
             $("#stack_" + i).val(Stack[i]);
         }
+        $("#last_x").val(LastX);
         for (var i = 0; i < 10; i++) {
             $("#reg_" + i).val(Reg[i]);
         }
@@ -152,10 +154,12 @@
     }
 
     function unop(f) {
+        LastX = Stack[0];
         Stack[0] = f(Stack[0]);
     }
 
     function binop(f) {
+        LastX = Stack[0];
         Stack[0] = f(Stack[1], Stack[0]);
         Stack[1] = Stack[2];
         Stack[2] = Stack[3];
@@ -206,6 +210,7 @@
     }
 
     function op_pct() {
+        LastX = Stack[0];
         Stack[0] = Stack[1] * Stack[0] / 100;
     }
 
@@ -232,7 +237,7 @@
             }
             NewEntering = true;
         } else {
-            unop(function(x) { return -x; });
+            Stack[0] = -Stack[0];
         }
     }
 
@@ -443,6 +448,7 @@
     }
 
     function op_rnd() {
+        LastX = Stack[0];
         alert("Unimplemented: RND");
     }
 
@@ -475,10 +481,11 @@
     }
 
     function op_lastx() {
-        alert("Unimplemented: LST x");
+        push(LastX);
     }
 
     function op_to_r() {
+        LastX = Stack[0];
         var t = Stack[1];
         var r = Stack[0];
         Stack[1] = r * Math.sin(t);
@@ -486,6 +493,7 @@
     }
 
     function op_to_p() {
+        LastX = Stack[0];
         var y = Stack[1];
         var x = Stack[0];
         Stack[1] = Math.atan2(y, x);
@@ -591,6 +599,7 @@
     }
 
     function op_yhat() {
+        LastX = Stack[0];
         alert("Unimplemented: y\u0302,r");
     }
 
@@ -599,6 +608,7 @@
     }
 
     function op_sum() {
+        LastX = Stack[0];
         Reg[2] += 1;
         Reg[3] += Stack[0];
         Reg[4] += Stack[0] * Stack[0];
@@ -612,6 +622,7 @@
     }
 
     function op_sumsub() {
+        LastX = Stack[0];
         Reg[2] -= 1;
         Reg[3] -= Stack[0];
         Reg[4] -= Stack[0] * Stack[0];
@@ -749,10 +760,11 @@
 <h1>HP-15C</h1>
 <div id="stack">
 <table>
-<tr><td>t</td><td><input id="stack_3"></td></tr>
-<tr><td>z</td><td><input id="stack_2"></td></tr>
-<tr><td>y</td><td><input id="stack_1"></td></tr>
-<tr><td>x</td><td><input id="stack_0"></td></tr>
+<tr><td align="right">T</td><td><input id="stack_3"></td></tr>
+<tr><td align="right">Z</td><td><input id="stack_2"></td></tr>
+<tr><td align="right">Y</td><td><input id="stack_1"></td></tr>
+<tr><td align="right">X</td><td><input id="stack_0"></td></tr>
+<tr><td align="right">LAST X</td><td><input id="last_x"></td></tr>
 </table>
 </div>
 <div id="reg">
