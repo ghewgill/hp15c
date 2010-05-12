@@ -36,6 +36,7 @@
 <script type="text/javascript">
 //<![CDATA[
     var Digits = [];
+    var Display = [];
     var Stack = [0, 0, 0, 0];
     var LastX = 0;
     var Reg = new Array(10);
@@ -116,8 +117,8 @@
         for (var i = 0; i < 10; i++) {
             $("#reg_" + i).val(Reg[i]);
         }
-        for (var i in Digits) {
-            Digits[i].css("display", "none");
+        for (var i in Display) {
+            Display[i].css("display", "none");
         }
         var decimal = $("#decimal");
         var neg = $("#neg");
@@ -128,8 +129,8 @@
         for (var i = 0; i < s.length; i++) {
             var c = s.charAt(i);
             if (c >= '0' && c <= '9') {
-                Digits[d].attr("src", c+".png");
-                Digits[d].css("display", "inline");
+                Display[d].attr("src", Digits[c].src);
+                Display[d].css("display", "inline");
                 d++;
             } else if (c === '.') {
                 decimal.css("left", 169 + d * 27);
@@ -791,6 +792,10 @@
     }
 
     $(document).ready(function() {
+        for (var i = 0; i < 10; i++) {
+            Digits[i] = new Image(20, 30);
+            Digits[i].src = i + ".png";
+        }
         for (var i = 0; i < Reg.length; i++) {
             Reg[i] = 0;
         }
@@ -798,7 +803,7 @@
             var d = $("#dig"+i);
             d.css("left", 175 + i * 27);
             d.css("top", 67);
-            Digits[Digits.length] = d;
+            Display[Display.length] = d;
         }
         var neg = $("#neg");
         neg.css("left", 158);
