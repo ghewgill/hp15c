@@ -146,9 +146,9 @@
             Stack[3] = Stack[2];
             Stack[2] = Stack[1];
             Stack[1] = Stack[0];
-            StackLift = false;
         }
         Stack[0] = x;
+        StackLift = true;
     }
 
     function unop(f) {
