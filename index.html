@@ -61,7 +61,7 @@
         '9': [function() { op_input('9'); }, op_eng, op_grd],
         '/': [op_div, op_solve, op_le],
         '': [op_sst, op_lbl, op_bst],
-        '': [op_gto, op_hyp, op_ahyp],
+        'T': [op_gto, op_hyp, op_ahyp],
         's': [op_sin, op_dim, op_asin],
         'c': [op_cos, op_index, op_acos],
         't': [op_tan, op_I, op_atan],
@@ -100,7 +100,7 @@
 
     var KeyTable = [
         ['q', 'E', ')', '^', '?', '_', '7', '8', '9', '/'],
-        [' ', ' ', 's', 'c', 't', 'e', '4', '5', '6', '*'],
+        [' ', 'T', 's', 'c', 't', 'e', '4', '5', '6', '*'],
         [' ', 'G', 'r', 'x', '\b','\r','1', '2', '3', '-'],
         [' ', 'f', 'g', 'S', 'R', '\r','0', '.', ';', '+']
     ];
@@ -308,11 +308,49 @@
     }
 
     function op_hyp() {
-        alert("Unimplemented: HYP");
+        Prefix = function(k) {
+            switch (k) {
+                case 's':
+                    unop(function(x) {
+                        return (Math.exp(x) - Math.exp(-x)) / 2;
+                    });
+                    break;
+                case 'c':
+                    unop(function(x) {
+                        return (Math.exp(x) + Math.exp(-x)) / 2;
+                    });
+                    break;
+                case 't':
+                    unop(function(x) {
+                        return (Math.exp(2*x) - 1) / (Math.exp(2*x) + 1);
+                    });
+                    break;
+            }
+            Prefix = null;
+        };
     }
 
     function op_ahyp() {
-        alert("Unimplemented: HYP-1");
+        Prefix = function(k) {
+            switch (k) {
+                case 's':
+                    unop(function(x) {
+                        return Math.log(x + Math.sqrt(x*x + 1));
+                    });
+                    break;
+                case 'c':
+                    unop(function(x) {
+                        return Math.log(x + Math.sqrt(x*x - 1));
+                    });
+                    break;
+                case 't':
+                    unop(function(x) {
+                        return Math.log((1 + x) / (1 - x)) / 2;
+                    });
+                    break;
+            }
+            Prefix = null;
+        };
     }
 
     function op_sin() {
