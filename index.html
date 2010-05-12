@@ -636,11 +636,18 @@
 
     function op_yhat() {
         LastX = Stack[0];
-        alert("Unimplemented: y\u0302,r");
+        var M = Reg[2] * Reg[4] - Reg[3] * Reg[3];
+        var N = Reg[2] * Reg[6] - Reg[5] * Reg[5];
+        var P = Reg[2] * Reg[7] - Reg[3] * Reg[5];
+        push(P / Math.sqrt(M * N));
+        push((M * Reg[5] + P * (Reg[2] * LastX - Reg[3])) / (Reg[2] * M));
     }
 
     function op_s() {
-        alert("Unimplemented: s");
+        var M = Reg[2] * Reg[4] - Reg[3] * Reg[3];
+        var N = Reg[2] * Reg[6] - Reg[5] * Reg[5];
+        push(Math.sqrt(N / (Reg[2] * (Reg[2] - 1))));
+        push(Math.sqrt(M / (Reg[2] * (Reg[2] - 1))));
     }
 
     function op_sum() {
@@ -655,7 +662,11 @@
     }
 
     function op_lr() {
-        alert("Unimplemented: L.R.");
+        var M = Reg[2] * Reg[4] - Reg[3] * Reg[3];
+        var N = Reg[2] * Reg[6] - Reg[5] * Reg[5];
+        var P = Reg[2] * Reg[7] - Reg[3] * Reg[5];
+        push(P / M);
+        push((M * Reg[5] - P * Reg[3]) / (Reg[2] * M));
     }
 
     function op_sumsub() {
