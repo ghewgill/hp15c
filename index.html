@@ -403,7 +403,15 @@
     }
 
     function op_xchg() {
-        alert("Unimplemented: x\u2277");
+        Prefix = function(k) {
+            if (k >= '0' && k <= '9') {
+                var r = Number(k);
+                var t = Reg[r];
+                Reg[r] = Stack[0];
+                Stack[0] = t;
+            }
+            Prefix = null;
+        };
     }
 
     function op_sf() {
