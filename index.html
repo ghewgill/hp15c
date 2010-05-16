@@ -31,6 +31,13 @@
         position: absolute;
         display: none;
     }
+    #trigmode {
+        position: absolute;
+        left: 300;
+        top: 100;
+        font-family: sans-serif;
+        font-size: 8px;
+    }
 </style>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
 <script type="text/javascript">
@@ -48,6 +55,7 @@
     var Shift = 0;
     var Prefix;
     var MouseDown = false;
+    var TrigFactor = Math.PI / 180;
 
     var CharTable = {
         ' ': [function() {}, function() {}, function() {}],
@@ -254,7 +262,8 @@
     }
 
     function op_deg() {
-        alert("Unimplemented: DEG");
+        TrigFactor = Math.PI / 180;
+        $("#trigmode").css("display", "none");
         StackLift = OldStackLift;
     }
 
@@ -264,7 +273,8 @@
     }
 
     function op_rad() {
-        alert("Unimplemented: RAD");
+        TrigFactor = 1;
+        $("#trigmode").css("display", "block").text("RAD");
         StackLift = OldStackLift;
     }
 
@@ -274,7 +284,8 @@
     }
 
     function op_grd() {
-        alert("Unimplemented: GRD");
+        TrigFactor = Math.PI / 200;
+        $("#trigmode").css("display", "block").text("GRAD");
         StackLift = OldStackLift;
     }
 
@@ -355,7 +366,9 @@
     }
 
     function op_sin() {
-        unop(Math.sin);
+        unop(function(x) {
+            return Math.sin(x * TrigFactor);
+        });
     }
 
     function op_dim() {
@@ -363,11 +376,15 @@
     }
 
     function op_asin() {
-        unop(Math.asin);
+        unop(function(x) {
+            return Math.asin(x) / TrigFactor;
+        });
     }
 
     function op_cos() {
-        unop(Math.cos);
+        unop(function(x) {
+            return Math.cos(x * TrigFactor);
+        });
     }
 
     function op_index() {
@@ -376,11 +393,15 @@
     }
 
     function op_acos() {
-        unop(Math.acos);
+        unop(function(x) {
+            return Math.acos(x) / TrigFactor;
+        });
     }
 
     function op_tan() {
-        unop(Math.tan);
+        unop(function(x) {
+            return Math.tan(x * TrigFactor);
+        });
     }
 
     function op_I() {
@@ -388,7 +409,9 @@
     }
 
     function op_atan() {
-        unop(Math.atan);
+        unop(function(x) {
+            return Math.atan(x) / TrigFactor;
+        });
     }
 
     function op_eex() {
@@ -555,15 +578,15 @@
         LastX = Stack[0];
         var t = Stack[1];
         var r = Stack[0];
-        Stack[1] = r * Math.sin(t);
-        Stack[0] = r * Math.cos(t);
+        Stack[1] = r * Math.sin(t * TrigFactor);
+        Stack[0] = r * Math.cos(t * TrigFactor);
     }
 
     function op_to_p() {
         LastX = Stack[0];
         var y = Stack[1];
         var x = Stack[0];
-        Stack[1] = Math.atan2(y, x);
+        Stack[1] = Math.atan2(y, x) / TrigFactor;
         Stack[0] = Math.sqrt(x*x + y*y);
     }
 
@@ -904,6 +927,7 @@
 <img id="dig9" class="lcd" src="9.png">
 <img id="decimal" class="lcd" src="decimal.png">
 <img id="neg" class="lcd" src="neg.png">
+<div id="trigmode"></div>
 </div>
 </body>
 </html>
