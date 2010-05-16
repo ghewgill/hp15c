@@ -817,12 +817,18 @@
                 var r = Math.floor((y - 155) / 65);
                 if (c >= 0 && c < 10 && r >= 0 && r < 4) {
                     MouseDown = true;
+                    var h = 34;
+                    if (c == 5 && r >= 2) {
+                        r = 2;
+                        h = 99;
+                    }
                     var keyx = 81 + c * 57;
                     var keyy = 169 + r * 65;
                     var press = $("#press");
                     var presskey = $("#presskey");
                     press.css("left", keyx);
                     press.css("top", keyy);
+                    press.css("height", h);
                     presskey.css("left", -keyx);
                     presskey.css("top", -keyy - 1);
                     press.css("display", "block");
