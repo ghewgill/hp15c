@@ -52,6 +52,7 @@
     var NewDigitEntry;
     var StackLift = false;
     var OldStackLift, NewStackLift;
+    var DelayUpdate = 0;
     var Shift = 0;
     var Prefix;
     var MouseDown = false;
@@ -114,17 +115,7 @@
         [' ', 'f', 'g', 'S', 'R', '\r','0', '.', ';', '+']
     ];
 
-    function update_display() {
-        if (DigitEntry) {
-            Stack[0] = Number(Entry);
-        }
-        for (var i = 0; i < 4; i++) {
-            $("#stack_" + i).val(Stack[i]);
-        }
-        $("#last_x").val(LastX);
-        for (var i = 0; i < 10; i++) {
-            $("#reg_" + i).val(Reg[i]);
-        }
+    function update_lcd(s) {
         for (var i in Display) {
             Display[i].css("display", "none");
         }
@@ -132,9 +123,8 @@
         var neg = $("#neg");
         decimal.css("display", "none");
         neg.css("display", "none");
-        var s = String(Stack[0]);
         var d = 0;
-        for (var i = 0; i < s.length; i++) {
+        for (var i = 0; i < s.length && d < 10; i++) {
             var c = s.charAt(i);
             if (c >= '0' && c <= '9') {
                 Display[d].attr("src", Digits[c].src);
@@ -148,6 +138,20 @@
                 neg.css("display", "inline");
             }
         }
+    }
+
+    function update_display() {
+        if (DigitEntry) {
+            Stack[0] = Number(Entry);
+        }
+        for (var i = 0; i < 4; i++) {
+            $("#stack_" + i).val(Stack[i]);
+        }
+        $("#last_x").val(LastX);
+        for (var i = 0; i < 10; i++) {
+            $("#reg_" + i).val(Reg[i]);
+        }
+        update_lcd(String(Stack[0]));
     }
 
     function push(x, forcelift) {
@@ -552,7 +556,13 @@
     }
 
     function op_clear_prefix() {
-        alert("Unimplemented: CLEAR PREFIX");
+        Prefix = null;
+        var s = String(Stack[0]).replace(".", "");
+        while (s.length < 10) {
+            s += '0';
+        }
+        update_lcd(s);
+        DelayUpdate = 1000;
         StackLift = OldStackLift;
     }
 
@@ -811,7 +821,12 @@
         }
         DigitEntry = NewDigitEntry;
         StackLift = NewStackLift;
-        update_display();
+        if (DelayUpdate === 0) {
+            update_display();
+        } else {
+            setTimeout(update_display, DelayUpdate);
+            DelayUpdate = 0;
+        }
     }
 
     $(document).ready(function() {
