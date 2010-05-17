@@ -31,12 +31,21 @@
         position: absolute;
         display: none;
     }
-    #trigmode {
+    .indicator {
+        display: none;
         position: absolute;
-        left: 300;
         top: 100;
         font-family: sans-serif;
-        font-size: 8px;
+        font-size: 10px;
+    }
+    #f {
+        left: 200;
+    }
+    #g {
+        left: 220;
+    }
+    #trigmode {
+        left: 300;
     }
 </style>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
@@ -652,10 +661,14 @@
 
     function op_f() {
         Shift = 1;
+        $(".shift").css("display", "none");
+        $("#f").css("display", "block");
     }
 
     function op_g() {
         Shift = 2;
+        $(".shift").css("display", "none");
+        $("#g").css("display", "block");
     }
 
     function op_sto() {
@@ -818,6 +831,7 @@
         }
         if (Shift === -1) {
             Shift = 0;
+            $(".shift").css("display", "none");
         }
         DigitEntry = NewDigitEntry;
         StackLift = NewStackLift;
@@ -942,7 +956,9 @@
 <img id="dig9" class="lcd" src="9.png">
 <img id="decimal" class="lcd" src="decimal.png">
 <img id="neg" class="lcd" src="neg.png">
-<div id="trigmode"></div>
+<div id="f" class="shift indicator">f</div>
+<div id="g" class="shift indicator">g</div>
+<div id="trigmode" class="indicator"></div>
 </div>
 </body>
 </html>
