@@ -751,6 +751,7 @@
         Reg[5] += Stack[1];
         Reg[6] += Stack[1] * Stack[1];
         Reg[7] += Stack[0] * Stack[1];
+        Stack[0] = Reg[2];
         NewStackLift = false;
     }
 
@@ -770,6 +771,7 @@
         Reg[5] -= Stack[1];
         Reg[6] -= Stack[1] * Stack[1];
         Reg[7] -= Stack[0] * Stack[1];
+        Stack[0] = Reg[2];
         NewStackLift = false;
     }
 
