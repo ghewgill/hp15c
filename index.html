@@ -65,6 +65,8 @@
     var Shift = 0;
     var Prefix;
     var MouseDown = false;
+    var DisplayMode = 1; // 1=FIX 2=SCI 3=ENG
+    var DisplayDigits = 4;
     var TrigFactor = Math.PI / 180;
 
     var CharTable = {
@@ -132,19 +134,38 @@
         var neg = $("#neg");
         decimal.css("display", "none");
         neg.css("display", "none");
+        var eex = false;
         var d = 0;
         for (var i = 0; i < s.length && d < 10; i++) {
             var c = s.charAt(i);
             if (c >= '0' && c <= '9') {
-                Display[d].attr("src", Digits[c].src);
-                Display[d].css("display", "inline");
-                d++;
+                if (eex) {
+                    Display[8].attr("src", Display[9].attr("src"));
+                    Display[9].attr("src", Digits[c].src);
+                } else {
+                    Display[d].attr("src", Digits[c].src);
+                    Display[d].css("display", "inline");
+                    d++;
+                }
             } else if (c === '.') {
                 decimal.css("left", 169 + d * 27);
                 decimal.css("top", 91);
                 decimal.css("display", "inline");
             } else if (c === '-') {
-                neg.css("display", "inline");
+                if (eex) {
+                    Display[7].attr("src", Digits["-"].src);
+                    Display[7].css("display", "inline");
+                } else {
+                    neg.css("display", "inline");
+                }
+            } else if (c === 'e') {
+                eex = true;
+                d = 9;
+                Display[7].css("display", "none");
+                Display[8].attr("src", Digits[0].src);
+                Display[8].css("display", "inline");
+                Display[9].attr("src", Digits[0].src);
+                Display[9].css("display", "inline");
             }
         }
     }
@@ -160,7 +181,56 @@
         for (var i = 0; i < 10; i++) {
             $("#reg_" + i).val(Reg[i]);
         }
-        update_lcd(String(Stack[0]));
+        if (DigitEntry) {
+            update_lcd(Entry);
+        } else {
+            var n = Stack[0];
+            var s = n.toString();
+            var mag = 0;
+            var x = Math.abs(n);
+            if (x >= 1) {
+                while (x >= 10) {
+                    mag++;
+                    x /= 10;
+                }
+            } else if (x > 0) {
+                while (x < 1) {
+                    mag--;
+                    x *= 10;
+                }
+            }
+            var sign = "";
+            if (n < 0) {
+                n = -n;
+                sign = "-";
+            }
+            var dm = DisplayMode;
+            if (dm === 1 && (mag >= 10 || mag < -DisplayDigits)) {
+                dm = 2;
+            }
+            switch (dm) {
+            case 1:
+                var x = Math.floor(n * Math.pow(10, DisplayDigits) + 0.5);
+                s = x.toString();
+                while (s.length < DisplayDigits+1) {
+                    s = '0' + s;
+                }
+                s = s.substr(0, s.length-DisplayDigits) + '.' + s.substr(s.length-DisplayDigits);
+                break;
+            case 2:
+                var x = Math.floor(n * Math.pow(10, DisplayDigits - mag) + 0.5);
+                s = x.toString();
+                while (s.length < DisplayDigits+1) {
+                    s = '0' + s;
+                }
+                s = s.substr(0, 1) + '.' + s.substr(1);
+                s += "e" + mag;
+                break;
+            case 3:
+                break;
+            }
+            update_lcd(sign + s);
+        }
     }
 
     function push(x, forcelift) {
@@ -270,7 +340,13 @@
     }
 
     function op_fix() {
-        alert("Unimplemented: FIX");
+        Prefix = function(k) {
+            if (k >= '0' && k <= '9') {
+                DisplayMode = 1;
+                DisplayDigits = Number(k);
+            }
+            Prefix = null;
+        };
         StackLift = OldStackLift;
     }
 
@@ -281,7 +357,13 @@
     }
 
     function op_sci() {
-        alert("Unimplemented: SCI");
+        Prefix = function(k) {
+            if (k >= '0' && k <= '9') {
+                DisplayMode = 2;
+                DisplayDigits = Number(k);
+            }
+            Prefix = null;
+        };
         StackLift = OldStackLift;
     }
 
@@ -566,7 +648,16 @@
 
     function op_clear_prefix() {
         Prefix = null;
-        var s = String(Stack[0]).replace(".", "");
+        var x = Math.abs(Stack[0]);
+        if (x !== 0) {
+            while (x >= 10) {
+                x /= 10;
+            }
+            while (x < 1) {
+                x *= 10;
+            }
+        }
+        var s = x.toString().replace(".", "");
         while (s.length < 10) {
             s += '0';
         }
@@ -850,6 +941,8 @@
             Digits[i] = new Image(20, 30);
             Digits[i].src = i + ".png";
         }
+        Digits["-"] = new Image(20, 30);
+        Digits["-"].src = "-.png";
         for (var i = 0; i < Reg.length; i++) {
             Reg[i] = 0;
         }
