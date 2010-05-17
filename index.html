@@ -126,6 +126,23 @@
         [' ', 'f', 'g', 'S', 'R', '\r','0', '.', ';', '+']
     ];
 
+    function log10int(x) {
+        var mag = 0;
+        var x = Math.abs(x);
+        if (x >= 1) {
+            while (x >= 10) {
+                mag++;
+                x /= 10;
+            }
+        } else if (x > 0) {
+            while (x < 1) {
+                mag--;
+                x *= 10;
+            }
+        }
+        return mag;
+    }
+
     function update_lcd(s) {
         for (var i in Display) {
             Display[i].css("display", "none");
@@ -186,19 +203,7 @@
         } else {
             var n = Stack[0];
             var s = n.toString();
-            var mag = 0;
-            var x = Math.abs(n);
-            if (x >= 1) {
-                while (x >= 10) {
-                    mag++;
-                    x /= 10;
-                }
-            } else if (x > 0) {
-                while (x < 1) {
-                    mag--;
-                    x *= 10;
-                }
-            }
+            var mag = log10int(n);
             var sign = "";
             if (n < 0) {
                 n = -n;
@@ -632,8 +637,10 @@
     }
 
     function op_rnd() {
-        LastX = Stack[0];
-        alert("Unimplemented: RND");
+        unop(function(x) {
+            var factor = Math.pow(10, DisplayDigits + log10int(x));
+            return Math.floor(x * factor + 0.5) / factor;
+        });
     }
 
     function op_back() {
