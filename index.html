@@ -223,7 +223,7 @@
             }
             switch (dm) {
             case 1:
-                var x = Math.floor(n * Math.pow(10, DisplayDigits) + 0.5);
+                var x = Math.round(n * Math.pow(10, DisplayDigits));
                 s = x.toString();
                 while (s.length < DisplayDigits+1) {
                     s = '0' + s;
@@ -231,7 +231,7 @@
                 s = s.substr(0, s.length-DisplayDigits) + '.' + s.substr(s.length-DisplayDigits);
                 break;
             case 2:
-                var x = Math.floor(n * Math.pow(10, DisplayDigits - mag) + 0.5);
+                var x = Math.round(n * Math.pow(10, DisplayDigits - mag));
                 s = x.toString();
                 while (s.length < DisplayDigits+1) {
                     s = '0' + s;
@@ -647,7 +647,7 @@
     function op_rnd() {
         unop(function(x) {
             var factor = Math.pow(10, DisplayDigits + log10int(x));
-            return Math.floor(x * factor + 0.5) / factor;
+            return Math.round(x * factor) / factor;
         });
     }
 
