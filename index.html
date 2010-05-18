@@ -9,6 +9,10 @@
         clear: right;
         float: right;
     }
+    #test {
+        clear: right;
+        float: right;
+    }
     #frame {
         position: relative;
     }
@@ -65,6 +69,7 @@
     var Shift = 0;
     var Prefix;
     var MouseDown = false;
+    var LcdDisplay;
     var DisplayMode = 1; // 1=FIX 2=SCI 3=ENG
     var DisplayDigits = 4;
     var TrigFactor = Math.PI / 180;
@@ -153,6 +158,7 @@
     }
 
     function update_lcd(s) {
+        LcdDisplay = s;
         for (var i in Display) {
             Display[i].css("display", "none");
         }
@@ -994,6 +1000,10 @@
         }
     }
 
+    function run_test() {
+        $.getScript("test.js");
+    }
+
     $(document).ready(function() {
         for (var i = 0; i < 10; i++) {
             Digits[i] = new Image(20, 30);
@@ -1112,6 +1122,9 @@
 <div id="f" class="shift indicator">f</div>
 <div id="g" class="shift indicator">g</div>
 <div id="trigmode" class="indicator"></div>
+</div>
+<div id="test">
+<input type="button" onclick="run_test()" value="Test">
 </div>
 </body>
 </html>
