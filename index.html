@@ -837,12 +837,36 @@
 
     function op_fact() {
         unop(function(x) {
-            var r = 1;
-            while (x > 1) {
-                r *= x;
-                x -= 1;
+            if (x >= 0 && x === Math.floor(x)) {
+                var r = 1;
+                while (x > 1) {
+                    r *= x;
+                    x -= 1;
+                }
+                return r;
+            } else {
+                x += 1;
+                var gamma = function(z) {
+                    // Lanczos approximation
+                    // from http://en.wikipedia.org/wiki/Lanczos_approximation
+                    var g = 7;
+                    var p = [0.99999999999980993, 676.5203681218851, -1259.1392167224028,
+                             771.32342877765313, -176.61502916214059, 12.507343278686905,
+                             -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+                    z -= 1;
+                    var r = p[0];
+                    for (var i = 1; i < g+2; i++) {
+                        r += p[i] / (z + i);
+                    }
+                    var t = z + g + 0.5;
+                    return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * r;
+                };
+                if (x >= 0.5) {
+                    return gamma(x);
+                } else {
+                    return Math.PI / (gamma(1-x) * Math.sin(Math.PI * x));
+                }
             }
-            return r;
         });
     }
 
