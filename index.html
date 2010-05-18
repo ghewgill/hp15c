@@ -126,6 +126,14 @@
         [' ', 'f', 'g', 'S', 'R', '\r','0', '.', ';', '+']
     ];
 
+    function trunc(x) {
+        if (x < 0) {
+            return -Math.floor(-x);
+        } else {
+            return Math.floor(x);
+        }
+    }
+
     function log10int(x) {
         var mag = 0;
         var x = Math.abs(x);
@@ -781,11 +789,13 @@
     }
 
     function op_frac() {
-        unop(function(x) { x - Math.floor(x); });
+        unop(function(x) {
+            return x - trunc(x);
+        });
     }
 
     function op_int() {
-        unop(Math.floor);
+        unop(trunc);
     }
 
     function op_rcl() {
