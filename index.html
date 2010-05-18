@@ -778,11 +778,19 @@
     }
 
     function op_sto() {
+        var op = null;
         Prefix = function(k) {
             if (k >= '0' && k <= '9') {
-                Reg[Number(k)] = Stack[0];
+                switch (op) {
+                    case '+': Reg[Number(k)] += Stack[0]; break;
+                    case '-': Reg[Number(k)] -= Stack[0]; break;
+                    case '*': Reg[Number(k)] *= Stack[0]; break;
+                    case '/': Reg[Number(k)] /= Stack[0]; break;
+                    default:  Reg[Number(k)] = Stack[0]; break;
+                }
             } else if (k === '+' || k === '-' || k === '*' || k === '/') {
-                alert("Unimplemented: STO " + k);
+                op = k;
+                return;
             }
             Prefix = null;
         };
@@ -799,11 +807,19 @@
     }
 
     function op_rcl() {
+        var op = null;
         Prefix = function(k) {
             if (k >= '0' && k <= '9') {
-                push(Reg[Number(k)]);
+                switch (op) {
+                    case '+': Stack[0] += Reg[Number(k)]; break;
+                    case '-': Stack[0] -= Reg[Number(k)]; break;
+                    case '*': Stack[0] *= Reg[Number(k)]; break;
+                    case '/': Stack[0] /= Reg[Number(k)]; break;
+                    default:  push(Reg[Number(k)]); break;
+                }
             } else if (k === '+' || k === '-' || k === '*' || k === '/') {
-                alert("Unimplemented: RCL " + k);
+                op = k;
+                return;
             }
             Prefix = null;
         };
