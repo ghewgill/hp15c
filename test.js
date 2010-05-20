@@ -1,5 +1,6 @@
 var Tests = [
     // Page references from HP-15C Owner's Handbook (November 1985)
+
     // p13
     ["9\r6-", 3],
     ["9\r6*", 54],
@@ -7,6 +8,8 @@ var Tests = [
     ["9\r6^", 531441],
     // p14
     ["300.51\r2*9.8/q", 7.8313, 0.0001],
+
+    // Part I Fundamentals
     // p19
     ["123_\r", -123],
     ["1.2e3\r", 1200],
@@ -122,6 +125,10 @@ var Tests = [
     // p60
     ["p", "3.1416"],
     ["f\b", "3141592653589793"],
+
+    // Part II Programming
+
+    // Part III Advanced Functions
 
     // http://en.wikipedia.org/wiki/Gamma_function#Particular_values
     ["5\r2/_1-f0", -0.945, 0.001],
