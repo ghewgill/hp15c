@@ -129,6 +129,8 @@ var Tests = [
     // Part II Programming
 
     // Part III Advanced Functions
+    // p121
+    // ["2\r3I4\r5I+", new Complex(6, 8)],
 
     // http://en.wikipedia.org/wiki/Gamma_function#Particular_values
     ["5\r2/_1-f0", -0.945, 0.001],
