@@ -77,6 +77,7 @@
     var DisplayDigits = 4;
     var TrigFactor = Math.PI / 180;
     var User = false;
+    var Result = 0;
 
     var CharTable = {
         ' ': [function() {}, function() {}, function() {}],
@@ -219,7 +220,7 @@
         var d = 0;
         for (var i = 0; i < s.length && d < 10; i++) {
             var c = s.charAt(i);
-            if (c >= '0' && c <= '9') {
+            if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'E')) {
                 if (eex) {
                     Display[8].attr("src", Display[9].attr("src"));
                     Display[9].attr("src", Digits[c].src);
@@ -266,39 +267,43 @@
             update_lcd(Entry);
         } else {
             var n = Stack[0];
-            var s = n.toString();
-            var mag = log10int(n);
-            var sign = "";
-            if (n < 0) {
-                n = -n;
-                sign = "-";
-            }
-            var dm = DisplayMode;
-            if (dm === 1 && (mag >= 10 || mag < -DisplayDigits)) {
-                dm = 2;
-            }
-            switch (dm) {
-            case 1:
-                var x = Math.round(n * Math.pow(10, DisplayDigits));
-                s = x.toString();
-                while (s.length < DisplayDigits+1) {
-                    s = '0' + s;
+            if (n instanceof Descriptor) {
+                update_lcd(String.fromCharCode("A".charCodeAt(0) + n.label));
+            } else {
+                var s = n.toString();
+                var mag = log10int(n);
+                var sign = "";
+                if (n < 0) {
+                    n = -n;
+                    sign = "-";
                 }
-                s = s.substr(0, s.length-DisplayDigits) + '.' + s.substr(s.length-DisplayDigits);
-                break;
-            case 2:
-                var x = Math.round(n * Math.pow(10, DisplayDigits - mag));
-                s = x.toString();
-                while (s.length < DisplayDigits+1) {
-                    s = '0' + s;
+                var dm = DisplayMode;
+                if (dm === 1 && (mag >= 10 || mag < -DisplayDigits)) {
+                    dm = 2;
                 }
-                s = s.substr(0, 1) + '.' + s.substr(1);
-                s += "e" + mag;
-                break;
-            case 3:
-                break;
+                switch (dm) {
+                case 1:
+                    var x = Math.round(n * Math.pow(10, DisplayDigits));
+                    s = x.toString();
+                    while (s.length < DisplayDigits+1) {
+                        s = '0' + s;
+                    }
+                    s = s.substr(0, s.length-DisplayDigits) + '.' + s.substr(s.length-DisplayDigits);
+                    break;
+                case 2:
+                    var x = Math.round(n * Math.pow(10, DisplayDigits - mag));
+                    s = x.toString();
+                    while (s.length < DisplayDigits+1) {
+                        s = '0' + s;
+                    }
+                    s = s.substr(0, 1) + '.' + s.substr(1);
+                    s += "e" + mag;
+                    break;
+                case 3:
+                    break;
+                }
+                update_lcd(sign + s);
             }
-            update_lcd(sign + s);
         }
     }
 
@@ -614,7 +619,13 @@
     }
 
     function op_result() {
-        alert("Unimplemented: RESULT");
+        Prefix = function(k) {
+            var i = "qE)y?".indexOf(k);
+            if (i >= 0) {
+                Result = i;
+            }
+            Prefix = null;
+        };
     }
 
     function op_pi() {
@@ -1139,12 +1150,12 @@
     }
 
     $(document).ready(function() {
-        for (var i = 0; i < 10; i++) {
-            Digits[i] = new Image(20, 30);
-            Digits[i].src = i + ".png";
+        var digits = "0123456789-ABCDE";
+        for (var i = 0; i < digits.length; i++) {
+            var c = digits.substr(i, 1);
+            Digits[c] = new Image(20, 30);
+            Digits[c].src = c + ".png";
         }
-        Digits["-"] = new Image(20, 30);
-        Digits["-"].src = "-.png";
         for (var i = 0; i < Reg.length; i++) {
             Reg[i] = 0;
         }
