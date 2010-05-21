@@ -51,6 +51,9 @@
     #trigmode {
         left: 300;
     }
+    #user {
+        left: 400;
+    }
 </style>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
 <script type="text/javascript">
@@ -73,6 +76,7 @@
     var DisplayMode = 1; // 1=FIX 2=SCI 3=ENG
     var DisplayDigits = 4;
     var TrigFactor = Math.PI / 180;
+    var User = false;
 
     var CharTable = {
         ' ': [function() {}, function() {}, function() {}],
@@ -132,6 +136,50 @@
         [' ', 'G', 'r', 'x', '\b','\r','1', '2', '3', '-'],
         [' ', 'f', 'g', 'S', 'R', '\r','0', '.', ';', '+']
     ];
+
+    var A = 0;
+    var B = 1;
+    var C = 2;
+    var D = 3;
+    var E = 4;
+
+    function Matrix(rows, cols) {
+        this.rows = rows;
+        this.cols = cols;
+        this.data = new Array(rows);
+        for (var i = 0; i < rows; i++) {
+            this.data[i] = new Array(cols);
+            for (var j = 0; j < cols; j++) {
+                this.data[i][j] = 0;
+            }
+        }
+
+        this.get = function(row, col) {
+            return this.data[row-1][col-1];
+        }
+
+        this.set = function(row, col, value) {
+            this.data[row-1][col-1] = value;
+        };
+
+        this.toString = function() {
+            return "<Matrix " + this.rows + "," + this.cols + ">";
+        };
+    }
+
+    var g_Matrix = [new Matrix(0, 0),
+                    new Matrix(0, 0),
+                    new Matrix(0, 0),
+                    new Matrix(0, 0),
+                    new Matrix(0, 0)];
+
+    function Descriptor(label) {
+        this.label = label;
+
+        this.toString = function() {
+            return "<Descriptor " + this.label + " (" + g_Matrix[this.label].rows + "," + g_Matrix[this.label].cols + ")>";
+        };
+    }
 
     function trunc(x) {
         if (x < 0) {
@@ -353,7 +401,32 @@
     }
 
     function op_matrix() {
-        alert("Unimplemented: MATRIX");
+        Prefix = function(k) {
+            switch (k) {
+                case '0':
+                    g_Matrix = [new Matrix(0, 0),
+                                new Matrix(0, 0),
+                                new Matrix(0, 0),
+                                new Matrix(0, 0),
+                                new Matrix(0, 0)];
+                    break;
+                case '1':
+                    Reg[0] = 1;
+                    Reg[1] = 1;
+                    break;
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    alert("Unimplemented: MATRIX " + k);
+                    break;
+            }
+            Prefix = null;
+        };
     }
 
     function op_abs() {
@@ -488,7 +561,13 @@
     }
 
     function op_dim() {
-        alert("Unimplemented: DIM");
+        Prefix = function(k) {
+            var i = "qE)y?".indexOf(k);
+            if (i >= 0) {
+                g_Matrix[i] = new Matrix(Stack[1], Stack[0]);
+            }
+            Prefix = null;
+        };
     }
 
     function op_asin() {
@@ -799,6 +878,24 @@
             } else if (k === '+' || k === '-' || k === '*' || k === '/') {
                 op = k;
                 return;
+            } else {
+                var i = "qE)y?".indexOf(k);
+                if (i >= 0) {
+                    g_Matrix[i].set(Reg[0], Reg[1], Stack[0]);
+                    update_lcd(String.fromCharCode("A".charCodeAt(0) + i) + "\t" + Reg[0] + "," + Reg[1]);
+                    DelayUpdate = 1000;
+                    if (User) {
+                        if (Reg[1] < g_Matrix[i].cols) {
+                            Reg[1]++;
+                        } else if (Reg[0] < g_Matrix[i].rows) {
+                            Reg[0]++;
+                            Reg[1] = 1;
+                        } else {
+                            Reg[0] = 1;
+                            Reg[1] = 1;
+                        }
+                    }
+                }
             }
             Prefix = null;
         };
@@ -828,13 +925,49 @@
             } else if (k === '+' || k === '-' || k === '*' || k === '/') {
                 op = k;
                 return;
+            } else if (k === '_') {
+                Prefix = function(k) {
+                    var i = "qE)y?".indexOf(k);
+                    if (i >= 0) {
+                        push(new Descriptor(i));
+                    }
+                    Prefix = null;
+                }
+                return;
+            } else if (k === 's') {
+                Prefix = function(k) {
+                    var i = "qE)y?".indexOf(k);
+                    if (i >= 0) {
+                        push(g_Matrix[i].rows);
+                        push(g_Matrix[i].cols);
+                    }
+                    Prefix = null;
+                }
+                return;
+            } else {
+                var i = "qE)y?".indexOf(k);
+                if (i >= 0) {
+                    push(g_Matrix[i].get(Reg[0], Reg[1]));
+                    if (User) {
+                        if (Reg[1] < g_Matrix[i].cols) {
+                            Reg[1]++;
+                        } else if (Reg[0] < g_Matrix[i].rows) {
+                            Reg[0]++;
+                            Reg[1] = 1;
+                        } else {
+                            Reg[0] = 1;
+                            Reg[1] = 1;
+                        }
+                    }
+                }
             }
             Prefix = null;
         };
     }
 
     function op_user() {
-        alert("Unimplemented: USER");
+        User = !User;
+        $("#user").css("display", User ? "block" : "none");
         StackLift = OldStackLift;
     }
 
@@ -1123,6 +1256,7 @@
 <div id="f" class="shift indicator">f</div>
 <div id="g" class="shift indicator">g</div>
 <div id="trigmode" class="indicator"></div>
+<div id="user" class="indicator">USER</div>
 </div>
 <div id="test">
 <input type="button" onclick="run_test()" value="Test">

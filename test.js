@@ -131,6 +131,53 @@ var Tests = [
     // Part III Advanced Functions
     // p121
     // ["2\r3I4\r5I+", new Complex(6, 8)],
+    // ["g58"],
+    // p139
+    ["2\rfsq", 2],
+    ["f_1", 2],
+    ["fR", function() { return User; }],
+    ["3.8Sq", "A\t1,1"],
+    ["7.2Sq", 7.2],
+    ["1.3Sq", 1.3],
+    [".9_Sq", -0.9],
+    ["2\r1fsE", 1],
+    /*["1.65SE", 16.5],
+    ["22.1_SE", -22.1],
+    ["fe)", -22.1],
+    ["R_E", new MatrixCheck(B, 2, 1)],
+    ["R_A", new MatrixCheck(A, 2, 2)],
+    ["/", new MatrixCheck(C, 2, 1)],
+    ["R)", -11.2887],
+    ["R)", 8.2496],*/
+    ["fR", function() { return !User; }],
+    ["f_0"],
+    // p142
+    ["2\r", 2],
+    ["3", 3],
+    ["fsq", 3],
+    ["R_E", new MatrixCheck(B, 0, 0)],
+    ["Rsq", [3, 2]],
+    // p145
+    ["f_1", function() { return Reg[0] === 1 && Reg[1] === 1; }],
+    ["fR", function() { return User; }],
+    ["1Sq", 1],
+    ["2Sq", 2],
+    ["3Sq", 3],
+    ["4Sq", 4],
+    ["5Sq", 5],
+    ["6Sq", 6],
+    ["Rq", 1],
+    ["Rq", 2],
+    ["Rq", 3],
+    ["Rq", 4],
+    ["Rq", 5],
+    ["Rq", 6],
+    ["fR", 6],
+    // p146
+    ["2S0", 2],
+    ["3S1", 3],
+    ["9", 9],
+    ["Sq", function() { return g_Matrix[0].get(2, 3) === 9; }],
 
     // http://en.wikipedia.org/wiki/Gamma_function#Particular_values
     ["5\r2/_1-f0", -0.945, 0.001],
@@ -146,11 +193,28 @@ var Tests = [
     ["3f0", 6, 0.001],
 ];
 
+function MatrixCheck(label, rows, cols) {
+    this.label = label;
+    this.rows = rows;
+    this.cols = cols;
+
+    this.toString = function() {
+        return "<MatrixCheck " + this.label + " " + this.rows + "," + this.cols + ">";
+    };
+}
+
 function verify(test, result, expected) {
-    if (test.length >= 3) {
-        return Math.abs(result / expected - 1) < test[2];
+    if (expected instanceof MatrixCheck) {
+        return result instanceof Descriptor
+            && result.label === expected.label
+            && g_Matrix[result.label].rows === expected.rows
+            && g_Matrix[result.label].cols === expected.cols;
     } else {
-        return result === expected;
+        if (test.length >= 3) {
+            return Math.abs(result / expected - 1) < test[2];
+        } else {
+            return result === expected;
+        }
     }
 }
 
@@ -162,22 +226,32 @@ for (var t in Tests) {
     for (var i in keys) {
         key(keys[i]);
     }
-    var expected = test[1];
-    if (typeof(expected) === "string") {
-        if (expected !== LcdDisplay) {
-            alert("fail: " + keys + "\nresult: " + LcdDisplay + "\nexpected: " + expected);
-            pass = false;
-        }
-    } else {
-        if (!$.isArray(expected)) {
-            expected = [expected];
-        }
-        for (var i in expected) {
-            if (!verify(test, Stack[i], expected[i])) {
-                alert("fail: " + keys + "\nresult: " + Stack[i] + "\nexpected: " + expected[i] + "\ndiff: " + Math.abs(Stack[i] / expected[i] - 1));
+    if (test.length > 1) {
+        var expected = test[1];
+        if (typeof(expected) === "string") {
+            if (expected !== LcdDisplay) {
+                alert("fail: " + keys + "\nresult: " + LcdDisplay + "\nexpected: " + expected);
                 pass = false;
             }
+        } else if (typeof(expected) === "function") {
+            if (!expected()) {
+                alert("fail: " + keys + "\nresult: " + LcdDisplay + "\nexpected: " + expected);
+                pass = false;
+            }
+        } else {
+            if (!$.isArray(expected)) {
+                expected = [expected];
+            }
+            for (var i in expected) {
+                if (!verify(test, Stack[i], expected[i])) {
+                    alert("fail: " + keys + "\nresult: " + Stack[i] + "\nexpected: " + expected[i] + "\ndiff: " + Math.abs(Stack[i] / expected[i] - 1));
+                    pass = false;
+                }
+            }
         }
+    }
+    if (!pass) {
+        break;
     }
 }
 if (pass) {
