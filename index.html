@@ -91,8 +91,8 @@
         '8': [function() { op_input('8'); }, op_sci, op_rad],
         '9': [function() { op_input('9'); }, op_eng, op_grd],
         '/': [op_div, op_solve, op_le],
-        '': [op_sst, op_lbl, op_bst],
-        'T': [op_gto, op_hyp, op_ahyp],
+        'T': [op_sst, op_lbl, op_bst],
+        'G': [op_gto, op_hyp, op_ahyp],
         's': [op_sin, op_dim, op_asin],
         'c': [op_cos, op_index, op_acos],
         't': [op_tan, op_I, op_atan],
@@ -101,8 +101,8 @@
         '5': [function() { op_input('5'); }, op_dse, op_cf],
         '6': [function() { op_input('6'); }, op_isg, op_ftest],
         '*': [op_mul, op_integrate, op_eq],
-        '': [op_rs, op_pse, op_pr],
-        'G': [op_gsb, op_clear_stat, op_rtn],
+        'P': [op_rs, op_pse, op_pr],
+        'U': [op_gsb, op_clear_stat, op_rtn],
         'r': [op_roll, op_clear_prgm, op_rollup],
         'x': [op_xy, op_clear_reg, op_rnd],
         '\b': [op_back, op_clear_prefix, op_clx],
@@ -133,8 +133,8 @@
 
     var KeyTable = [
         ['q', 'E', ')', '^', '?', '_', '7', '8', '9', '/'],
-        [' ', 'T', 's', 'c', 't', 'e', '4', '5', '6', '*'],
-        [' ', 'G', 'r', 'x', '\b','\r','1', '2', '3', '-'],
+        ['T', 'G', 's', 'c', 't', 'e', '4', '5', '6', '*'],
+        ['P', 'U', 'r', 'x', '\b','\r','1', '2', '3', '-'],
         [' ', 'f', 'g', 'S', 'R', '\r','0', '.', ';', '+']
     ];
 
