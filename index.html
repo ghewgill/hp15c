@@ -400,7 +400,14 @@
     }
 
     function op_ex() {
-        unop(Math.exp);
+        if (Flags[8]) {
+            unopc(function(xr, xi) {
+                var r = Math.exp(xr);
+                return [r * Math.cos(xi), r * Math.sin(xi)];
+            });
+        } else {
+            unop(Math.exp);
+        }
     }
 
     function op_B() {
@@ -412,7 +419,15 @@
     }
 
     function op_10x() {
-        unop(function(x) { return Math.pow(10, x); });
+        if (Flags[8]) {
+            unopc(function(xr, xi) {
+                var r = Math.pow(10, xr);
+                var t = xi * Math.LN10;
+                return [r * Math.cos(t), r * Math.sin(t)];
+            });
+        } else {
+            unop(function(x) { return Math.pow(10, x); });
+        }
     }
 
     function op_C() {
@@ -448,7 +463,14 @@
     }
 
     function op_1x() {
-        unop(function(x) { return 1 / x; });
+        if (Flags[8]) {
+            unopc(function(xr, xi) {
+                var d = xr*xr + xi*xi;
+                return [xr/d, -xi/d];
+            });
+        } else {
+            unop(function(x) { return 1 / x; });
+        }
     }
 
     function op_E() {
