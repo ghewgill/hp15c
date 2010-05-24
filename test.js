@@ -130,7 +130,30 @@ var Tests = [
 
     // Part III Advanced Functions
     // p121
-    // ["2\r3I4\r5I+", new Complex(6, 8)],
+    ["2\r3I4\r5I+", new Complex(6, 8)],
+    ["\b8f-\b9gq", new Complex(17, 144)],
+    ["1.2\r4.7I2.7\r3.2I/q", new Complex(1.0491, 0.2406), 0.0001],
+    // ["2.404gs", new Complex(1.5708, -1.5239), 0.0001],
+    // p135
+    ["g72\r65If1", 0.8452, 0.0001],
+    ["3\r40If1", 2.2981, 0.0001],
+    ["+", 3.1434, 0.0001],
+    ["g1", new Complex(4.8863, 49.9612), 0.0001],
+    // p136
+    ["2f-", 0],
+    ["8_\r", -8],
+    ["6I", -8],
+    ["3^", 352],
+    ["*", -1872],
+    ["4\r", 4],
+    ["5q", 2.2361, 0.0001],
+    ["2_*", -4.4721, 0.0001],
+    ["I", 4],
+    ["/", -295.4551, 0.0001],
+    ["2\r5q", 2.2361, 0.0001],
+    ["4_*", -8.9443, 0.0001],
+    ["I", 2],
+    ["/", new Complex(9.3982, -35.1344), 0.0001],
     // ["g58"],
     // p139
     ["2\rfsq", 2],
@@ -193,6 +216,15 @@ var Tests = [
     ["3f0", 6, 0.001],
 ];
 
+function Complex(real, imag) {
+    this.re = real;
+    this.im = imag;
+
+    this.toString = function() {
+        return "(" + this.re + "," + this.im + ")";
+    }
+}
+
 function MatrixCheck(label, rows, cols) {
     this.label = label;
     this.rows = rows;
@@ -203,12 +235,19 @@ function MatrixCheck(label, rows, cols) {
     };
 }
 
-function verify(test, result, expected) {
+function verify(test, result, resulti, expected) {
     if (expected instanceof MatrixCheck) {
         return result instanceof Descriptor
             && result.label === expected.label
             && g_Matrix[result.label].rows === expected.rows
             && g_Matrix[result.label].cols === expected.cols;
+    } else if (expected instanceof Complex) {
+        if (test.length >= 3) {
+            return Math.abs(result / expected.re - 1) < test[2]
+                && Math.abs(resulti / expected.im - 1) < test[2];
+        } else {
+            return result === expected.re && resulti === expected.im;
+        }
     } else {
         if (test.length >= 3) {
             return Math.abs(result / expected - 1) < test[2];
@@ -243,7 +282,7 @@ for (var t in Tests) {
                 expected = [expected];
             }
             for (var i in expected) {
-                if (!verify(test, Stack[i], expected[i])) {
+                if (!verify(test, Stack[i], StackI[i], expected[i])) {
                     alert("fail: " + keys + "\nresult: " + Stack[i] + "\nexpected: " + expected[i] + "\ndiff: " + Math.abs(Stack[i] / expected[i] - 1));
                     pass = false;
                 }

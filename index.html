@@ -5,6 +5,9 @@
     #stack {
         float: right;
     }
+    .stacki {
+        display: none;
+    }
     #reg {
         clear: right;
         float: right;
@@ -51,6 +54,9 @@
     #trigmode {
         left: 300;
     }
+    #complex {
+        left: 380;
+    }
     #user {
         left: 400;
     }
@@ -61,7 +67,9 @@
     var Digits = [];
     var Display = [];
     var Stack = [0, 0, 0, 0];
+    var StackI = [0, 0, 0, 0];
     var LastX = 0;
+    var LastXI = 0;
     var Reg = new Array(10);
     var Entry;
     var DigitEntry = false;
@@ -76,6 +84,7 @@
     var DisplayMode = 1; // 1=FIX 2=SCI 3=ENG
     var DisplayDigits = 4;
     var TrigFactor = Math.PI / 180;
+    var Flags = new Array(10);
     var User = false;
     var Result = 0;
 
@@ -256,6 +265,46 @@
         }
     }
 
+    function update_display_num(n) {
+        if (n instanceof Descriptor) {
+            update_lcd(String.fromCharCode("A".charCodeAt(0) + n.label));
+        } else {
+            var s = n.toString();
+            var mag = log10int(n);
+            var sign = "";
+            if (n < 0) {
+                n = -n;
+                sign = "-";
+            }
+            var dm = DisplayMode;
+            if (dm === 1 && (mag >= 10 || mag < -DisplayDigits)) {
+                dm = 2;
+            }
+            switch (dm) {
+            case 1:
+                var x = Math.round(n * Math.pow(10, DisplayDigits));
+                s = x.toString();
+                while (s.length < DisplayDigits+1) {
+                    s = '0' + s;
+                }
+                s = s.substr(0, s.length-DisplayDigits) + '.' + s.substr(s.length-DisplayDigits);
+                break;
+            case 2:
+                var x = Math.round(n * Math.pow(10, DisplayDigits - mag));
+                s = x.toString();
+                while (s.length < DisplayDigits+1) {
+                    s = '0' + s;
+                }
+                s = s.substr(0, 1) + '.' + s.substr(1);
+                s += "e" + mag;
+                break;
+            case 3:
+                break;
+            }
+            update_lcd(sign + s);
+        }
+    }
+
     function update_display() {
         if (DigitEntry) {
             Stack[0] = Number(Entry);
@@ -264,77 +313,76 @@
             $("#stack_" + i).val(Stack[i]);
         }
         $("#last_x").val(LastX);
+        if (Flags[8]) {
+            for (var i = 0; i < 4; i++) {
+                $("#stacki_" + i).val(StackI[i]);
+            }
+            $("#last_xi").val(LastXI);
+        }
         for (var i = 0; i < 10; i++) {
             $("#reg_" + i).val(Reg[i]);
         }
         if (DigitEntry) {
             update_lcd(Entry);
         } else {
-            var n = Stack[0];
-            if (n instanceof Descriptor) {
-                update_lcd(String.fromCharCode("A".charCodeAt(0) + n.label));
-            } else {
-                var s = n.toString();
-                var mag = log10int(n);
-                var sign = "";
-                if (n < 0) {
-                    n = -n;
-                    sign = "-";
-                }
-                var dm = DisplayMode;
-                if (dm === 1 && (mag >= 10 || mag < -DisplayDigits)) {
-                    dm = 2;
-                }
-                switch (dm) {
-                case 1:
-                    var x = Math.round(n * Math.pow(10, DisplayDigits));
-                    s = x.toString();
-                    while (s.length < DisplayDigits+1) {
-                        s = '0' + s;
-                    }
-                    s = s.substr(0, s.length-DisplayDigits) + '.' + s.substr(s.length-DisplayDigits);
-                    break;
-                case 2:
-                    var x = Math.round(n * Math.pow(10, DisplayDigits - mag));
-                    s = x.toString();
-                    while (s.length < DisplayDigits+1) {
-                        s = '0' + s;
-                    }
-                    s = s.substr(0, 1) + '.' + s.substr(1);
-                    s += "e" + mag;
-                    break;
-                case 3:
-                    break;
-                }
-                update_lcd(sign + s);
-            }
+            update_display_num(Stack[0]);
         }
+        $("#complex").css("display", Flags[8] ? "block" : "none");
+        $(".stacki").css("display", Flags[8] ? "table-cell" : "none");
     }
 
     function push(x, forcelift) {
         if (forcelift || StackLift) {
-            Stack[3] = Stack[2];
-            Stack[2] = Stack[1];
-            Stack[1] = Stack[0];
+            Stack[3] = Stack[2]; StackI[3] = StackI[2];
+            Stack[2] = Stack[1]; StackI[2] = StackI[1];
+            Stack[1] = Stack[0]; StackI[1] = StackI[0];
         }
         Stack[0] = x;
+        StackI[0] = 0;
         StackLift = true;
     }
 
     function unop(f) {
         LastX = Stack[0];
+        LastXI = StackI[0];
         Stack[0] = f(Stack[0]);
     }
 
     function binop(f) {
         LastX = Stack[0];
+        LastXI = StackI[0];
         Stack[0] = f(Stack[1], Stack[0]);
-        Stack[1] = Stack[2];
-        Stack[2] = Stack[3];
+        Stack[1] = Stack[2]; StackI[1] = StackI[2];
+        Stack[2] = Stack[3]; StackI[2] = StackI[3];
+    }
+
+    function unopc(f) {
+        LastX = Stack[0];
+        LastXI = StackI[0];
+        var r = f(Stack[0], StackI[0]);
+        Stack[0] = r[0];
+        StackI[0] = r[1];
+    }
+
+    function binopc(f) {
+        LastX = Stack[0];
+        LastXI = StackI[0];
+        var r = f(Stack[1], StackI[1], Stack[0], StackI[0]);
+        Stack[0] = r[0];
+        StackI[0] = r[1];
+        Stack[1] = Stack[2]; StackI[1] = StackI[2];
+        Stack[2] = Stack[3]; StackI[2] = StackI[3];
     }
 
     function op_sqrt() {
-        unop(Math.sqrt);
+        if (Flags[8]) {
+            unopc(function(xr, xi) {
+                var a = Math.sqrt(xr*xr + xi*xi);
+                return [Math.sqrt((xr + a) / 2), (xi < 0 ? -1 : 1) * Math.sqrt((-xr + a) / 2)];
+            });
+        } else {
+            unop(Math.sqrt);
+        }
     }
 
     function op_A() {
@@ -342,7 +390,13 @@
     }
 
     function op_x2() {
-        unop(function(x) { return x * x; });
+        if (Flags[8]) {
+            unopc(function(xr, xi) {
+                return [xr*xr - xi*xi, 2*xr*xi];
+            });
+        } else {
+            unop(function(x) { return x * x; });
+        }
     }
 
     function op_ex() {
@@ -370,7 +424,17 @@
     }
 
     function op_yx() {
-        binop(Math.pow);
+        if (Flags[8]) {
+            binopc(function(yr, yi, xr, xi) {
+                var p = Math.atan2(yi, yr);
+                var a = Math.sqrt(yr*yr + yi*yi);
+                var r = Math.pow(a, xr) * Math.exp(-xi * p);
+                var t = xr * p + xi * Math.log(a);
+                return [r * Math.cos(t), r * Math.sin(t)];
+            });
+        } else {
+            binop(Math.pow);
+        }
     }
 
     function op_D() {
@@ -379,6 +443,7 @@
 
     function op_pct() {
         LastX = Stack[0];
+        LastXI = StackI[0];
         Stack[0] = Stack[1] * Stack[0] / 100;
     }
 
@@ -488,7 +553,14 @@
     }
 
     function op_div() {
-        binop(function(y, x) { return y / x; });
+        if (Flags[8]) {
+            binopc(function(yr, yi, xr, xi) {
+                var d = xr*xr + xi*xi;
+                return [(yr*xr + yi*xi) / d, (yi*xr - yr*xi) / d];
+            });
+        } else {
+            binop(function(y, x) { return y / x; });
+        }
     }
 
     function op_solve() {
@@ -592,7 +664,10 @@
     }
 
     function op_index() {
-        alert("Unimplemented: (i)");
+        if (Flags[8]) {
+            update_display_num(StackI[0]);
+            DelayUpdate = 1000;
+        }
         StackLift = OldStackLift;
     }
 
@@ -609,7 +684,11 @@
     }
 
     function op_I() {
-        alert("Unimplemented: I");
+        Flags[8] = true;
+        StackI[0] = Stack[0];
+        Stack[0] = Stack[1];
+        Stack[1] = Stack[2]; StackI[1] = StackI[2];
+        Stack[2] = Stack[3]; StackI[2] = StackI[3];
     }
 
     function op_atan() {
@@ -649,7 +728,12 @@
     }
 
     function op_sf() {
-        alert("Unimplemented: SF");
+        Prefix = function(k) {
+            if (k > '0' && k <= '9') {
+                Flags[k] = true;
+            }
+            Prefix = null;
+        };
     }
 
     function op_dse() {
@@ -657,7 +741,12 @@
     }
 
     function op_cf() {
-        alert("Unimplemented: CF");
+        Prefix = function(k) {
+            if (k > '0' && k <= '9') {
+                Flags[k] = false;
+            }
+            Prefix = null;
+        };
     }
 
     function op_isg() {
@@ -669,7 +758,13 @@
     }
 
     function op_mul() {
-        binop(function(y, x) { return y * x; });
+        if (Flags[8]) {
+            binopc(function(yr, yi, xr, xi) {
+                return [yr * xr - yi * xi, yr * xi + yi * xr];
+            });
+        } else {
+            binop(function(y, x) { return y * x; });
+        }
     }
 
     function op_integrate() {
@@ -803,18 +898,34 @@
 
     function op_to_r() {
         LastX = Stack[0];
-        var t = Stack[1];
-        var r = Stack[0];
-        Stack[1] = r * Math.sin(t * TrigFactor);
-        Stack[0] = r * Math.cos(t * TrigFactor);
+        LastXI = StackI[0];
+        if (Flags[8]) {
+            var t = StackI[0];
+            var r = Stack[0];
+            StackI[0] = r * Math.sin(t * TrigFactor);
+            Stack[0] = r * Math.cos(t * TrigFactor);
+        } else {
+            var t = Stack[1];
+            var r = Stack[0];
+            Stack[1] = r * Math.sin(t * TrigFactor);
+            Stack[0] = r * Math.cos(t * TrigFactor);
+        }
     }
 
     function op_to_p() {
         LastX = Stack[0];
-        var y = Stack[1];
-        var x = Stack[0];
-        Stack[1] = Math.atan2(y, x) / TrigFactor;
-        Stack[0] = Math.sqrt(x*x + y*y);
+        LastXI = StackI[0];
+        if (Flags[8]) {
+            var y = StackI[0];
+            var x = Stack[0];
+            StackI[0] = Math.atan2(y, x) / TrigFactor;
+            Stack[0] = Math.sqrt(x*x + y*y);
+        } else {
+            var y = Stack[1];
+            var x = Stack[0];
+            Stack[1] = Math.atan2(y, x) / TrigFactor;
+            Stack[0] = Math.sqrt(x*x + y*y);
+        }
     }
 
     function op_to_hms() {
@@ -852,11 +963,20 @@
     }
 
     function op_sub() {
-        binop(function(y, x) { return y - x; });
+        if (Flags[8]) {
+            binopc(function(yr, yi, xr, xi) {
+                return [yr - xr, yi - xi];
+            });
+        } else {
+            binop(function(y, x) { return y - x; });
+        }
     }
 
     function op_re_im() {
-        alert("Unimplemented: Re\u2277Im");
+        Flags[8] = true;
+        var t = StackI[0];
+        StackI[0] = Stack[0];
+        Stack[0] = t;
     }
 
     function op_test() {
@@ -1080,7 +1200,13 @@
     }
 
     function op_add() {
-        binop(function(y, x) { return y + x; });
+        if (Flags[8]) {
+            binopc(function(yr, yi, xr, xi) {
+                return [yr + xr, yi + xi];
+            });
+        } else {
+            binop(function(y, x) { return y + x; });
+        }
     }
 
     function op_Pyx() {
@@ -1232,11 +1358,11 @@
 <h1>HP-15C</h1>
 <div id="stack">
 <table>
-<tr><td align="right">T</td><td><input id="stack_3"></td></tr>
-<tr><td align="right">Z</td><td><input id="stack_2"></td></tr>
-<tr><td align="right">Y</td><td><input id="stack_1"></td></tr>
-<tr><td align="right">X</td><td><input id="stack_0"></td></tr>
-<tr><td align="right">LAST X</td><td><input id="last_x"></td></tr>
+<tr><td align="right">T</td><td><input id="stack_3" size="8"></td><td align="right" class="stacki">Ti</td><td class="stacki"><input id="stacki_3" size="8"></td></tr>
+<tr><td align="right">Z</td><td><input id="stack_2" size="8"></td><td align="right" class="stacki">Zi</td><td class="stacki"><input id="stacki_2" size="8"></td></tr>
+<tr><td align="right">Y</td><td><input id="stack_1" size="8"></td><td align="right" class="stacki">Yi</td><td class="stacki"><input id="stacki_1" size="8"></td></tr>
+<tr><td align="right">X</td><td><input id="stack_0" size="8"></td><td align="right" class="stacki">Xi</td><td class="stacki"><input id="stacki_0" size="8"></td></tr>
+<tr><td align="right">LAST X</td><td><input id="last_x" size="8"></td><td align="right" class="stacki">LAST Xi</td><td class="stacki"><input id="last_xi" size="8"></td></tr>
 </table>
 </div>
 <div id="reg">
@@ -1271,6 +1397,7 @@
 <div id="f" class="shift indicator">f</div>
 <div id="g" class="shift indicator">g</div>
 <div id="trigmode" class="indicator"></div>
+<div id="complex" class="indicator">C</div>
 <div id="user" class="indicator">USER</div>
 </div>
 <div id="test">
