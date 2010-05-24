@@ -832,10 +832,12 @@
 
     function op_roll() {
         var t = Stack[0];
-        Stack[0] = Stack[1];
-        Stack[1] = Stack[2];
-        Stack[2] = Stack[3];
+        var ti = StackI[0];
+        Stack[0] = Stack[1]; StackI[0] = StackI[1];
+        Stack[1] = Stack[2]; StackI[1] = StackI[2];
+        Stack[2] = Stack[3]; StackI[2] = StackI[3];
         Stack[3] = t;
+        StackI[3] = ti;
     }
 
     function op_clear_prgm() {
@@ -844,16 +846,20 @@
 
     function op_rollup() {
         var t = Stack[3];
-        Stack[3] = Stack[2];
-        Stack[2] = Stack[1];
-        Stack[1] = Stack[0];
+        var ti = StackI[3];
+        Stack[3] = Stack[2]; StackI[3] = StackI[2];
+        Stack[2] = Stack[1]; StackI[2] = StackI[1];
+        Stack[1] = Stack[0]; StackI[1] = StackI[0];
         Stack[0] = t;
+        StackI[0] = ti;
     }
 
     function op_xy() {
         var t = Stack[0];
-        Stack[0] = Stack[1];
+        var ti = StackI[0];
+        Stack[0] = Stack[1]; StackI[0] = StackI[1];
         Stack[1] = t;
+        StackI[1] = ti;
     }
 
     function op_clear_reg() {
