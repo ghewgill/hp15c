@@ -922,6 +922,7 @@
 
     function op_lastx() {
         push(LastX);
+        StackI[0] = LastXI;
     }
 
     function op_to_r() {
@@ -1181,6 +1182,7 @@
 
     function op_yhat() {
         LastX = Stack[0];
+        LastXI = StackI[0];
         var M = Reg[2] * Reg[4] - Reg[3] * Reg[3];
         var N = Reg[2] * Reg[6] - Reg[5] * Reg[5];
         var P = Reg[2] * Reg[7] - Reg[3] * Reg[5];
@@ -1197,6 +1199,7 @@
 
     function op_sum() {
         LastX = Stack[0];
+        LastXI = StackI[0];
         Reg[2] += 1;
         Reg[3] += Stack[0];
         Reg[4] += Stack[0] * Stack[0];
@@ -1217,6 +1220,7 @@
 
     function op_sumsub() {
         LastX = Stack[0];
+        LastXI = StackI[0];
         Reg[2] -= 1;
         Reg[3] -= Stack[0];
         Reg[4] -= Stack[0] * Stack[0];
