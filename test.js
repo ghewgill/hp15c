@@ -262,7 +262,7 @@ var pass = true;
 for (var t in Tests) {
     var test = Tests[t];
     var keys = test[0];
-    for (var i in keys) {
+    for (var i = 0; i < keys.length; i++) {
         key(keys[i]);
     }
     if (test.length > 1) {
