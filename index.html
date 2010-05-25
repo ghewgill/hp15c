@@ -79,6 +79,7 @@
     var DelayUpdate = 0;
     var Shift = 0;
     var Prefix;
+    var OldPrefix;
     var MouseDown = false;
     var LcdDisplay;
     var DisplayMode = 1; // 1=FIX 2=SCI 3=ENG
@@ -88,60 +89,62 @@
     var User = false;
     var Result = 0;
 
+    function _(x) { return function(k) { return x; }}
+
     var CharTable = {
         ' ': [function() {}, function() {}, function() {}],
-        'q': [op_sqrt, op_A, op_x2],
-        'E': [op_ex, op_B, op_ln],
-        ')': [op_10x, op_C, op_log],
-        '^': [op_yx, op_D, op_pct],
-        '?': [op_1x, op_E, op_dpct],
-        '_': [op_chs, op_matrix, op_abs],
-        '7': [function() { op_input('7'); }, op_fix, op_deg],
-        '8': [function() { op_input('8'); }, op_sci, op_rad],
-        '9': [function() { op_input('9'); }, op_eng, op_grd],
-        '/': [op_div, op_solve, op_le],
-        'T': [op_sst, op_lbl, op_bst],
-        'G': [op_gto, op_hyp, op_ahyp],
-        's': [op_sin, op_dim, op_asin],
-        'c': [op_cos, op_index, op_acos],
-        't': [op_tan, op_I, op_atan],
-        'e': [op_eex, op_result, op_pi],
-        '4': [function() { op_input('4'); }, op_xchg, op_sf],
-        '5': [function() { op_input('5'); }, op_dse, op_cf],
-        '6': [function() { op_input('6'); }, op_isg, op_ftest],
-        '*': [op_mul, op_integrate, op_eq],
-        'P': [op_rs, op_pse, op_pr],
-        'U': [op_gsb, op_clear_stat, op_rtn],
-        'r': [op_roll, op_clear_prgm, op_rollup],
-        'x': [op_xy, op_clear_reg, op_rnd],
-        '\b': [op_back, op_clear_prefix, op_clx],
-        '\r': [op_enter, op_rand, op_lastx],
-        '1': [function() { op_input('1'); }, op_to_r, op_to_p],
-        '2': [function() { op_input('2'); }, op_to_hms, op_to_h],
-        '3': [function() { op_input('3'); }, op_to_rad, op_to_deg],
-        '-': [op_sub, op_re_im, op_test],
-        '': [op_on, op_on, op_on],
-        'f': [op_f, op_f, op_f],
-        'g': [op_g, op_g, op_g],
-        'S': [op_sto, op_frac, op_int],
-        'R': [op_rcl, op_user, op_mem],
-        '0': [function() { op_input('0'); }, op_fact, op_mean],
-        '.': [function() { op_input('.'); }, op_yhat, op_s],
-        ';': [op_sum, op_lr, op_sumsub],
-        '+': [op_add, op_Pyx, op_Cyx],
-        '!': op_fact,
-        '@': op_x2,
-        '%': op_pct,
-        'A': op_A,
-        'B': op_B,
-        'C': op_C,
-        'D': op_D,
-        'a': op_abs,
-        'i': op_int,
-        'I': op_I,
-        'l': op_ln,
-        'p': op_pi,
-        '\x12': op_rand
+        'q': [_(op_sqrt), _(op_A), _(op_x2)],
+        'E': [_(op_ex), _(op_B), _(op_ln)],
+        ')': [_(op_10x), _(op_C), _(op_log)],
+        '^': [_(op_yx), _(op_D), _(op_pct)],
+        '?': [_(op_1x), _(op_E), _(op_dpct)],
+        '_': [_(op_chs), decode_matrix, _(op_abs)],
+        '7': [_(function() { op_input('7'); }), decode_fix, _(op_deg)],
+        '8': [_(function() { op_input('8'); }), decode_sci, _(op_rad)],
+        '9': [_(function() { op_input('9'); }), decode_eng, _(op_grd)],
+        '/': [_(op_div), decode_solve, _(op_le)],
+        'T': [_(op_sst), decode_lbl, _(op_bst)],
+        'G': [_(op_gto), decode_hyp, decode_ahyp],
+        's': [_(op_sin), decode_dim, _(op_asin)],
+        'c': [_(op_cos), _(op_index), _(op_acos)],
+        't': [_(op_tan), _(op_I), _(op_atan)],
+        'e': [_(op_eex), decode_result, _(op_pi)],
+        '4': [_(function() { op_input('4'); }), decode_xchg, decode_sf],
+        '5': [_(function() { op_input('5'); }), _(op_dse), decode_cf],
+        '6': [_(function() { op_input('6'); }), _(op_isg), decode_ftest],
+        '*': [_(op_mul), decode_integrate, _(op_eq)],
+        'P': [_(op_rs), _(op_pse), _(op_pr)],
+        'U': [_(op_gsb), _(op_clear_stat), _(op_rtn)],
+        'r': [_(op_roll), _(op_clear_prgm), _(op_rollup)],
+        'x': [_(op_xy), _(op_clear_reg), _(op_rnd)],
+        '\b': [_(op_back), _(op_clear_prefix), _(op_clx)],
+        '\r': [_(op_enter), _(op_rand), _(op_lastx)],
+        '1': [_(function() { op_input('1'); }), _(op_to_r), _(op_to_p)],
+        '2': [_(function() { op_input('2'); }), _(op_to_hms), _(op_to_h)],
+        '3': [_(function() { op_input('3'); }), _(op_to_rad), _(op_to_deg)],
+        '-': [_(op_sub), _(op_re_im), decode_test],
+        '': [_(op_on), _(op_on), _(op_on)],
+        'f': [_(op_f), _(op_f), _(op_f)],
+        'g': [_(op_g), _(op_g), _(op_g)],
+        'S': [decode_sto, _(op_frac), _(op_int)],
+        'R': [decode_rcl, _(op_user), _(op_mem)],
+        '0': [_(function() { op_input('0'); }), _(op_fact), _(op_mean)],
+        '.': [_(function() { op_input('.'); }), _(op_yhat), _(op_s)],
+        ';': [_(op_sum), _(op_lr), _(op_sumsub)],
+        '+': [_(op_add), _(op_Pyx), _(op_Cyx)],
+        '!': _(op_fact),
+        '@': _(op_x2),
+        '%': _(op_pct),
+        'A': _(op_A),
+        'B': _(op_B),
+        'C': _(op_C),
+        'D': _(op_D),
+        'a': _(op_abs),
+        'i': _(op_int),
+        'I': _(op_I),
+        'l': _(op_ln),
+        'p': _(op_pi),
+        '\x12': _(op_rand)
     };
 
     var KeyTable = [
@@ -500,47 +503,26 @@
         }
     }
 
-    function op_matrix() {
-        Prefix = function(k) {
-            switch (k) {
-                case '0':
-                    g_Matrix = [new Matrix(0, 0),
-                                new Matrix(0, 0),
-                                new Matrix(0, 0),
-                                new Matrix(0, 0),
-                                new Matrix(0, 0)];
-                    break;
-                case '1':
-                    Reg[0] = 1;
-                    Reg[1] = 1;
-                    break;
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
-                    alert("Unimplemented: MATRIX " + k);
-                    break;
-            }
-            Prefix = null;
-        };
+    function op_matrix_clear() {
+        g_Matrix = [new Matrix(0, 0),
+                    new Matrix(0, 0),
+                    new Matrix(0, 0),
+                    new Matrix(0, 0),
+                    new Matrix(0, 0)];
+    }
+
+    function op_matrix_home() {
+        Reg[0] = 1;
+        Reg[1] = 1;
     }
 
     function op_abs() {
         unop(Math.abs);
     }
 
-    function op_fix() {
-        Prefix = function(k) {
-            if (k >= '0' && k <= '9') {
-                DisplayMode = 1;
-                DisplayDigits = Number(k);
-            }
-            Prefix = null;
-        };
+    function op_fix(n) {
+        DisplayMode = 1;
+        DisplayDigits = n;
         StackLift = OldStackLift;
     }
 
@@ -550,14 +532,9 @@
         StackLift = OldStackLift;
     }
 
-    function op_sci() {
-        Prefix = function(k) {
-            if (k >= '0' && k <= '9') {
-                DisplayMode = 2;
-                DisplayDigits = Number(k);
-            }
-            Prefix = null;
-        };
+    function op_sci(n) {
+        DisplayMode = 2;
+        DisplayDigits = n;
         StackLift = OldStackLift;
     }
 
@@ -567,7 +544,7 @@
         StackLift = OldStackLift;
     }
 
-    function op_eng() {
+    function op_eng(n) {
         alert("Unimplemented: ENG");
         StackLift = OldStackLift;
     }
@@ -615,50 +592,40 @@
         alert("Unimplemented: GTO");
     }
 
-    function op_hyp() {
-        Prefix = function(k) {
-            switch (k) {
-                case 's':
-                    unop(function(x) {
-                        return (Math.exp(x) - Math.exp(-x)) / 2;
-                    });
-                    break;
-                case 'c':
-                    unop(function(x) {
-                        return (Math.exp(x) + Math.exp(-x)) / 2;
-                    });
-                    break;
-                case 't':
-                    unop(function(x) {
-                        return (Math.exp(2*x) - 1) / (Math.exp(2*x) + 1);
-                    });
-                    break;
-            }
-            Prefix = null;
-        };
+    function op_sinh() {
+        unop(function(x) {
+            return (Math.exp(x) - Math.exp(-x)) / 2;
+        });
     }
 
-    function op_ahyp() {
-        Prefix = function(k) {
-            switch (k) {
-                case 's':
-                    unop(function(x) {
-                        return Math.log(x + Math.sqrt(x*x + 1));
-                    });
-                    break;
-                case 'c':
-                    unop(function(x) {
-                        return Math.log(x + Math.sqrt(x*x - 1));
-                    });
-                    break;
-                case 't':
-                    unop(function(x) {
-                        return Math.log((1 + x) / (1 - x)) / 2;
-                    });
-                    break;
-            }
-            Prefix = null;
-        };
+    function op_cosh() {
+        unop(function(x) {
+            return (Math.exp(x) + Math.exp(-x)) / 2;
+        });
+    }
+
+    function op_tanh() {
+        unop(function(x) {
+            return (Math.exp(2*x) - 1) / (Math.exp(2*x) + 1);
+        });
+    }
+
+    function op_asinh() {
+        unop(function(x) {
+            return Math.log(x + Math.sqrt(x*x + 1));
+        });
+    }
+
+    function op_acosh() {
+        unop(function(x) {
+            return Math.log(x + Math.sqrt(x*x - 1));
+        });
+    }
+
+    function op_atanh() {
+        unop(function(x) {
+            return Math.log((1 + x) / (1 - x)) / 2;
+        });
     }
 
     function op_sin() {
@@ -667,14 +634,8 @@
         });
     }
 
-    function op_dim() {
-        Prefix = function(k) {
-            var i = "qE)y?".indexOf(k);
-            if (i >= 0) {
-                g_Matrix[i] = new Matrix(Stack[1], Stack[0]);
-            }
-            Prefix = null;
-        };
+    function op_dim(m) {
+        g_Matrix[m] = new Matrix(Stack[1], Stack[0]);
     }
 
     function op_asin() {
@@ -727,52 +688,30 @@
         op_input('e');
     }
 
-    function op_result() {
-        Prefix = function(k) {
-            var i = "qE)y?".indexOf(k);
-            if (i >= 0) {
-                Result = i;
-            }
-            Prefix = null;
-        };
+    function op_result(m) {
+        Result = m;
     }
 
     function op_pi() {
         push(Math.PI);
     }
 
-    function op_xchg() {
-        Prefix = function(k) {
-            if (k >= '0' && k <= '9') {
-                var r = Number(k);
-                var t = Reg[r];
-                Reg[r] = Stack[0];
-                Stack[0] = t;
-            }
-            Prefix = null;
-        };
+    function op_xchg(r) {
+        var t = Reg[r];
+        Reg[r] = Stack[0];
+        Stack[0] = t;
     }
 
-    function op_sf() {
-        Prefix = function(k) {
-            if (k > '0' && k <= '9') {
-                Flags[k] = true;
-            }
-            Prefix = null;
-        };
+    function op_sf(f) {
+        Flags[f] = true;
     }
 
     function op_dse() {
         alert("Unimplemented: DSE");
     }
 
-    function op_cf() {
-        Prefix = function(k) {
-            if (k > '0' && k <= '9') {
-                Flags[k] = false;
-            }
-            Prefix = null;
-        };
+    function op_cf(f) {
+        Flags[f] = false;
     }
 
     function op_isg() {
@@ -1032,41 +971,34 @@
         $("#g").css("display", "block");
     }
 
-    function op_sto() {
-        var op = null;
-        Prefix = function(k) {
-            if (k >= '0' && k <= '9') {
-                switch (op) {
-                    case '+': Reg[Number(k)] += Stack[0]; break;
-                    case '-': Reg[Number(k)] -= Stack[0]; break;
-                    case '*': Reg[Number(k)] *= Stack[0]; break;
-                    case '/': Reg[Number(k)] /= Stack[0]; break;
-                    default:  Reg[Number(k)] = Stack[0]; break;
-                }
-            } else if (k === '+' || k === '-' || k === '*' || k === '/') {
-                op = k;
-                return;
+    function op_sto_reg(n) {
+        Reg[n] = Stack[0];
+    }
+
+    function op_sto_op_reg(op, n) {
+        switch (op) {
+            case '+': Reg[n] += Stack[0]; break;
+            case '-': Reg[n] -= Stack[0]; break;
+            case '*': Reg[n] *= Stack[0]; break;
+            case '/': Reg[n] /= Stack[0]; break;
+        }
+    }
+
+    function op_sto_matrix(m) {
+        g_Matrix[m].set(Reg[0], Reg[1], Stack[0]);
+        update_lcd(String.fromCharCode("A".charCodeAt(0) + m) + "\t" + Reg[0] + "," + Reg[1]);
+        DelayUpdate = 1000;
+        if (User) {
+            if (Reg[1] < g_Matrix[m].cols) {
+                Reg[1]++;
+            } else if (Reg[0] < g_Matrix[m].rows) {
+                Reg[0]++;
+                Reg[1] = 1;
             } else {
-                var i = "qE)y?".indexOf(k);
-                if (i >= 0) {
-                    g_Matrix[i].set(Reg[0], Reg[1], Stack[0]);
-                    update_lcd(String.fromCharCode("A".charCodeAt(0) + i) + "\t" + Reg[0] + "," + Reg[1]);
-                    DelayUpdate = 1000;
-                    if (User) {
-                        if (Reg[1] < g_Matrix[i].cols) {
-                            Reg[1]++;
-                        } else if (Reg[0] < g_Matrix[i].rows) {
-                            Reg[0]++;
-                            Reg[1] = 1;
-                        } else {
-                            Reg[0] = 1;
-                            Reg[1] = 1;
-                        }
-                    }
-                }
+                Reg[0] = 1;
+                Reg[1] = 1;
             }
-            Prefix = null;
-        };
+        }
     }
 
     function op_frac() {
@@ -1079,58 +1011,41 @@
         unop(trunc);
     }
 
-    function op_rcl() {
-        var op = null;
-        Prefix = function(k) {
-            if (k >= '0' && k <= '9') {
-                switch (op) {
-                    case '+': Stack[0] += Reg[Number(k)]; break;
-                    case '-': Stack[0] -= Reg[Number(k)]; break;
-                    case '*': Stack[0] *= Reg[Number(k)]; break;
-                    case '/': Stack[0] /= Reg[Number(k)]; break;
-                    default:  push(Reg[Number(k)]); break;
-                }
-            } else if (k === '+' || k === '-' || k === '*' || k === '/') {
-                op = k;
-                return;
-            } else if (k === '_') {
-                Prefix = function(k) {
-                    var i = "qE)y?".indexOf(k);
-                    if (i >= 0) {
-                        push(new Descriptor(i));
-                    }
-                    Prefix = null;
-                }
-                return;
-            } else if (k === 's') {
-                Prefix = function(k) {
-                    var i = "qE)y?".indexOf(k);
-                    if (i >= 0) {
-                        push(g_Matrix[i].rows);
-                        push(g_Matrix[i].cols);
-                    }
-                    Prefix = null;
-                }
-                return;
+    function op_rcl_reg(r) {
+        push(Reg[r]);
+    }
+
+    function op_rcl_op_reg(op, r) {
+        switch (op) {
+            case '+': Stack[0] += Reg[r]; break;
+            case '-': Stack[0] -= Reg[r]; break;
+            case '*': Stack[0] *= Reg[r]; break;
+            case '/': Stack[0] /= Reg[r]; break;
+        }
+    }
+
+    function op_rcl_descriptor(m) {
+        push(new Descriptor(m));
+    }
+
+    function op_rcl_dim(m) {
+        push(g_Matrix[m].rows);
+        push(g_Matrix[m].cols);
+    }
+
+    function op_rcl_matrix(m) {
+        push(g_Matrix[m].get(Reg[0], Reg[1]));
+        if (User) {
+            if (Reg[1] < g_Matrix[m].cols) {
+                Reg[1]++;
+            } else if (Reg[0] < g_Matrix[m].rows) {
+                Reg[0]++;
+                Reg[1] = 1;
             } else {
-                var i = "qE)y?".indexOf(k);
-                if (i >= 0) {
-                    push(g_Matrix[i].get(Reg[0], Reg[1]));
-                    if (User) {
-                        if (Reg[1] < g_Matrix[i].cols) {
-                            Reg[1]++;
-                        } else if (Reg[0] < g_Matrix[i].rows) {
-                            Reg[0]++;
-                            Reg[1] = 1;
-                        } else {
-                            Reg[0] = 1;
-                            Reg[1] = 1;
-                        }
-                    }
-                }
+                Reg[0] = 1;
+                Reg[1] = 1;
             }
-            Prefix = null;
-        };
+        }
     }
 
     function op_user() {
@@ -1284,25 +1199,242 @@
         NewDigitEntry = true;
     }
 
-    function key(k) {
-        var s = Shift;
-        Shift = -1;
+    function exec_op(op) {
         OldStackLift = StackLift;
         NewDigitEntry = false;
         NewStackLift = true;
+        op();
+        DigitEntry = NewDigitEntry;
+        StackLift = NewStackLift;
+    }
+
+    function decode_matrix(k) {
+        Prefix = function(k) {
+            switch (k) {
+                case '0': return op_matrix_clear;
+                case '1': return op_matrix_home;
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9': alert("Unimplemented: MATRIX " + k); break;
+            }
+        };
+        return null;
+    }
+
+    function decode_fix(k) {
+        Prefix = function(k) {
+            if (k >= '0' && k <= '9') {
+                return function() { op_fix(Number(k)); };
+            }
+        };
+        return null;
+    }
+
+    function decode_sci(k) {
+        Prefix = function(k) {
+            if (k >= '0' && k <= '9') {
+                return function() { op_sci(Number(k)); };
+            }
+        };
+        return null;
+    }
+
+    function decode_eng(k) {
+        Prefix = function(k) {
+            if (k >= '0' && k <= '9') {
+                return function() { op_eng(Number(k)); };
+            }
+        };
+        return null;
+    }
+
+    function decode_solve(k) {
+        alert("Unimplemented: SOLVE");
+        return null;
+    }
+
+    function decode_lbl(k) {
+        alert("Unimplemented: LBL");
+        return null;
+    }
+
+    function decode_hyp(k) {
+        Prefix = function(k) {
+            switch (k) {
+                case 's': return op_sinh;
+                case 'c': return op_cosh;
+                case 't': return op_tanh;
+            }
+        };
+        return null;
+    }
+
+    function decode_ahyp(k) {
+        Prefix = function(k) {
+            switch (k) {
+                case 's': return op_asinh;
+                case 'c': return op_acosh;
+                case 't': return op_atanh;
+            }
+        };
+        return null;
+    }
+
+    function decode_dim(k) {
+        Prefix = function(k) {
+            var i = "qE)y?".indexOf(k);
+            if (i >= 0) {
+                return function() { op_dim(i); };
+            }
+        };
+        return null;
+    }
+
+    function decode_result(k) {
+        Prefix = function(k) {
+            var i = "qE)y?".indexOf(k);
+            if (i >= 0) {
+                return function() { op_result(i); };
+            }
+        };
+        return null;
+    }
+
+    function decode_xchg(k) {
+        Prefix = function(k) {
+            if (k >= '0' && k <= '9') {
+                return function() { op_xchg(Number(k)); };
+            }
+        };
+        return null;
+    }
+
+    function decode_sf(k) {
+        Prefix = function(k) {
+            if (k > '0' && k <= '9') {
+                return function() { op_sf(Number(k)); };
+            }
+        };
+        return null;
+    }
+
+    function decode_cf(k) {
+        Prefix = function(k) {
+            if (k > '0' && k <= '9') {
+                return function() { op_cf(Number(k)); };
+            }
+        };
+        return null;
+    }
+
+    function decode_ftest(k) {
+        alert("Unimplemented: F?");
+        return null;
+    }
+
+    function decode_integrate(k) {
+        alert("Unimplemented: \u222bxy");
+        return null;
+    }
+
+    function decode_test(k) {
+        alert("Unimplemented: TEST");
+        return null;
+    }
+
+    function decode_sto(k) {
+        var op = null;
+        Prefix = function(k) {
+            if (k >= '0' && k <= '9') {
+                if (op !== null) {
+                    return function() { op_sto_op_reg(op, Number(k)); };
+                } else {
+                    return function() { op_sto_reg(Number(k)); };
+                }
+            } else if (k === '+' || k === '-' || k === '*' || k === '/') {
+                op = k;
+                Prefix = OldPrefix;
+                return null;
+            } else {
+                var i = "qE)y?".indexOf(k);
+                if (i >= 0) {
+                    return function() { op_sto_matrix(i); };
+                }
+            }
+        };
+        return null;
+    }
+
+    function decode_rcl(k) {
+        var op = null;
+        Prefix = function(k) {
+            if (k >= '0' && k <= '9') {
+                if (op !== null) {
+                    return function() { op_rcl_op_reg(op, Number(k)); };
+                } else {
+                    return function() { op_rcl_reg(Number(k)); };
+                }
+            } else if (k === '+' || k === '-' || k === '*' || k === '/') {
+                op = k;
+                Prefix = OldPrefix;
+                return null;
+            } else if (k === '_') {
+                Prefix = function(k) {
+                    var i = "qE)y?".indexOf(k);
+                    if (i >= 0) {
+                        return function() { op_rcl_descriptor(i); };
+                    }
+                }
+                return null;
+            } else if (k === 's') {
+                Prefix = function(k) {
+                    var i = "qE)y?".indexOf(k);
+                    if (i >= 0) {
+                        return function() { op_rcl_dim(i); };
+                    }
+                }
+                return null;
+            } else {
+                var i = "qE)y?".indexOf(k);
+                if (i >= 0) {
+                    return function() { op_rcl_matrix(i); };
+                }
+            }
+        };
+        return null;
+    }
+
+    function decode(k) {
+        var d = null;
+        var s = Shift;
+        Shift = -1;
         if (Prefix != null) {
-            Prefix(k);
+            d = Prefix;
         } else if (jQuery.isArray(CharTable[k])) {
-            CharTable[k][s]();
+            d = CharTable[k][s];
         } else {
-            CharTable[k]();
+            d = CharTable[k];
         }
+        OldPrefix = Prefix;
+        Prefix = null;
+        var r = d(k);
         if (Shift === -1) {
             Shift = 0;
             $(".shift").css("display", "none");
         }
-        DigitEntry = NewDigitEntry;
-        StackLift = NewStackLift;
+        return r;
+    }
+
+    function key(k) {
+        var op = decode(k);
+        if (op !== null) {
+            exec_op(op);
+        }
         if (DelayUpdate === 0) {
             update_display();
         } else {
