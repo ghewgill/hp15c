@@ -323,7 +323,11 @@
             $("#reg_" + i).val(Reg[i]);
         }
         if (DigitEntry) {
-            update_lcd(Entry);
+            if (Entry !== "") {
+                update_lcd(Entry);
+            } else {
+                update_display_num(0);
+            }
         } else {
             update_display_num(Stack[0]);
         }
