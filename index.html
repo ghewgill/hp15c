@@ -1377,11 +1377,9 @@
         });
         $(document).keypress(function(e) {
             var c = String.fromCharCode(e.which);
-            if (c === '\b') {
-                e.preventDefault();
-            }
             if (CharTable[c]) {
                 key(c);
+                e.preventDefault();
             }
             e.stopPropagation();
         });
