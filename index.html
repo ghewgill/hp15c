@@ -48,20 +48,20 @@
     .indicator-on {
         display: block;
     }
+    #user {
+        left: 190;
+    }
     #f {
-        left: 200;
+        left: 230;
     }
     #g {
-        left: 220;
+        left: 250;
     }
     #trigmode {
         left: 300;
     }
     #complex {
-        left: 380;
-    }
-    #user {
-        left: 400;
+        left: 390;
     }
 </style>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
@@ -88,7 +88,7 @@
     var DisplayMode = 1; // 1=FIX 2=SCI 3=ENG
     var DisplayDigits = 4;
     var TrigFactor = Math.PI / 180;
-    var Flags = new Array(10);
+    var Flags = [false, false, false, false, false, false, false, false, false, false];
     var User = false;
     var Result = 0;
 
@@ -1563,11 +1563,11 @@
 <img id="dig9" class="lcd" src="9.png">
 <img id="decimal" class="lcd" src="decimal.png">
 <img id="neg" class="lcd" src="neg.png">
+<div id="user" class="indicator">USER</div>
 <div id="f" class="shift indicator">f</div>
 <div id="g" class="shift indicator">g</div>
 <div id="trigmode" class="indicator"></div>
 <div id="complex" class="indicator">C</div>
-<div id="user" class="indicator">USER</div>
 </div>
 <div id="test">
 <input type="button" onclick="run_test()" value="Test">
