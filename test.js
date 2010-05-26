@@ -263,7 +263,7 @@ for (var t in Tests) {
     var test = Tests[t];
     var keys = test[0];
     for (var i = 0; i < keys.length; i++) {
-        key(keys[i]);
+        key(keys.substr(i, 1));
     }
     if (test.length > 1) {
         var expected = test[1];
