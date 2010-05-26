@@ -45,6 +45,9 @@
         font-family: sans-serif;
         font-size: 10px;
     }
+    .indicator-on {
+        display: block;
+    }
     #f {
         left: 200;
     }
@@ -334,7 +337,7 @@
         } else {
             update_display_num(Stack[0]);
         }
-        $("#complex").css("display", Flags[8] ? "block" : "none");
+        $("#complex").toggleClass("indicator-on", Flags[8]);
         $(".stacki").css("display", Flags[8] ? "table-cell" : "none");
     }
 
@@ -528,7 +531,7 @@
 
     function op_deg() {
         TrigFactor = Math.PI / 180;
-        $("#trigmode").css("display", "none");
+        $("#trigmode").removeClass("indicator-on");
         StackLift = OldStackLift;
     }
 
@@ -540,7 +543,7 @@
 
     function op_rad() {
         TrigFactor = 1;
-        $("#trigmode").css("display", "block").text("RAD");
+        $("#trigmode").addClass("indicator-on").text("RAD");
         StackLift = OldStackLift;
     }
 
@@ -551,7 +554,7 @@
 
     function op_grd() {
         TrigFactor = Math.PI / 200;
-        $("#trigmode").css("display", "block").text("GRAD");
+        $("#trigmode").addClass("indicator-on").text("GRAD");
         StackLift = OldStackLift;
     }
 
@@ -961,14 +964,14 @@
 
     function op_f() {
         Shift = 1;
-        $(".shift").css("display", "none");
-        $("#f").css("display", "block");
+        $(".shift").removeClass("indicator-on");
+        $("#f").addClass("indicator-on");
     }
 
     function op_g() {
         Shift = 2;
-        $(".shift").css("display", "none");
-        $("#g").css("display", "block");
+        $(".shift").removeClass("indicator-on");
+        $("#g").addClass("indicator-on");
     }
 
     function op_sto_reg(n) {
@@ -1050,7 +1053,7 @@
 
     function op_user() {
         User = !User;
-        $("#user").css("display", User ? "block" : "none");
+        $("#user").toggleClass("indicator-on", User);
         StackLift = OldStackLift;
     }
 
@@ -1425,7 +1428,7 @@
         var r = d(k);
         if (Shift === -1) {
             Shift = 0;
-            $(".shift").css("display", "none");
+            $(".shift").removeClass("indicator-on");
         }
         return r;
     }
