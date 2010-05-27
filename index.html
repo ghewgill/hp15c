@@ -64,7 +64,8 @@
         left: 390;
     }
 </style>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
+<!--script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script-->
+<script type="text/javascript" src="jquery-1.4.2.min.js"></script>
 <script type="text/javascript">
 //<![CDATA[
     var Digits = [];
@@ -338,7 +339,7 @@
             update_display_num(Stack[0]);
         }
         $("#complex").toggleClass("indicator-on", Flags[8]);
-        $(".stacki").css("display", Flags[8] ? "table-cell" : "none");
+        $(".stacki").css("display", Flags[8] ? "inline" : "none");
     }
 
     function push(x, forcelift) {
