@@ -66,6 +66,7 @@
 </style>
 <!--script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script-->
 <script type="text/javascript" src="jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="sprintf-0.6.js"></script>
 <script type="text/javascript">
 //<![CDATA[
     var Digits = [];
@@ -91,6 +92,9 @@
     var TrigFactor = Math.PI / 180;
     var Flags = [false, false, false, false, false, false, false, false, false, false];
     var User = false;
+    var Prgm = false;
+    var Program = [null];
+    var PC = 0;
     var Result = 0;
 
     function OpcodeInfo(keys, defn, programmable) {
@@ -391,6 +395,10 @@
                 if (eex) {
                     Display[7].attr("src", Digits["-"].src);
                     Display[7].css("display", "inline");
+                } else if (d > 0) {
+                    Display[d].attr("src", Digits["-"].src);
+                    Display[d].css("display", "inline");
+                    d++;
                 } else {
                     neg.css("display", "inline");
                 }
@@ -402,6 +410,8 @@
                 Display[8].css("display", "inline");
                 Display[9].attr("src", Digits[0].src);
                 Display[9].css("display", "inline");
+            } else if (c === ' ') {
+                d++;
             }
         }
     }
@@ -447,33 +457,47 @@
     }
 
     function update_display() {
-        if (DigitEntry) {
-            Stack[0] = Number(Entry);
-        }
-        for (var i = 0; i < 4; i++) {
-            $("#stack_" + i).val(Stack[i]);
-        }
-        $("#last_x").val(LastX);
-        if (Flags[8]) {
-            for (var i = 0; i < 4; i++) {
-                $("#stacki_" + i).val(StackI[i]);
+        if (Prgm) {
+            var s = sprintf("%03d-", PC);
+            if (PC > 0) {
+                var keys = Program[PC].info.keys;
+                for (var i = 0; i < keys.length; i++) {
+                    if (i > 0) {
+                        s += ".";
+                    }
+                    s += sprintf("%2d", keys[i]);
+                }
             }
-            $("#last_xi").val(LastXI);
-        }
-        for (var i = 0; i < 10; i++) {
-            $("#reg_" + i).val(Reg[i]);
-        }
-        if (DigitEntry) {
-            if (Entry !== "") {
-                update_lcd(Entry);
-            } else {
-                update_display_num(0);
-            }
+            update_lcd(s);
         } else {
-            update_display_num(Stack[0]);
+            if (DigitEntry) {
+                Stack[0] = Number(Entry);
+            }
+            for (var i = 0; i < 4; i++) {
+                $("#stack_" + i).val(Stack[i]);
+            }
+            $("#last_x").val(LastX);
+            if (Flags[8]) {
+                for (var i = 0; i < 4; i++) {
+                    $("#stacki_" + i).val(StackI[i]);
+                }
+                $("#last_xi").val(LastXI);
+            }
+            for (var i = 0; i < 10; i++) {
+                $("#reg_" + i).val(Reg[i]);
+            }
+            if (DigitEntry) {
+                if (Entry !== "") {
+                    update_lcd(Entry);
+                } else {
+                    update_display_num(0);
+                }
+            } else {
+                update_display_num(Stack[0]);
+            }
+            $("#complex").toggleClass("indicator-on", Flags[8]);
+            $(".stacki").css("display", Flags[8] ? "inline" : "none");
         }
-        $("#complex").toggleClass("indicator-on", Flags[8]);
-        $(".stacki").css("display", Flags[8] ? "inline" : "none");
     }
 
     function push(x, forcelift) {
@@ -889,7 +913,7 @@
     }
 
     function op_pr() {
-        alert("Unimplemented: P/R");
+        Prgm = !Prgm;
         StackLift = OldStackLift;
     }
 
@@ -1355,7 +1379,8 @@
     function decode_fix(k) {
         Prefix = function(k) {
             if (k >= '0' && k <= '9') {
-                return new Opcode(new OpcodeInfo([42,7,k]), function() { op_fix(Number(k)); });
+                var i = Number(k);
+                return new Opcode(new OpcodeInfo([42,7,i]), function() { op_fix(i); });
             }
         };
         return null;
@@ -1364,7 +1389,8 @@
     function decode_sci(k) {
         Prefix = function(k) {
             if (k >= '0' && k <= '9') {
-                return new Opcode(new OpcodeInfo([42,8,k]), function() { op_sci(Number(k)); });
+                var i = Number(k);
+                return new Opcode(new OpcodeInfo([42,8,i]), function() { op_sci(i); });
             }
         };
         return null;
@@ -1373,7 +1399,8 @@
     function decode_eng(k) {
         Prefix = function(k) {
             if (k >= '0' && k <= '9') {
-                return new Opcode(new OpcodeInfo([42,9,k]), function() { op_eng(Number(k)); });
+                var i = Number(k);
+                return new Opcode(new OpcodeInfo([42,9,i]), function() { op_eng(i); });
             }
         };
         return null;
@@ -1439,7 +1466,8 @@
     function decode_xchg(k) {
         Prefix = function(k) {
             if (k >= '0' && k <= '9') {
-                return new Opcode(new OpcodeInfo([42,4,k]), function() { op_xchg(Number(k)); });
+                var i = Number(k);
+                return new Opcode(new OpcodeInfo([42,4,i]), function() { op_xchg(i); });
             }
         };
         return null;
@@ -1448,7 +1476,8 @@
     function decode_sf(k) {
         Prefix = function(k) {
             if (k > '0' && k <= '9') {
-                return new Opcode(new OpcodeInfo([43,4,k]), function() { op_sf(Number(k)); });
+                var i = Number(k);
+                return new Opcode(new OpcodeInfo([43,4,i]), function() { op_sf(i); });
             }
         };
         return null;
@@ -1457,7 +1486,8 @@
     function decode_cf(k) {
         Prefix = function(k) {
             if (k > '0' && k <= '9') {
-                return new Opcode(new OpcodeInfo([43,5,k]), function() { op_cf(Number(k)); });
+                var i = Number(k);
+                return new Opcode(new OpcodeInfo([43,5,i]), function() { op_cf(i); });
             }
         };
         return null;
@@ -1501,10 +1531,11 @@
         var op = null;
         Prefix = function(k) {
             if (k >= '0' && k <= '9') {
+                var i = Number(k);
                 if (op !== null) {
-                    return new Opcode(new OpcodeInfo([44,99,k]), function() { op_sto_op_reg(op, Number(k)); });
+                    return new Opcode(new OpcodeInfo([44,99,i]), function() { op_sto_op_reg(op, i); });
                 } else {
-                    return new Opcode(new OpcodeInfo([44,k]), function() { op_sto_reg(Number(k)); });
+                    return new Opcode(new OpcodeInfo([44,i]), function() { op_sto_reg(i); });
                 }
             } else if (k === '+' || k === '-' || k === '*' || k === '/') {
                 op = k;
@@ -1524,10 +1555,11 @@
         var op = null;
         Prefix = function(k) {
             if (k >= '0' && k <= '9') {
+                var i = Number(k);
                 if (op !== null) {
-                    return new Opcode(new OpcodeInfo([45,99,k]), function() { op_rcl_op_reg(op, Number(k)); });
+                    return new Opcode(new OpcodeInfo([45,99,i]), function() { op_rcl_op_reg(op, i); });
                 } else {
-                    return new Opcode(new OpcodeInfo([45,k]), function() { op_rcl_reg(Number(k)); });
+                    return new Opcode(new OpcodeInfo([45,i]), function() { op_rcl_reg(i); });
                 }
             } else if (k === '+' || k === '-' || k === '*' || k === '/') {
                 op = k;
@@ -1583,7 +1615,12 @@
     function key(k) {
         var op = decode(k);
         if (op !== null) {
-            op.exec();
+            if (Prgm && op.info.programmable) {
+                PC++;
+                Program.splice(PC, 0, op);
+            } else {
+                op.exec();
+            }
         }
         if (DelayUpdate === 0) {
             update_display();
