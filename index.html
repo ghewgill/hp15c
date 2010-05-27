@@ -93,62 +93,178 @@
     var User = false;
     var Result = 0;
 
-    function _(x) { return function(k) { return x; }}
+    function OpcodeInfo(keys, defn, programmable) {
+        this.keys = keys;
+        this.defn = defn;
+        this.programmable = programmable !== false;
+    }
+
+    var OpSqrt      = new OpcodeInfo([11],      op_sqrt);
+    var OpA         = new OpcodeInfo([42,11],   op_A);
+    var OpX2        = new OpcodeInfo([43,11],   op_x2);
+    var OpEx        = new OpcodeInfo([12],      op_ex);
+    var OpB         = new OpcodeInfo([42,12],   op_B);
+    var OpLn        = new OpcodeInfo([43,12],   op_ln);
+    var Op10x       = new OpcodeInfo([13],      op_10x);
+    var OpC         = new OpcodeInfo([42,13],   op_C);
+    var OpLog       = new OpcodeInfo([43,13],   op_log);
+    var OpYx        = new OpcodeInfo([14],      op_yx);
+    var OpD         = new OpcodeInfo([42,14],   op_D);
+    var OpPct       = new OpcodeInfo([43,14],   op_pct);
+    var Op1x        = new OpcodeInfo([15],      op_1x);
+    var OpE         = new OpcodeInfo([42,15],   op_E);
+    var OpDpct      = new OpcodeInfo([43,15],   op_dpct);
+    var OpChs       = new OpcodeInfo([16],      op_chs);
+    //var OpMatrix
+    var OpAbs       = new OpcodeInfo([43,16],   op_abs);
+    var Op7         = new OpcodeInfo([7],       function() { op_input('7'); });
+    //var OpFix
+    var OpDeg       = new OpcodeInfo([43,7],    op_deg);
+    var Op8         = new OpcodeInfo([8],       function() { op_input('8'); });
+    //var OpSci
+    var OpRad       = new OpcodeInfo([43,8],    op_rad);
+    var Op9         = new OpcodeInfo([9],       function() { op_input('9'); });
+    //var OpEng
+    var OpGrd       = new OpcodeInfo([43,9],    op_grd);
+    var OpDiv       = new OpcodeInfo([10],      op_div);
+    //var OpSolve
+    var OpLe        = new OpcodeInfo([44,10],   op_le);
+    var OpSst       = new OpcodeInfo([21],      op_sst, false);
+    //var OpLbl
+    var OpBst       = new OpcodeInfo([43,21],   op_bst, false);
+    //var OpGto
+    //var OpHyp
+    //var OpAhyp
+    var OpSin       = new OpcodeInfo([23],      op_sin);
+    //var OpDim
+    var OpAsin      = new OpcodeInfo([43,23],   op_asin);
+    var OpCos       = new OpcodeInfo([24],      op_cos);
+    var OpIndex     = new OpcodeInfo([42,24],   op_index, false);
+    var OpAcos      = new OpcodeInfo([43,24],   op_acos);
+    var OpTan       = new OpcodeInfo([25],      op_tan);
+    var OpI         = new OpcodeInfo([42,25],   op_I);
+    var OpAtan      = new OpcodeInfo([43,25],   op_atan);
+    var OpEex       = new OpcodeInfo([26],      op_eex);
+    //var OpResult
+    var OpPi        = new OpcodeInfo([43,26],   op_pi);
+    var Op4         = new OpcodeInfo([4],       function() { op_input('4'); });
+    //var OpXchg
+    //var OpSf
+    var Op5         = new OpcodeInfo([5],       function() { op_input('5'); });
+    var OpDse       = new OpcodeInfo([42,5],    op_dse);
+    //var OpCf
+    var Op6         = new OpcodeInfo([6],       function() { op_input('6'); });
+    var OpIsg       = new OpcodeInfo([42,6],    op_isg);
+    //var OpFtest
+    var OpMul       = new OpcodeInfo([20],      op_mul);
+    //var OpIntegrate
+    var OpEq        = new OpcodeInfo([43,20],   op_eq);
+    var OpRs        = new OpcodeInfo([31],      op_rs, false);
+    var OpPse       = new OpcodeInfo([42,31],   op_pse);
+    var OpPr        = new OpcodeInfo([43,31],   op_pr, false);
+    //var OpGsb
+    var OpClearStat = new OpcodeInfo([42,32],   op_clear_stat);
+    var OpRtn       = new OpcodeInfo([43,32],   op_rtn);
+    var OpRoll      = new OpcodeInfo([33],      op_roll);
+    var OpClearPrgm = new OpcodeInfo([42,33],   op_clear_prgm, false);
+    var OpRollup    = new OpcodeInfo([43,33],   op_rollup);
+    var OpXy        = new OpcodeInfo([34],      op_xy);
+    var OpClearReg  = new OpcodeInfo([42,34],   op_clear_reg);
+    var OpRnd       = new OpcodeInfo([43,34],   op_rnd);
+    var OpBack      = new OpcodeInfo([35],      op_back, false);
+    var OpClearPrefix=new OpcodeInfo([42,35],   op_clear_prefix, false);
+    var OpClx       = new OpcodeInfo([43,35],   op_clx);
+    var OpEnter     = new OpcodeInfo([36],      op_enter);
+    var OpRand      = new OpcodeInfo([42,36],   op_rand);
+    var OpLastx     = new OpcodeInfo([43,36],   op_lastx);
+    var Op1         = new OpcodeInfo([1],       function() { op_input('1'); });
+    var OpToR       = new OpcodeInfo([42,1],    op_to_r);
+    var OpToP       = new OpcodeInfo([42,1],    op_to_p);
+    var Op2         = new OpcodeInfo([2],       function() { op_input('2'); });
+    var OpToHms     = new OpcodeInfo([42,2],    op_to_hms);
+    var OpToH       = new OpcodeInfo([43,2],    op_to_h);
+    var Op3         = new OpcodeInfo([3],       function() { op_input('3'); });
+    var OpToRad     = new OpcodeInfo([42,3],    op_to_rad);
+    var OpToDeg     = new OpcodeInfo([43,3],    op_to_deg);
+    var OpSub       = new OpcodeInfo([40],      op_sub);
+    var OpReIm      = new OpcodeInfo([42,40],   op_re_im);
+    //var OpTest
+    var OpOn        = new OpcodeInfo([41],      op_on, false);
+    //var OpSto
+    var OpFrac      = new OpcodeInfo([42,44],   op_frac);
+    var OpInt       = new OpcodeInfo([43,44],   op_int);
+    //var OpRcl
+    var OpUser      = new OpcodeInfo([42,46],   op_user, false);
+    var OpMem       = new OpcodeInfo([43,46],   op_mem, false);
+    var Op0         = new OpcodeInfo([0],       function() { op_input('0'); });
+    var OpFact      = new OpcodeInfo([42,0],    op_fact);
+    var OpMean      = new OpcodeInfo([43,0],    op_mean);
+    var OpDot       = new OpcodeInfo([48],      function() { op_input('.'); });
+    var OpYhat      = new OpcodeInfo([42,48],   op_yhat);
+    var OpS         = new OpcodeInfo([43,48],   op_s);
+    var OpSum       = new OpcodeInfo([49],      op_sum);
+    var OpLr        = new OpcodeInfo([42,49],   op_lr);
+    var OpSumsub    = new OpcodeInfo([43,49],   op_sumsub);
+    var OpAdd       = new OpcodeInfo([50],      op_add);
+    var OpPyx       = new OpcodeInfo([42,50],   op_Pyx);
+    var OpCyx       = new OpcodeInfo([43,50],   op_Cyx);
+
+    function _(x) { return function(k) { return new Opcode(x); }; }
 
     var CharTable = {
-        ' ': [function() {}, function() {}, function() {}],
-        'q': [_(op_sqrt), _(op_A), _(op_x2)],
-        'E': [_(op_ex), _(op_B), _(op_ln)],
-        ')': [_(op_10x), _(op_C), _(op_log)],
-        '^': [_(op_yx), _(op_D), _(op_pct)],
-        '?': [_(op_1x), _(op_E), _(op_dpct)],
-        '_': [_(op_chs), decode_matrix, _(op_abs)],
-        '7': [_(function() { op_input('7'); }), decode_fix, _(op_deg)],
-        '8': [_(function() { op_input('8'); }), decode_sci, _(op_rad)],
-        '9': [_(function() { op_input('9'); }), decode_eng, _(op_grd)],
-        '/': [_(op_div), decode_solve, _(op_le)],
-        'T': [_(op_sst), decode_lbl, _(op_bst)],
-        'G': [_(op_gto), decode_hyp, decode_ahyp],
-        's': [_(op_sin), decode_dim, _(op_asin)],
-        'c': [_(op_cos), _(op_index), _(op_acos)],
-        't': [_(op_tan), _(op_I), _(op_atan)],
-        'e': [_(op_eex), decode_result, _(op_pi)],
-        '4': [_(function() { op_input('4'); }), decode_xchg, decode_sf],
-        '5': [_(function() { op_input('5'); }), _(op_dse), decode_cf],
-        '6': [_(function() { op_input('6'); }), _(op_isg), decode_ftest],
-        '*': [_(op_mul), decode_integrate, _(op_eq)],
-        'P': [_(op_rs), _(op_pse), _(op_pr)],
-        'U': [_(op_gsb), _(op_clear_stat), _(op_rtn)],
-        'r': [_(op_roll), _(op_clear_prgm), _(op_rollup)],
-        'x': [_(op_xy), _(op_clear_reg), _(op_rnd)],
-        '\b': [_(op_back), _(op_clear_prefix), _(op_clx)],
-        '\r': [_(op_enter), _(op_rand), _(op_lastx)],
-        '1': [_(function() { op_input('1'); }), _(op_to_r), _(op_to_p)],
-        '2': [_(function() { op_input('2'); }), _(op_to_hms), _(op_to_h)],
-        '3': [_(function() { op_input('3'); }), _(op_to_rad), _(op_to_deg)],
-        '-': [_(op_sub), _(op_re_im), decode_test],
-        '': [_(op_on), _(op_on), _(op_on)],
+        'q': [_(OpSqrt), _(OpA), _(OpX2)],
+        'E': [_(OpEx), _(OpB), _(OpLn)],
+        ')': [_(Op10x), _(OpC), _(OpLog)],
+        '^': [_(OpYx), _(OpD), _(OpPct)],
+        '?': [_(Op1x), _(OpE), _(OpDpct)],
+        '_': [_(OpChs), decode_matrix, _(OpAbs)],
+        '7': [_(Op7), decode_fix, _(OpDeg)],
+        '8': [_(Op8), decode_sci, _(OpRad)],
+        '9': [_(Op9), decode_eng, _(OpGrd)],
+        '/': [_(OpDiv), decode_solve, _(OpLe)],
+        'T': [_(OpSst), decode_lbl, _(OpBst)],
+        'G': [decode_gto, decode_hyp, decode_ahyp],
+        's': [_(OpSin), decode_dim, _(OpAsin)],
+        'c': [_(OpCos), _(OpIndex), _(OpAcos)],
+        't': [_(OpTan), _(OpI), _(OpAtan)],
+        'e': [_(OpEex), decode_result, _(OpPi)],
+        '4': [_(Op4), decode_xchg, decode_sf],
+        '5': [_(Op5), _(OpDse), decode_cf],
+        '6': [_(Op6), _(OpIsg), decode_ftest],
+        '*': [_(OpMul), decode_integrate, _(OpEq)],
+        'P': [_(OpRs), _(OpPse), _(OpPr)],
+        'U': [decode_gsb, _(OpClearStat), _(OpRtn)],
+        'r': [_(OpRoll), _(OpClearPrgm), _(OpRollup)],
+        'x': [_(OpXy), _(OpClearReg), _(OpRnd)],
+        '\b': [_(OpBack), _(OpClearPrefix), _(OpClx)],
+        '\r': [_(OpEnter), _(OpRand), _(OpLastx)],
+        '1': [_(Op1), _(OpToR), _(OpToP)],
+        '2': [_(Op2), _(OpToHms), _(OpToH)],
+        '3': [_(Op3), _(OpToRad), _(OpToDeg)],
+        '-': [_(OpSub), _(OpReIm), decode_test],
+        '': [_(OpOn), _(OpOn), _(OpOn)],
         'f': [decode_f, decode_f, decode_f],
         'g': [decode_g, decode_g, decode_g],
-        'S': [decode_sto, _(op_frac), _(op_int)],
-        'R': [decode_rcl, _(op_user), _(op_mem)],
-        '0': [_(function() { op_input('0'); }), _(op_fact), _(op_mean)],
-        '.': [_(function() { op_input('.'); }), _(op_yhat), _(op_s)],
-        ';': [_(op_sum), _(op_lr), _(op_sumsub)],
-        '+': [_(op_add), _(op_Pyx), _(op_Cyx)],
-        '!': _(op_fact),
-        '@': _(op_x2),
-        '%': _(op_pct),
-        'A': _(op_A),
-        'B': _(op_B),
-        'C': _(op_C),
-        'D': _(op_D),
-        'a': _(op_abs),
-        'i': _(op_int),
-        'I': _(op_I),
-        'l': _(op_ln),
-        'p': _(op_pi),
-        '\x12': _(op_rand)
+        'S': [decode_sto, _(OpFrac), _(OpInt)],
+        'R': [decode_rcl, _(OpUser), _(OpMem)],
+        '0': [_(Op0), _(OpFact), _(OpMean)],
+        '.': [_(OpDot), _(OpYhat), _(OpS)],
+        ';': [_(OpSum), _(OpLr), _(OpSumsub)],
+        '+': [_(OpAdd), _(OpPyx), _(OpCyx)],
+        ' ': _(OpEnter),
+        '!': _(OpFact),
+        '@': _(OpX2),
+        '%': _(OpPct),
+        'A': _(OpA),
+        'B': _(OpB),
+        'C': _(OpC),
+        'D': _(OpD),
+        'a': _(OpAbs),
+        'i': _(OpInt),
+        'I': _(OpI),
+        'l': _(OpLn),
+        'p': _(OpPi),
+        '\x12': _(OpRand)
     };
 
     var KeyTable = [
@@ -200,6 +316,24 @@
         this.toString = function() {
             return "<Descriptor " + this.label + " (" + g_Matrix[this.label].rows + "," + g_Matrix[this.label].cols + ")>";
         };
+    }
+
+    function Opcode(info, fn) {
+        this.info = info;
+        this.fn = fn;
+
+        this.exec = function() {
+            OldStackLift = StackLift;
+            NewDigitEntry = false;
+            NewStackLift = true;
+            if (this.fn === undefined) {
+                this.info.defn();
+            } else {
+                this.fn();
+            }
+            DigitEntry = NewDigitEntry;
+            StackLift = NewStackLift;
+        }
     }
 
     function trunc(x) {
@@ -1203,8 +1337,8 @@
     function decode_matrix(k) {
         Prefix = function(k) {
             switch (k) {
-                case '0': return op_matrix_clear;
-                case '1': return op_matrix_home;
+                case '0': return new Opcode(new OpcodeInfo([42,16,0], op_matrix_clear));
+                case '1': return new Opcode(new OpcodeInfo([42,16,1], op_matrix_home));
                 case '2':
                 case '3':
                 case '4':
@@ -1221,7 +1355,7 @@
     function decode_fix(k) {
         Prefix = function(k) {
             if (k >= '0' && k <= '9') {
-                return function() { op_fix(Number(k)); };
+                return new Opcode(new OpcodeInfo([42,7,k]), function() { op_fix(Number(k)); });
             }
         };
         return null;
@@ -1230,7 +1364,7 @@
     function decode_sci(k) {
         Prefix = function(k) {
             if (k >= '0' && k <= '9') {
-                return function() { op_sci(Number(k)); };
+                return new Opcode(new OpcodeInfo([42,8,k]), function() { op_sci(Number(k)); });
             }
         };
         return null;
@@ -1239,7 +1373,7 @@
     function decode_eng(k) {
         Prefix = function(k) {
             if (k >= '0' && k <= '9') {
-                return function() { op_eng(Number(k)); };
+                return new Opcode(new OpcodeInfo([42,9,k]), function() { op_eng(Number(k)); });
             }
         };
         return null;
@@ -1255,12 +1389,17 @@
         return null;
     }
 
+    function decode_gto() {
+        alert("Unimplemented: GTO");
+        return null;
+    }
+
     function decode_hyp(k) {
         Prefix = function(k) {
             switch (k) {
-                case 's': return op_sinh;
-                case 'c': return op_cosh;
-                case 't': return op_tanh;
+                case 's': return new Opcode(new OpcodeInfo([42,22,23], op_sinh));
+                case 'c': return new Opcode(new OpcodeInfo([42,22,24], op_cosh));
+                case 't': return new Opcode(new OpcodeInfo([42,22,25], op_tanh));
             }
         };
         return null;
@@ -1269,9 +1408,9 @@
     function decode_ahyp(k) {
         Prefix = function(k) {
             switch (k) {
-                case 's': return op_asinh;
-                case 'c': return op_acosh;
-                case 't': return op_atanh;
+                case 's': return new Opcode(new OpcodeInfo([43,22,23], op_asinh));
+                case 'c': return new Opcode(new OpcodeInfo([43,22,24], op_acosh));
+                case 't': return new Opcode(new OpcodeInfo([43,22,25], op_atanh));
             }
         };
         return null;
@@ -1281,7 +1420,7 @@
         Prefix = function(k) {
             var i = "qE)y?".indexOf(k);
             if (i >= 0) {
-                return function() { op_dim(i); };
+                return new Opcode(new OpcodeInfo([42,23,11+i]), function() { op_dim(i); });
             }
         };
         return null;
@@ -1291,7 +1430,7 @@
         Prefix = function(k) {
             var i = "qE)y?".indexOf(k);
             if (i >= 0) {
-                return function() { op_result(i); };
+                return new Opcode(new OpcodeInfo([42,26,11+i]), function() { op_result(i); });
             }
         };
         return null;
@@ -1300,7 +1439,7 @@
     function decode_xchg(k) {
         Prefix = function(k) {
             if (k >= '0' && k <= '9') {
-                return function() { op_xchg(Number(k)); };
+                return new Opcode(new OpcodeInfo([42,4,k]), function() { op_xchg(Number(k)); });
             }
         };
         return null;
@@ -1309,7 +1448,7 @@
     function decode_sf(k) {
         Prefix = function(k) {
             if (k > '0' && k <= '9') {
-                return function() { op_sf(Number(k)); };
+                return new Opcode(new OpcodeInfo([43,4,k]), function() { op_sf(Number(k)); });
             }
         };
         return null;
@@ -1318,7 +1457,7 @@
     function decode_cf(k) {
         Prefix = function(k) {
             if (k > '0' && k <= '9') {
-                return function() { op_cf(Number(k)); };
+                return new Opcode(new OpcodeInfo([43,5,k]), function() { op_cf(Number(k)); });
             }
         };
         return null;
@@ -1331,6 +1470,11 @@
 
     function decode_integrate(k) {
         alert("Unimplemented: \u222bxy");
+        return null;
+    }
+
+    function decode_gsb() {
+        alert("Unimplemented: GSB");
         return null;
     }
 
@@ -1358,9 +1502,9 @@
         Prefix = function(k) {
             if (k >= '0' && k <= '9') {
                 if (op !== null) {
-                    return function() { op_sto_op_reg(op, Number(k)); };
+                    return new Opcode(new OpcodeInfo([44,99,k]), function() { op_sto_op_reg(op, Number(k)); });
                 } else {
-                    return function() { op_sto_reg(Number(k)); };
+                    return new Opcode(new OpcodeInfo([44,k]), function() { op_sto_reg(Number(k)); });
                 }
             } else if (k === '+' || k === '-' || k === '*' || k === '/') {
                 op = k;
@@ -1369,7 +1513,7 @@
             } else {
                 var i = "qE)y?".indexOf(k);
                 if (i >= 0) {
-                    return function() { op_sto_matrix(i); };
+                    return new Opcode(new OpcodeInfo([44,16,11+i]), function() { op_sto_matrix(i); });
                 }
             }
         };
@@ -1381,9 +1525,9 @@
         Prefix = function(k) {
             if (k >= '0' && k <= '9') {
                 if (op !== null) {
-                    return function() { op_rcl_op_reg(op, Number(k)); };
+                    return new Opcode(new OpcodeInfo([45,99,k]), function() { op_rcl_op_reg(op, Number(k)); });
                 } else {
-                    return function() { op_rcl_reg(Number(k)); };
+                    return new Opcode(new OpcodeInfo([45,k]), function() { op_rcl_reg(Number(k)); });
                 }
             } else if (k === '+' || k === '-' || k === '*' || k === '/') {
                 op = k;
@@ -1393,7 +1537,7 @@
                 Prefix = function(k) {
                     var i = "qE)y?".indexOf(k);
                     if (i >= 0) {
-                        return function() { op_rcl_descriptor(i); };
+                        return new Opcode(new OpcodeInfo([45,16,11+i]), function() { op_rcl_descriptor(i); });
                     }
                 }
                 return null;
@@ -1401,14 +1545,14 @@
                 Prefix = function(k) {
                     var i = "qE)y?".indexOf(k);
                     if (i >= 0) {
-                        return function() { op_rcl_dim(i); };
+                        return new Opcode(new OpcodeInfo([45,23,11+i]), function() { op_rcl_dim(i); });
                     }
                 }
                 return null;
             } else {
                 var i = "qE)y?".indexOf(k);
                 if (i >= 0) {
-                    return function() { op_rcl_matrix(i); };
+                    return new Opcode(new OpcodeInfo([45,11+i]), function() { op_rcl_matrix(i); });
                 }
             }
         };
@@ -1439,7 +1583,7 @@
     function key(k) {
         var op = decode(k);
         if (op !== null) {
-            exec_op(op);
+            op.exec();
         }
         if (DelayUpdate === 0) {
             update_display();
