@@ -128,8 +128,8 @@
         '3': [_(function() { op_input('3'); }), _(op_to_rad), _(op_to_deg)],
         '-': [_(op_sub), _(op_re_im), decode_test],
         '': [_(op_on), _(op_on), _(op_on)],
-        'f': [_(op_f), _(op_f), _(op_f)],
-        'g': [_(op_g), _(op_g), _(op_g)],
+        'f': [decode_f, decode_f, decode_f],
+        'g': [decode_g, decode_g, decode_g],
         'S': [decode_sto, _(op_frac), _(op_int)],
         'R': [decode_rcl, _(op_user), _(op_mem)],
         '0': [_(function() { op_input('0'); }), _(op_fact), _(op_mean)],
@@ -963,18 +963,6 @@
         alert("Unimplemented: ON");
     }
 
-    function op_f() {
-        Shift = 1;
-        $(".shift").removeClass("indicator-on");
-        $("#f").addClass("indicator-on");
-    }
-
-    function op_g() {
-        Shift = 2;
-        $(".shift").removeClass("indicator-on");
-        $("#g").addClass("indicator-on");
-    }
-
     function op_sto_reg(n) {
         Reg[n] = Stack[0];
     }
@@ -1348,6 +1336,20 @@
 
     function decode_test(k) {
         alert("Unimplemented: TEST");
+        return null;
+    }
+
+    function decode_f() {
+        Shift = 1;
+        $(".shift").removeClass("indicator-on");
+        $("#f").addClass("indicator-on");
+        return null;
+    }
+
+    function decode_g() {
+        Shift = 2;
+        $(".shift").removeClass("indicator-on");
+        $("#g").addClass("indicator-on");
         return null;
     }
 
