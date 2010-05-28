@@ -562,22 +562,7 @@
     }
 
     function op_A() {
-        var p = PC;
-        while (true) {
-            if (Program[p].info.keys.toString() === [42,21,11].toString()) {
-                break;
-            }
-            p++;
-            if (p >= Program.length) {
-                p = 1;
-            }
-            if (p === PC) {
-                // error 4
-                return;
-            }
-        }
-        PC = p;
-        Running = true;
+        op_gsb(11);
     }
 
     function op_x2() {
@@ -602,7 +587,7 @@
     }
 
     function op_B() {
-        alert("Unimplemented: B");
+        op_gsb(12);
     }
 
     function op_ln() {
@@ -622,7 +607,7 @@
     }
 
     function op_C() {
-        alert("Unimplemented: C");
+        op_gsb(13);
     }
 
     function op_log() {
@@ -644,7 +629,7 @@
     }
 
     function op_D() {
-        alert("Unimplemented: D");
+        op_gsb(14);
     }
 
     function op_pct() {
@@ -665,7 +650,7 @@
     }
 
     function op_E() {
-        alert("Unimplemented: E");
+        op_gsb(15);
     }
 
     function op_dpct() {
@@ -925,12 +910,13 @@
     }
 
     function op_rs() {
-        alert("Unimplemented: R/S");
+        Running = !Running;
         StackLift = OldStackLift;
     }
 
     function op_pse() {
-        alert("Unimplemented: PSE");
+        //alert("Unimplemented: PSE");
+        // TODO set RunningPause?
         StackLift = OldStackLift;
     }
 
@@ -939,8 +925,23 @@
         StackLift = OldStackLift;
     }
 
-    function op_gsb() {
-        alert("Unimplemented: GSB");
+    function op_gsb(n) {
+        var p = PC;
+        while (true) {
+            if (Program[p].info.keys.toString() === [42,21,n].toString()) {
+                break;
+            }
+            p++;
+            if (p >= Program.length) {
+                p = 1;
+            }
+            if (p === PC) {
+                // error 4
+                return;
+            }
+        }
+        PC = p;
+        Running = true;
     }
 
     function op_clear_stat() {
@@ -954,7 +955,8 @@
     }
 
     function op_rtn() {
-        alert("Unimplemented: RTN");
+        Running = false;
+        PC = 0;
     }
 
     function op_roll() {
@@ -1525,7 +1527,17 @@
     }
 
     function decode_gsb() {
-        alert("Unimplemented: GSB");
+        Prefix = function(k) {
+            if (k > '0' && k <= '9') {
+                var i = Number(k);
+                return new Opcode(new OpcodeInfo([32,i]), function() { op_gsb(i); });
+            } else {
+                var i = "qE)y?".indexOf(k);
+                if (i >= 0) {
+                    return new Opcode(new OpcodeInfo([32,11+i]), function() { op_gsb(11+i); });
+                }
+            }
+        };
         return null;
     }
 
@@ -1636,11 +1648,14 @@
     }
 
     function step() {
+        if (PC === 0) {
+            PC = 1;
+        }
         //alert("PC="+PC+"\n"+Program[PC].info.defn);
         Program[PC].exec();
         PC++;
         if (PC >= Program.length) {
-            Running = false;
+            op_rtn();
         }
     }
 
