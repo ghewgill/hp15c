@@ -914,8 +914,10 @@
         alert("Unimplemented: ISG");
     }
 
-    function op_ftest() {
-        alert("Unimplemented: F?");
+    function op_ftest(f) {
+        if (!Flags[f]) {
+            PC++;
+        }
     }
 
     function op_mul() {
@@ -1158,8 +1160,23 @@
         Stack[0] = t;
     }
 
-    function op_test() {
-        alert("Unimplemented: TEST");
+    function op_test(t) {
+        var b;
+        switch (t) {
+            case 0: b = Stack[0] != 0; break;
+            case 1: b = Stack[0]  > 0; break;
+            case 2: b = Stack[0]  < 0; break;
+            case 3: b = Stack[0] >= 0; break;
+            case 4: b = Stack[0] <= 0; break;
+            case 5: b = Stack[0] == Stack[1]; break;
+            case 6: b = Stack[0] != Stack[1]; break;
+            case 7: b = Stack[0]  > Stack[1]; break;
+            case 8: b = Stack[0]  < Stack[1]; break;
+            case 9: b = Stack[0] >= Stack[1]; break;
+        }
+        if (!b) {
+            PC++;
+        }
     }
 
     function op_on() {
@@ -1449,9 +1466,14 @@
 
     function decode_lbl(k) {
         Prefix = function(k) {
-            var i = "qE)y?".indexOf(k);
-            if (i >= 0) {
-                return new Opcode(new OpcodeInfo([42,21,11+i]), function() {});
+            if (k >= '0' && k <= '9') {
+                var i = Number(k);
+                return new Opcode(new OpcodeInfo([42,21,i]), function() {});
+            } else {
+                var i = "qE)y?".indexOf(k);
+                if (i >= 0) {
+                    return new Opcode(new OpcodeInfo([42,21,11+i]), function() {});
+                }
             }
         }
         return null;
@@ -1562,7 +1584,12 @@
     }
 
     function decode_ftest(k) {
-        alert("Unimplemented: F?");
+        Prefix = function(k) {
+            if (k >= '0' && k <= '9') {
+                var i = Number(k);
+                return new Opcode(new OpcodeInfo([43,6,i]), function() { op_ftest(i); });
+            }
+        };
         return null;
     }
 
@@ -1587,7 +1614,12 @@
     }
 
     function decode_test(k) {
-        alert("Unimplemented: TEST");
+        Prefix = function(k) {
+            if (k >= '0' && k <= '9') {
+                var i = Number(k);
+                return new Opcode(new OpcodeInfo([43,30,i]), function() { op_test(i); });
+            }
+        };
         return null;
     }
 
