@@ -744,7 +744,14 @@
     }
 
     function op_sst() {
-        alert("Unimplemented: SST");
+        if (Prgm) {
+            PC++;
+            if (PC >= Program.length) {
+                PC = 0;
+            }
+        } else {
+            step();
+        }
         StackLift = OldStackLift;
     }
 
@@ -753,12 +760,32 @@
     }
 
     function op_bst() {
-        alert("Unimplemented: BST");
+        if (PC > 0) {
+            PC--;
+        }
         StackLift = OldStackLift;
     }
 
-    function op_gto() {
-        alert("Unimplemented: GTO");
+    function op_gto_immediate(n) {
+        PC = n;
+    }
+
+    function op_gto_label(n) {
+        var p = PC;
+        while (true) {
+            if (Program[p].info.keys.toString() === [42,21,n].toString()) {
+                break;
+            }
+            p++;
+            if (p >= Program.length) {
+                p = 1;
+            }
+            if (p === PC) {
+                // error 4
+                return;
+            }
+        }
+        PC = p;
     }
 
     function op_sinh() {
@@ -926,21 +953,7 @@
     }
 
     function op_gsb(n) {
-        var p = PC;
-        while (true) {
-            if (Program[p].info.keys.toString() === [42,21,n].toString()) {
-                break;
-            }
-            p++;
-            if (p >= Program.length) {
-                p = 1;
-            }
-            if (p === PC) {
-                // error 4
-                return;
-            }
-        }
-        PC = p;
+        op_gto_label(n);
         Running = true;
     }
 
@@ -1009,7 +1022,12 @@
     }
 
     function op_back() {
-        if (DigitEntry && Entry.length > 0) {
+        if (Prgm) {
+            if (PC > 0) {
+                Program.splice(PC, 1);
+                PC--;
+            }
+        } else if (DigitEntry && Entry.length > 0) {
             Entry = Entry.substr(0, Entry.length-1);
         } else {
             op_clx();
@@ -1440,7 +1458,34 @@
     }
 
     function decode_gto() {
-        alert("Unimplemented: GTO");
+        var immediate = false;
+        var n = 0;
+        var i = 0;
+        Prefix = function(k) {
+            if (k === '_' && n === 0) {
+                immediate = true;
+                Prefix = OldPrefix;
+                return null;
+            } else if (k >= '0' && k <= '9') {
+                var x = Number(k);
+                if (immediate) {
+                    n = n * 10 + x;
+                    i++;
+                    if (i === 3) {
+                        return new Opcode(new OpcodeInfo([22], null, false), function() { op_gto_immediate(n); });
+                    }
+                    Prefix = OldPrefix;
+                    return null;
+                } else {
+                    return new Opcode(new OpcodeInfo([22,x]), function() { op_gto_label(x); });
+                }
+            } else {
+                var x = "qE)y?".indexOf(k);
+                if (x >= 0) {
+                    return new Opcode(new OpcodeInfo([22,11+x]), function() { op_gto_label(11+x); });
+                }
+            }
+        };
         return null;
     }
 
