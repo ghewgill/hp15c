@@ -127,6 +127,20 @@ var Tests = [
     ["f\b", "3141592653589793"],
 
     // Part II Programming
+    ["gP",  "000-"],
+    ["fr",  "000-"],
+    ["fTq", "001-42.21.11"],
+    ["2",   "002- 2"],
+    ["*",   "003-20"],
+    ["9",   "004- 9"],
+    [".",   "005-48"],
+    ["8",   "006- 8"],
+    ["/",   "007-10"],
+    ["q",   "008-11"],
+    ["gU",  "009-43.32"],
+    ["gP"],
+    ["300.51", 300.51],
+    ["fq", 7.8313, 0.0001],
 
     // Part III Advanced Functions
     // p121
@@ -257,6 +271,10 @@ function verify(test, result, resulti, expected) {
     }
 }
 
+if ($("#testlog").length === 0) {
+    $("body").append('<div><textarea id="testlog" cols="80" rows="10"></div>');
+}
+
 key('f'); key('7'); key('4');
 var pass = true;
 for (var t in Tests) {
@@ -264,6 +282,16 @@ for (var t in Tests) {
     var keys = test[0];
     for (var i = 0; i < keys.length; i++) {
         key(keys.substr(i, 1));
+        var oldalert = alert;
+        //alert = function(msg) { $("#testlog").append(msg + "\n"); };
+        while (Running) {
+            if (RunTimer !== null) {
+                clearTimeout(RunTimer);
+                RunTimer = null;
+            }
+            step();
+        }
+        alert = oldalert;
     }
     if (test.length > 1) {
         var expected = test[1];

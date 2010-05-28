@@ -18,6 +18,7 @@
     }
     #frame {
         position: relative;
+        height: 450;
     }
     #calc {
         position: absolute;
@@ -63,6 +64,9 @@
     #complex {
         left: 390;
     }
+    #program {
+        left: 410;
+    }
 </style>
 <!--script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script-->
 <script type="text/javascript" src="jquery-1.4.2.min.js"></script>
@@ -95,6 +99,8 @@
     var Prgm = false;
     var Program = [null];
     var PC = 0;
+    var Running = false;
+    var RunTimer = null;
     var Result = 0;
 
     function OpcodeInfo(keys, defn, programmable) {
@@ -337,6 +343,9 @@
             }
             DigitEntry = NewDigitEntry;
             StackLift = NewStackLift;
+            if (DigitEntry) {
+                Stack[0] = Number(Entry);
+            }
         }
     }
 
@@ -470,9 +479,6 @@
             }
             update_lcd(s);
         } else {
-            if (DigitEntry) {
-                Stack[0] = Number(Entry);
-            }
             for (var i = 0; i < 4; i++) {
                 $("#stack_" + i).val(Stack[i]);
             }
@@ -495,9 +501,10 @@
             } else {
                 update_display_num(Stack[0]);
             }
-            $("#complex").toggleClass("indicator-on", Flags[8]);
-            $(".stacki").css("display", Flags[8] ? "inline" : "none");
         }
+        $("#complex").toggleClass("indicator-on", Flags[8]);
+        $(".stacki").css("display", Flags[8] ? "inline" : "none");
+        $("#program").toggleClass("indicator-on", Prgm);
     }
 
     function push(x, forcelift) {
@@ -555,7 +562,22 @@
     }
 
     function op_A() {
-        alert("Unimplemented: A");
+        var p = PC;
+        while (true) {
+            if (Program[p].info.keys.toString() === [42,21,11].toString()) {
+                break;
+            }
+            p++;
+            if (p >= Program.length) {
+                p = 1;
+            }
+            if (p === PC) {
+                // error 4
+                return;
+            }
+        }
+        PC = p;
+        Running = true;
     }
 
     function op_x2() {
@@ -946,7 +968,10 @@
     }
 
     function op_clear_prgm() {
-        alert("Unimplemented: CLEAR PRGM");
+        if (Prgm) {
+            Program = [null];
+        } 
+        PC = 0;
     }
 
     function op_rollup() {
@@ -1349,15 +1374,6 @@
         NewDigitEntry = true;
     }
 
-    function exec_op(op) {
-        OldStackLift = StackLift;
-        NewDigitEntry = false;
-        NewStackLift = true;
-        op();
-        DigitEntry = NewDigitEntry;
-        StackLift = NewStackLift;
-    }
-
     function decode_matrix(k) {
         Prefix = function(k) {
             switch (k) {
@@ -1412,7 +1428,12 @@
     }
 
     function decode_lbl(k) {
-        alert("Unimplemented: LBL");
+        Prefix = function(k) {
+            var i = "qE)y?".indexOf(k);
+            if (i >= 0) {
+                return new Opcode(new OpcodeInfo([42,21,11+i]), function() {});
+            }
+        }
         return null;
     }
 
@@ -1612,6 +1633,29 @@
         return r;
     }
 
+    function step() {
+        //alert("PC="+PC+"\n"+Program[PC].info.defn);
+        Program[PC].exec();
+        PC++;
+        if (PC >= Program.length) {
+            Running = false;
+        }
+    }
+
+    function run() {
+        RunTimer = null;
+        if (!Running) {
+            alert("run() called when not Running");
+            return;
+        }
+        step();
+        if (Running) {
+            RunTimer = setTimeout(run, 0);
+        } else {
+            update_display();
+        }
+    }
+
     function key(k) {
         var op = decode(k);
         if (op !== null) {
@@ -1620,6 +1664,9 @@
                 Program.splice(PC, 0, op);
             } else {
                 op.exec();
+                if (Running) {
+                    RunTimer = setTimeout(run, 0);
+                }
             }
         }
         if (DelayUpdate === 0) {
@@ -1752,6 +1799,7 @@
 <div id="g" class="shift indicator">g</div>
 <div id="trigmode" class="indicator"></div>
 <div id="complex" class="indicator">C</div>
+<div id="program" class="indicator">PRGM</div>
 </div>
 <div id="test">
 <input type="button" onclick="run_test()" value="Test">
