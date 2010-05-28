@@ -169,7 +169,7 @@
     var OpMul       = new OpcodeInfo([20],      op_mul);
     //var OpIntegrate
     var OpEq        = new OpcodeInfo([43,20],   op_eq);
-    var OpRs        = new OpcodeInfo([31],      op_rs, false);
+    var OpRs        = new OpcodeInfo([31],      op_rs);
     var OpPse       = new OpcodeInfo([42,31],   op_pse);
     var OpPr        = new OpcodeInfo([43,31],   op_pr, false);
     //var OpGsb
@@ -215,9 +215,9 @@
     var OpSum       = new OpcodeInfo([49],      op_sum);
     var OpLr        = new OpcodeInfo([42,49],   op_lr);
     var OpSumsub    = new OpcodeInfo([43,49],   op_sumsub);
-    var OpAdd       = new OpcodeInfo([50],      op_add);
-    var OpPyx       = new OpcodeInfo([42,50],   op_Pyx);
-    var OpCyx       = new OpcodeInfo([43,50],   op_Cyx);
+    var OpAdd       = new OpcodeInfo([40],      op_add);
+    var OpPyx       = new OpcodeInfo([42,40],   op_Pyx);
+    var OpCyx       = new OpcodeInfo([43,40],   op_Cyx);
 
     function _(x) { return function(k) { return new Opcode(x); }; }
 
@@ -1554,7 +1554,8 @@
             if (k >= '0' && k <= '9') {
                 var i = Number(k);
                 if (op !== null) {
-                    return new Opcode(new OpcodeInfo([44,99,i]), function() { op_sto_op_reg(op, i); });
+                    var opindex = {'/':10, '*':20, '-':30, '+':40};
+                    return new Opcode(new OpcodeInfo([44,opindex[op],i]), function() { op_sto_op_reg(op, i); });
                 } else {
                     return new Opcode(new OpcodeInfo([44,i]), function() { op_sto_reg(i); });
                 }
@@ -1578,7 +1579,8 @@
             if (k >= '0' && k <= '9') {
                 var i = Number(k);
                 if (op !== null) {
-                    return new Opcode(new OpcodeInfo([45,99,i]), function() { op_rcl_op_reg(op, i); });
+                    var opindex = {'/':10, '*':20, '-':30, '+':40};
+                    return new Opcode(new OpcodeInfo([45,opindex[op],i]), function() { op_rcl_op_reg(op, i); });
                 } else {
                     return new Opcode(new OpcodeInfo([45,i]), function() { op_rcl_reg(i); });
                 }
