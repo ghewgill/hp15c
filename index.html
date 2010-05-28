@@ -1543,7 +1543,7 @@
 
     function decode_sf(k) {
         Prefix = function(k) {
-            if (k > '0' && k <= '9') {
+            if (k >= '0' && k <= '9') {
                 var i = Number(k);
                 return new Opcode(new OpcodeInfo([43,4,i]), function() { op_sf(i); });
             }
@@ -1553,7 +1553,7 @@
 
     function decode_cf(k) {
         Prefix = function(k) {
-            if (k > '0' && k <= '9') {
+            if (k >= '0' && k <= '9') {
                 var i = Number(k);
                 return new Opcode(new OpcodeInfo([43,5,i]), function() { op_cf(i); });
             }
@@ -1573,7 +1573,7 @@
 
     function decode_gsb() {
         Prefix = function(k) {
-            if (k > '0' && k <= '9') {
+            if (k >= '0' && k <= '9') {
                 var i = Number(k);
                 return new Opcode(new OpcodeInfo([32,i]), function() { op_gsb(i); });
             } else {
