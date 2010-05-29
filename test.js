@@ -434,6 +434,11 @@ for (var t in Tests) {
                 clearTimeout(RunTimer);
                 RunTimer = null;
             }
+            var p = PC;
+            if (p === 0) {
+                p = 1;
+            }
+            log(sprintf("%03d-%s", p, Program[p].info.keys));
             step();
         }
     }
