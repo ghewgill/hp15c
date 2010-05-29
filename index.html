@@ -79,7 +79,7 @@
     var StackI = [0, 0, 0, 0];
     var LastX = 0;
     var LastXI = 0;
-    var Reg = new Array(10);
+    var Reg = new Array(60);
     var Entry;
     var DigitEntry = false;
     var NewDigitEntry;
@@ -904,6 +904,10 @@
         Stack[0] = t;
     }
 
+    function op_xchg_index() {
+        op_xchg(Math.floor(Math.abs(Reg['I'])));
+    }
+
     function op_sf(f) {
         Flags[f] = true;
     }
@@ -1209,6 +1213,14 @@
         }
     }
 
+    function op_sto_index() {
+        op_sto_reg(Math.floor(Math.abs(Reg['I'])));
+    }
+
+    function op_sto_op_index(op) {
+        op_sto_op_reg(op, Math.floor(Math.abs(Reg['I'])));
+    }
+
     function op_sto_matrix(m) {
         g_Matrix[m].set(Reg[0], Reg[1], Stack[0]);
         update_lcd(String.fromCharCode("A".charCodeAt(0) + m) + "\t" + Reg[0] + "," + Reg[1]);
@@ -1247,6 +1259,14 @@
             case '*': Stack[0] *= Reg[r]; break;
             case '/': Stack[0] /= Reg[r]; break;
         }
+    }
+
+    function op_rcl_index() {
+        op_rcl_reg(Math.floor(Math.abs(Reg['I'])));
+    }
+
+    function op_rcl_op_index(op) {
+        op_rcl_op_reg(op, Math.floor(Math.abs(Reg['I'])));
     }
 
     function op_rcl_descriptor(m) {
@@ -1587,6 +1607,10 @@
             } else if (k >= '0' && k <= '9') {
                 var i = Number(k) + f;
                 return new Opcode(new OpcodeInfo([42,4,i]), function() { op_xchg(i); });
+            } else if (k === 'c') {
+                return new Opcode(new OpcodeInfo([44,24]), op_xchg_index);
+            } else if (k === 't') {
+                return new Opcode(new OpcodeInfo([44,25]), function() { op_xchg('I'); });
             }
         };
         return null;
@@ -1691,6 +1715,20 @@
                 op = k;
                 Prefix = OldPrefix;
                 return null;
+            } else if (k === 'c') {
+                if (op !== null) {
+                    var opindex = {'/':10, '*':20, '-':30, '+':40};
+                    return new Opcode(new OpcodeInfo([44,opindex[op],24]), function() { op_sto_op_index(op); });
+                } else {
+                    return new Opcode(new OpcodeInfo([44,24]), op_sto_index);
+                }
+            } else if (k === 't') {
+                if (op !== null) {
+                    var opindex = {'/':10, '*':20, '-':30, '+':40};
+                    return new Opcode(new OpcodeInfo([44,opindex[op],24]), function() { op_sto_op_reg(op, 'I'); });
+                } else {
+                    return new Opcode(new OpcodeInfo([44,25]), function() { op_sto_reg('I'); });
+                }
             } else {
                 var i = "qE)y?".indexOf(k);
                 if (i >= 0) {
@@ -1737,6 +1775,20 @@
                     }
                 }
                 return null;
+            } else if (k === 'c') {
+                if (op !== null) {
+                    var opindex = {'/':10, '*':20, '-':30, '+':40};
+                    return new Opcode(new OpcodeInfo([45,opindex[op],i]), function() { op_rcl_op_index(op); });
+                } else {
+                    return new Opcode(new OpcodeInfo([45,24]), op_rcl_index);
+                }
+            } else if (k === 't') {
+                if (op !== null) {
+                    var opindex = {'/':10, '*':20, '-':30, '+':40};
+                    return new Opcode(new OpcodeInfo([45,opindex[op],i]), function() { op_rcl_op_reg(op, 'I'); });
+                } else {
+                    return new Opcode(new OpcodeInfo([45,25]), function() { op_rcl_reg('I'); });
+                }
             } else {
                 var i = "qE)y?".indexOf(k);
                 if (i >= 0) {
