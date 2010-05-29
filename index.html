@@ -475,7 +475,11 @@
                     if (i > 0) {
                         s += ".";
                     }
-                    s += sprintf("%2d", keys[i]);
+                    if (Math.floor(keys[i]) === keys[i]) {
+                        s += sprintf("%2d", keys[i]);
+                    } else {
+                        s += sprintf("%.1f", keys[i]);
+                    }
                 }
             }
             update_lcd(s);
@@ -1474,9 +1478,14 @@
     }
 
     function decode_lbl(k) {
+        var f = 1;
         Prefix = function(k) {
-            if (k >= '0' && k <= '9') {
-                var i = Number(k);
+            if (k === '.') {
+                f = 10;
+                Prefix = OldPrefix;
+                return null;
+            } else if (k >= '0' && k <= '9') {
+                var i = Number(k) / f;
                 return new Opcode(new OpcodeInfo([42,21,i]), function() {});
             } else {
                 var i = "qE)y?".indexOf(k);
@@ -1489,12 +1498,17 @@
     }
 
     function decode_gto() {
+        var f = 1;
         var immediate = false;
         var n = 0;
         var i = 0;
         Prefix = function(k) {
             if (k === '_' && n === 0) {
                 immediate = true;
+                Prefix = OldPrefix;
+                return null;
+            } else if (k === '.') {
+                f = 10;
                 Prefix = OldPrefix;
                 return null;
             } else if (k >= '0' && k <= '9') {
@@ -1508,6 +1522,7 @@
                     Prefix = OldPrefix;
                     return null;
                 } else {
+                    x /= f;
                     return new Opcode(new OpcodeInfo([22,x]), function() { op_gto_label(x); });
                 }
             } else {
@@ -1608,9 +1623,14 @@
     }
 
     function decode_gsb() {
+        var f = 1;
         Prefix = function(k) {
-            if (k >= '0' && k <= '9') {
-                var i = Number(k);
+            if (k === '.') {
+                f = 10;
+                Prefix = OldPrefix;
+                return null;
+            } else if (k >= '0' && k <= '9') {
+                var i = Number(k) / f;
                 return new Opcode(new OpcodeInfo([32,i]), function() { op_gsb(i); });
             } else {
                 var i = "qE)y?".indexOf(k);

@@ -279,11 +279,13 @@ var Tests = [
     [".005", 0.005],
     ["f?", 10645.0795, 0.0001],
     // p103
-    //["gPfrfT9g8S0xS-0U.3_xU.3+R/0gUfT.3gqg\rs-gUgP"],
-    ["gPfrfT9g8S0xS-0U3_xU3+R/0gUfT3gqg\rs-gUgP"],
+    ["gPfrfT9g8S0xS-0U.3_xU.3+R/0gUfT.3gqg\rs-gUgP"],
     ["0.52\r1.25U9", 1.1507, 0.0001],
     ["1_\r1U9", -0.8415, 0.0001],
     ["0.81\r0.98U9", 1.1652, 0.0001],
+    // p104
+    ["gPfrfT.4gqU.5U.5U.5qgUfT.5xgq+gUgP"],
+    ["8\r1.3\r7.9\r4.3U.4", 12.1074, 0.0001],
 
     // Part III Advanced Functions
     // p121
