@@ -1578,9 +1578,14 @@
     }
 
     function decode_xchg(k) {
+        var f = 0;
         Prefix = function(k) {
-            if (k >= '0' && k <= '9') {
-                var i = Number(k);
+            if (k === '.') {
+                f = 10;
+                Prefix = OldPrefix;
+                return null;
+            } else if (k >= '0' && k <= '9') {
+                var i = Number(k) + f;
                 return new Opcode(new OpcodeInfo([42,4,i]), function() { op_xchg(i); });
             }
         };
@@ -1667,10 +1672,15 @@
     }
 
     function decode_sto(k) {
+        var f = 0;
         var op = null;
         Prefix = function(k) {
-            if (k >= '0' && k <= '9') {
-                var i = Number(k);
+            if (k === '.') {
+                f = 10;
+                Prefix = OldPrefix;
+                return null;
+            } else if (k >= '0' && k <= '9') {
+                var i = Number(k) + f;
                 if (op !== null) {
                     var opindex = {'/':10, '*':20, '-':30, '+':40};
                     return new Opcode(new OpcodeInfo([44,opindex[op],i]), function() { op_sto_op_reg(op, i); });
@@ -1692,10 +1702,15 @@
     }
 
     function decode_rcl(k) {
+        var f = 0;
         var op = null;
         Prefix = function(k) {
-            if (k >= '0' && k <= '9') {
-                var i = Number(k);
+            if (k === '.') {
+                f = 10;
+                Prefix = OldPrefix;
+                return null;
+            } else if (k >= '0' && k <= '9') {
+                var i = Number(k) + f;
                 if (op !== null) {
                     var opindex = {'/':10, '*':20, '-':30, '+':40};
                     return new Opcode(new OpcodeInfo([45,opindex[op],i]), function() { op_rcl_op_reg(op, i); });
