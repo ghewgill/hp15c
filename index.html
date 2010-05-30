@@ -162,10 +162,10 @@
     //var OpXchg
     //var OpSf
     var Op5         = new OpcodeInfo([5],       function() { op_input('5'); });
-    var OpDse       = new OpcodeInfo([42,5],    op_dse);
+    //var OpDse       = new OpcodeInfo([42,5],    op_dse);
     //var OpCf
     var Op6         = new OpcodeInfo([6],       function() { op_input('6'); });
-    var OpIsg       = new OpcodeInfo([42,6],    op_isg);
+    //var OpIsg       = new OpcodeInfo([42,6],    op_isg);
     //var OpFtest
     var OpMul       = new OpcodeInfo([20],      op_mul);
     //var OpIntegrate
@@ -240,8 +240,8 @@
         't': [_(OpTan), _(OpI), _(OpAtan)],
         'e': [_(OpEex), decode_result, _(OpPi)],
         '4': [_(Op4), decode_xchg, decode_sf],
-        '5': [_(Op5), _(OpDse), decode_cf],
-        '6': [_(Op6), _(OpIsg), decode_ftest],
+        '5': [_(Op5), decode_dse, decode_cf],
+        '6': [_(Op6), decode_isg, decode_ftest],
         '*': [_(OpMul), decode_integrate, _(OpEq)],
         'P': [_(OpRs), _(OpPse), _(OpPr)],
         'U': [decode_gsb, _(OpClearStat), _(OpRtn)],
@@ -794,6 +794,21 @@
         PC = p;
     }
 
+    function op_gto_index() {
+        var i = trunc(Reg['I']);
+        if (i < 0) {
+            PC = -i;
+        } else if (i < 10) {
+            op_gto_label(i);
+        } else if (i < 20) {
+            op_gto_label((i - 10) / 10);
+        } else if (i < 24) {
+            op_gto_label(i - 9);
+        } else {
+            alert("error 4 ");
+        }
+    }
+
     function op_sinh() {
         unop(function(x) {
             return (Math.exp(x) - Math.exp(-x)) / 2;
@@ -912,16 +927,46 @@
         Flags[f] = true;
     }
 
-    function op_dse() {
-        alert("Unimplemented: DSE");
+    function op_dse(r) {
+        var n = trunc(Reg[r]);
+        var f = Reg[r] - n;
+        var x = Math.floor(f * 1000);
+        var y = Math.round((Reg[r] * 1000 - trunc(Reg[r] * 1000)) * 100);
+        if (y === 0) {
+            y = 1;
+        }
+        n -= y;
+        Reg[r] = n + f;
+        if (n <= x) {
+            PC++;
+        }
+    }
+
+    function op_dse_index() {
+        op_dse(Math.floor(Math.abs(Reg['I'])));
     }
 
     function op_cf(f) {
         Flags[f] = false;
     }
 
-    function op_isg() {
-        alert("Unimplemented: ISG");
+    function op_isg(r) {
+        var n = trunc(Reg[r]);
+        var f = Reg[r] - n;
+        var x = Math.floor(f * 1000);
+        var y = Math.round((Reg[r] * 1000 - trunc(Reg[r] * 1000)) * 100);
+        if (y === 0) {
+            y = 1;
+        }
+        n += y;
+        Reg[r] = n + f;
+        if (n > x) {
+            PC++;
+        }
+    }
+
+    function op_isg_index() {
+        op_isg(Math.floor(Math.abs(Reg['I'])));
     }
 
     function op_ftest(f) {
@@ -969,6 +1014,14 @@
             ReturnStack.push(PC);
         }
         op_gto_label(n);
+        Running = true;
+    }
+
+    function op_gsb_index() {
+        if (Running) {
+            ReturnStack.push(PC);
+        }
+        op_gto_index();
         Running = true;
     }
 
@@ -1545,6 +1598,8 @@
                     x /= f;
                     return new Opcode(new OpcodeInfo([22,x]), function() { op_gto_label(x); });
                 }
+            } else if (k === 't') {
+                return new Opcode(new OpcodeInfo([22,25]), function() { op_gto_index(); });
             } else {
                 var x = "qE)y?".indexOf(k);
                 if (x >= 0) {
@@ -1608,9 +1663,9 @@
                 var i = Number(k) + f;
                 return new Opcode(new OpcodeInfo([42,4,i]), function() { op_xchg(i); });
             } else if (k === 'c') {
-                return new Opcode(new OpcodeInfo([44,24]), op_xchg_index);
+                return new Opcode(new OpcodeInfo([42,4,24]), op_xchg_index);
             } else if (k === 't') {
-                return new Opcode(new OpcodeInfo([44,25]), function() { op_xchg('I'); });
+                return new Opcode(new OpcodeInfo([42,4,25]), function() { op_xchg('I'); });
             }
         };
         return null;
@@ -1626,11 +1681,49 @@
         return null;
     }
 
+    function decode_dse(k) {
+        var f = 0;
+        Prefix = function(k) {
+            if (k === '.') {
+                f = 10;
+                Prefix = OldPrefix;
+                return null;
+            } else if (k >= '0' && k <= '9') {
+                var i = Number(k) + f;
+                return new Opcode(new OpcodeInfo([42,5,i]), function() { op_dse(i); });
+            } else if (k === 'c') {
+                return new Opcode(new OpcodeInfo([42,5,24]), op_dse_index);
+            } else if (k === 't') {
+                return new Opcode(new OpcodeInfo([42,5,25]), function() { op_dse('I'); });
+            }
+        };
+        return null;
+    }
+
     function decode_cf(k) {
         Prefix = function(k) {
             if (k >= '0' && k <= '9') {
                 var i = Number(k);
                 return new Opcode(new OpcodeInfo([43,5,i]), function() { op_cf(i); });
+            }
+        };
+        return null;
+    }
+
+    function decode_isg(k) {
+        var f = 0;
+        Prefix = function(k) {
+            if (k === '.') {
+                f = 10;
+                Prefix = OldPrefix;
+                return null;
+            } else if (k >= '0' && k <= '9') {
+                var i = Number(k) + f;
+                return new Opcode(new OpcodeInfo([42,6,i]), function() { op_isg(i); });
+            } else if (k === 'c') {
+                return new Opcode(new OpcodeInfo([42,6,24]), op_isg_index);
+            } else if (k === 't') {
+                return new Opcode(new OpcodeInfo([42,6,25]), function() { op_isg('I'); });
             }
         };
         return null;
@@ -1661,6 +1754,8 @@
             } else if (k >= '0' && k <= '9') {
                 var i = Number(k) / f;
                 return new Opcode(new OpcodeInfo([32,i]), function() { op_gsb(i); });
+            } else if (k === 't') {
+                return new Opcode(new OpcodeInfo([32,25]), function() { op_gsb_index(); });
             } else {
                 var i = "qE)y?".indexOf(k);
                 if (i >= 0) {
