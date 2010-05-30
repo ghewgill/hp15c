@@ -497,6 +497,7 @@
             for (var i = 0; i < 10; i++) {
                 $("#reg_" + i).val(Reg[i]);
             }
+            $("#reg_I").val(Reg['I']);
             if (DigitEntry) {
                 if (Entry !== "") {
                     update_lcd(Entry);
@@ -2063,6 +2064,7 @@
 <tr><td>7</td><td><input id="reg_7"></td></tr>
 <tr><td>8</td><td><input id="reg_8"></td></tr>
 <tr><td>9</td><td><input id="reg_9"></td></tr>
+<tr><td>I</td><td><input id="reg_I"></td></tr>
 </table>
 </div>
 <div id="frame">
