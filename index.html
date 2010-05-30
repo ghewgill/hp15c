@@ -1985,6 +1985,10 @@
 
     function key(k) {
         var op = decode(k);
+        if (op === undefined) {
+            alert("undefined decode: "+k);
+            return;
+        }
         if (op !== null) {
             if (Prgm && op.info.programmable) {
                 PC++;
