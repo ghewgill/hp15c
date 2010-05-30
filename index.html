@@ -597,7 +597,11 @@
     }
 
     function op_ln() {
-        unop(Math.log);
+        if (Flags[8]) {
+            alert("Unimplemented: complex ln");
+        } else {
+            unop(Math.log);
+        }
     }
 
     function op_10x() {
@@ -617,7 +621,11 @@
     }
 
     function op_log() {
-        unop(function(x) { return Math.log(x) / Math.LN10; });
+        if (Flags[8]) {
+            alert("Unimplemented: complex log");
+        } else {
+            unop(function(x) { return Math.log(x) / Math.LN10; });
+        }
     }
 
     function op_yx() {
@@ -692,7 +700,11 @@
     }
 
     function op_abs() {
-        unop(Math.abs);
+        if (Flags[8]) {
+            alert("Unimplemented: complex abs");
+        } else {
+            unop(Math.abs);
+        }
     }
 
     function op_fix(n) {
@@ -823,45 +835,73 @@
     }
 
     function op_sinh() {
-        unop(function(x) {
-            return (Math.exp(x) - Math.exp(-x)) / 2;
-        });
+        if (Flags[8]) {
+            alert("Unimplemented: complex sinh");
+        } else {
+            unop(function(x) {
+                return (Math.exp(x) - Math.exp(-x)) / 2;
+            });
+        }
     }
 
     function op_cosh() {
-        unop(function(x) {
-            return (Math.exp(x) + Math.exp(-x)) / 2;
-        });
+        if (Flags[8]) {
+            alert("Unimplemented: complex sinh");
+        } else {
+            unop(function(x) {
+                return (Math.exp(x) + Math.exp(-x)) / 2;
+            });
+        }
     }
 
     function op_tanh() {
-        unop(function(x) {
-            return (Math.exp(2*x) - 1) / (Math.exp(2*x) + 1);
-        });
+        if (Flags[8]) {
+            alert("Unimplemented: complex sinh");
+        } else {
+            unop(function(x) {
+                return (Math.exp(2*x) - 1) / (Math.exp(2*x) + 1);
+            });
+        }
     }
 
     function op_asinh() {
-        unop(function(x) {
-            return Math.log(x + Math.sqrt(x*x + 1));
-        });
+        if (Flags[8]) {
+            alert("Unimplemented: complex sinh");
+        } else {
+            unop(function(x) {
+                return Math.log(x + Math.sqrt(x*x + 1));
+            });
+        }
     }
 
     function op_acosh() {
-        unop(function(x) {
-            return Math.log(x + Math.sqrt(x*x - 1));
-        });
+        if (Flags[8]) {
+            alert("Unimplemented: complex sinh");
+        } else {
+            unop(function(x) {
+                return Math.log(x + Math.sqrt(x*x - 1));
+            });
+        }
     }
 
     function op_atanh() {
-        unop(function(x) {
-            return Math.log((1 + x) / (1 - x)) / 2;
-        });
+        if (Flags[8]) {
+            alert("Unimplemented: complex sinh");
+        } else {
+            unop(function(x) {
+                return Math.log((1 + x) / (1 - x)) / 2;
+            });
+        }
     }
 
     function op_sin() {
-        unop(function(x) {
-            return Math.sin(x * TrigFactor);
-        });
+        if (Flags[8]) {
+            alert("Unimplemented: complex sinh");
+        } else {
+            unop(function(x) {
+                return Math.sin(x * TrigFactor);
+            });
+        }
     }
 
     function op_dim(m) {
@@ -869,15 +909,23 @@
     }
 
     function op_asin() {
-        unop(function(x) {
-            return Math.asin(x) / TrigFactor;
-        });
+        if (Flags[8]) {
+            alert("Unimplemented: complex sinh");
+        } else {
+            unop(function(x) {
+                return Math.asin(x) / TrigFactor;
+            });
+        }
     }
 
     function op_cos() {
-        unop(function(x) {
-            return Math.cos(x * TrigFactor);
-        });
+        if (Flags[8]) {
+            alert("Unimplemented: complex sinh");
+        } else {
+            unop(function(x) {
+                return Math.cos(x * TrigFactor);
+            });
+        }
     }
 
     function op_index() {
@@ -889,15 +937,23 @@
     }
 
     function op_acos() {
-        unop(function(x) {
-            return Math.acos(x) / TrigFactor;
-        });
+        if (Flags[8]) {
+            alert("Unimplemented: complex sinh");
+        } else {
+            unop(function(x) {
+                return Math.acos(x) / TrigFactor;
+            });
+        }
     }
 
     function op_tan() {
-        unop(function(x) {
-            return Math.tan(x * TrigFactor);
-        });
+        if (Flags[8]) {
+            alert("Unimplemented: complex sinh");
+        } else {
+            unop(function(x) {
+                return Math.tan(x * TrigFactor);
+            });
+        }
     }
 
     function op_I() {
@@ -909,9 +965,13 @@
     }
 
     function op_atan() {
-        unop(function(x) {
-            return Math.atan(x) / TrigFactor;
-        });
+        if (Flags[8]) {
+            alert("Unimplemented: complex sinh");
+        } else {
+            unop(function(x) {
+                return Math.atan(x) / TrigFactor;
+            });
+        }
     }
 
     function op_eex() {
