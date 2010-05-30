@@ -318,6 +318,9 @@ var Tests = [
     ["3.00001S2", 3.00001],
     ["15_St", -15],
     ["fq", 50],
+    // p114
+    ["gPfrfTE9StfT0f7tRtfPf5tG0g-1G0gUgP"],
+    ["fE", 0],
 
     // Part III Advanced Functions
     // p121
