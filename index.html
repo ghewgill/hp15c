@@ -701,6 +701,10 @@
         StackLift = OldStackLift;
     }
 
+    function op_fix_index() {
+        op_fix(trunc(Reg['I']));
+    }
+
     function op_deg() {
         TrigFactor = Math.PI / 180;
         $("#trigmode").removeClass("indicator-on");
@@ -713,6 +717,10 @@
         StackLift = OldStackLift;
     }
 
+    function op_sci_index() {
+        op_sci(trunc(Reg['I']));
+    }
+
     function op_rad() {
         TrigFactor = 1;
         $("#trigmode").addClass("indicator-on").text("RAD");
@@ -722,6 +730,10 @@
     function op_eng(n) {
         alert("Unimplemented: ENG");
         StackLift = OldStackLift;
+    }
+
+    function op_eng_index() {
+        op_eng(trunc(Reg['I']));
     }
 
     function op_grd() {
@@ -1521,6 +1533,8 @@
             if (k >= '0' && k <= '9') {
                 var i = Number(k);
                 return new Opcode(new OpcodeInfo([42,7,i]), function() { op_fix(i); });
+            } else if (k === 't') {
+                return new Opcode(new OpcodeInfo([42,7,25]), op_fix_index);
             }
         };
         return null;
@@ -1531,6 +1545,8 @@
             if (k >= '0' && k <= '9') {
                 var i = Number(k);
                 return new Opcode(new OpcodeInfo([42,8,i]), function() { op_sci(i); });
+            } else if (k === 't') {
+                return new Opcode(new OpcodeInfo([42,8,25]), op_sci_index);
             }
         };
         return null;
@@ -1541,6 +1557,8 @@
             if (k >= '0' && k <= '9') {
                 var i = Number(k);
                 return new Opcode(new OpcodeInfo([42,9,i]), function() { op_eng(i); });
+            } else if (k === 't') {
+                return new Opcode(new OpcodeInfo([42,9,25]), op_eng_index);
             }
         };
         return null;
