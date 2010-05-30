@@ -940,6 +940,10 @@
         Flags[f] = true;
     }
 
+    function op_sf_index() {
+        op_sf(Math.floor(Math.abs(Reg['I'])));
+    }
+
     function op_dse(r) {
         var n = trunc(Reg[r]);
         var f = Reg[r] - n;
@@ -961,6 +965,10 @@
 
     function op_cf(f) {
         Flags[f] = false;
+    }
+
+    function op_cf_index() {
+        op_cf(Math.floor(Math.abs(Reg['I'])));
     }
 
     function op_isg(r) {
@@ -986,6 +994,10 @@
         if (!Flags[f]) {
             PC++;
         }
+    }
+
+    function op_ftest_index() {
+        op_ftest(Math.floor(Math.abs(Reg['I'])));
     }
 
     function op_mul() {
@@ -1695,6 +1707,8 @@
             if (k >= '0' && k <= '9') {
                 var i = Number(k);
                 return new Opcode(new OpcodeInfo([43,4,i]), function() { op_sf(i); });
+            } else if (k === 't') {
+                return new Opcode(new OpcodeInfo([43,4,25]), op_sf_index);
             }
         };
         return null;
@@ -1724,6 +1738,8 @@
             if (k >= '0' && k <= '9') {
                 var i = Number(k);
                 return new Opcode(new OpcodeInfo([43,5,i]), function() { op_cf(i); });
+            } else if (k === 't') {
+                return new Opcode(new OpcodeInfo([43,5,25]), op_cf_index);
             }
         };
         return null;
@@ -1753,6 +1769,8 @@
             if (k >= '0' && k <= '9') {
                 var i = Number(k);
                 return new Opcode(new OpcodeInfo([43,6,i]), function() { op_ftest(i); });
+            } else if (k === 't') {
+                return new Opcode(new OpcodeInfo([43,6,25]), op_ftest_index);
             }
         };
         return null;
