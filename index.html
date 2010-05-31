@@ -820,7 +820,9 @@
     }
 
     function op_le() {
-        alert("Unimplemented: x\u2264y");
+        if (!(Stack[0] <= Stack[1])) {
+            PC++;
+        }
     }
 
     function op_sst() {
@@ -1125,7 +1127,9 @@
     }
 
     function op_eq() {
-        alert("Unimplemented: x=0");
+        if (!(Stack[0] === 0)) {
+            PC++;
+        }
     }
 
     function op_rs() {
