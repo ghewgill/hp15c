@@ -1122,8 +1122,45 @@
         }
     }
 
-    function op_integrate() {
-        alert("Unimplemented: \u222bxy");
+    function op_integrate(n) {
+        call = function(n) {
+            op_gsb(n);
+            while (Running) {
+                step();
+            }
+        };
+        // This is http://mathworld.wolfram.com/SimpsonsRule.html
+        var eps = 1e-9;
+        var x0 = Stack[1];
+        var x1 = Stack[0];
+        var d = 0;
+        var prev = 0;
+        var steps = 32;
+        while (true) {
+            var r = 0;
+            for (var j = 0; j < steps; j += 2) {
+                fill(x0 + (x1-x0)*j/steps);
+                call(n);
+                r += Stack[0];
+                fill(x0 + (x1-x0)*(j+1)/steps);
+                call(n);
+                r += 4 * Stack[0];
+                fill(x0 + (x1-x0)*(j+2)/steps);
+                call(n);
+                r += Stack[0];
+            }
+            r *= ((x1-x0)/steps) / 3;
+            d = Math.abs(r - prev);
+            if (d < eps) {
+                break;
+            }
+            prev = r;
+            steps *= 2;
+        }
+        Stack[3] = x0;
+        Stack[2] = x1;
+        Stack[1] = d;
+        Stack[0] = r;
     }
 
     function op_eq() {
@@ -1942,7 +1979,22 @@
     }
 
     function decode_integrate(k) {
-        alert("Unimplemented: \u222bxy");
+        var f = 1;
+        Prefix = function(k) {
+            if (k === '.') {
+                f = 10;
+                Prefix = OldPrefix;
+                return null;
+            } else if (k >= '0' && k <= '9') {
+                var i = Number(k) / f;
+                return new Opcode(new OpcodeInfo([42,10,i]), function() { op_integrate(i); });
+            } else {
+                var i = "qE)^?".indexOf(k);
+                if (i >= 0) {
+                    return new Opcode(new OpcodeInfo([42,10,11+i]), function() { op_integrate(11+i); });
+                }
+            }
+        };
         return null;
     }
 
