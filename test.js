@@ -395,6 +395,9 @@ var Tests = [
     ["3S1", 3],
     ["9", 9],
     ["Sq", function() { return g_Matrix[0].get(2, 3) === 9; }],
+    // p147
+    ["2\r1", 1],
+    ["Rgq", 4],
 
     // Page references from HP-15C Advanced Functions Handbook (November 1985)
     // p66

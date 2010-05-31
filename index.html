@@ -1386,6 +1386,14 @@
         }
     }
 
+    function op_sto_matrix_imm(m) {
+        var x = Stack[0];
+        var y = Stack[1];
+        Stack[0] = Stack[2];
+        Stack[1] = Stack[2];
+        g_Matrix[m].set(Stack[0], y, x);
+    }
+
     function op_frac() {
         unop(function(x) {
             return x - trunc(x);
@@ -1449,6 +1457,12 @@
                 Reg[1] = 1;
             }
         }
+    }
+
+    function op_rcl_matrix_imm(m) {
+        binop(function(y, x) {
+            return g_Matrix[m].get(y, x);
+        });
     }
 
     function op_user() {
@@ -1910,6 +1924,7 @@
     function decode_sto(k) {
         var f = 0;
         var op = null;
+        var g = false;
         Prefix = function(k) {
             if (k === '.') {
                 f = 10;
@@ -1941,11 +1956,19 @@
                 } else {
                     return new Opcode(new OpcodeInfo([44,25]), function() { op_sto_reg('I'); });
                 }
+            } else if (k === 'g') {
+                g = true;
+                Prefix = OldPrefix;
+                return null;
             } else {
                 var i = "qE)^?".indexOf(k);
                 if (i >= 0) {
-                    var u = User; // capture current value
-                    return new Opcode(new OpcodeInfo([44,11+i], null, true, User), function() { op_sto_matrix(i, u); });
+                    if (g) {
+                        return new Opcode(new OpcodeInfo([44,43,11+i]), function() { op_sto_matrix_imm(i); });
+                    } else {
+                        var u = User; // capture current value
+                        return new Opcode(new OpcodeInfo([44,11+i], null, true, User), function() { op_sto_matrix(i, u); });
+                    }
                 }
             }
         };
@@ -1955,6 +1978,7 @@
     function decode_rcl(k) {
         var f = 0;
         var op = null;
+        var g = false;
         Prefix = function(k) {
             if (k === '.') {
                 f = 10;
@@ -2002,11 +2026,19 @@
                 } else {
                     return new Opcode(new OpcodeInfo([45,25]), function() { op_rcl_reg('I'); });
                 }
+            } else if (k === 'g') {
+                g = true;
+                Prefix = OldPrefix;
+                return null;
             } else {
                 var i = "qE)^?".indexOf(k);
                 if (i >= 0) {
-                    var u = User; // capture current value
-                    return new Opcode(new OpcodeInfo([45,11+i], null, true, User), function() { op_rcl_matrix(i, u); });
+                    if (g) {
+                        return new Opcode(new OpcodeInfo([45,43,11+i]), function() { op_rcl_matrix_imm(i); });
+                    } else {
+                        var u = User; // capture current value
+                        return new Opcode(new OpcodeInfo([45,11+i], null, true, User), function() { op_rcl_matrix(i, u); });
+                    }
                 }
             }
         };
