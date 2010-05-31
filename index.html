@@ -388,7 +388,7 @@
         var d = 0;
         for (var i = 0; i < s.length && d < 10; i++) {
             var c = s.charAt(i);
-            if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'E')) {
+            if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'E') || c === 'u') {
                 if (eex) {
                     Display[8].attr("src", Display[9].attr("src"));
                     Display[9].attr("src", Digits[c].src);
@@ -2075,7 +2075,7 @@
     }
 
     $(document).ready(function() {
-        var digits = "0123456789-ABCDE";
+        var digits = "0123456789-ABCDEu";
         for (var i = 0; i < digits.length; i++) {
             var c = digits.substr(i, 1);
             Digits[c] = new Image(20, 30);
