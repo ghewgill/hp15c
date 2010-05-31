@@ -104,10 +104,11 @@
     var ReturnStack = [];
     var Result = 0;
 
-    function OpcodeInfo(keys, defn, programmable) {
+    function OpcodeInfo(keys, defn, programmable, user) {
         this.keys = keys;
         this.defn = defn;
         this.programmable = programmable !== false;
+        this.user = user;
     }
 
     var OpSqrt      = new OpcodeInfo([11],      op_sqrt);
@@ -470,6 +471,9 @@
         if (Prgm) {
             var s = sprintf("%03d-", PC);
             if (PC > 0) {
+                if (Program[PC].info.user) {
+                    s = s.substr(0, 3) + "u";
+                }
                 var keys = Program[PC].info.keys;
                 for (var i = 0; i < keys.length; i++) {
                     if (i > 0) {
@@ -1365,11 +1369,11 @@
         op_sto_op_reg(op, Math.floor(Math.abs(Reg['I'])));
     }
 
-    function op_sto_matrix(m) {
+    function op_sto_matrix(m, user) {
         g_Matrix[m].set(Reg[0], Reg[1], Stack[0]);
         update_lcd(String.fromCharCode("A".charCodeAt(0) + m) + "\t" + Reg[0] + "," + Reg[1]);
         DelayUpdate = 1000;
-        if (User) {
+        if (user) {
             if (Reg[1] < g_Matrix[m].cols) {
                 Reg[1]++;
             } else if (Reg[0] < g_Matrix[m].rows) {
@@ -1393,7 +1397,12 @@
     }
 
     function op_rcl_reg(r) {
-        push(Reg[r]);
+        if (StackLift) {
+            push(Reg[r]);
+        } else {
+            Stack[0] = Reg[r];
+            StackLift = true;
+        }
     }
 
     function op_rcl_op_reg(op, r) {
@@ -1422,9 +1431,14 @@
         push(g_Matrix[m].cols);
     }
 
-    function op_rcl_matrix(m) {
-        push(g_Matrix[m].get(Reg[0], Reg[1]));
-        if (User) {
+    function op_rcl_matrix(m, user) {
+        if (StackLift) {
+            push(g_Matrix[m].get(Reg[0], Reg[1]));
+        } else {
+            Stack[0] = g_Matrix[m].get(Reg[0], Reg[1]);
+            StackLift = true;
+        }
+        if (user) {
             if (Reg[1] < g_Matrix[m].cols) {
                 Reg[1]++;
             } else if (Reg[0] < g_Matrix[m].rows) {
@@ -1930,7 +1944,8 @@
             } else {
                 var i = "qE)^?".indexOf(k);
                 if (i >= 0) {
-                    return new Opcode(new OpcodeInfo([44,11+i]), function() { op_sto_matrix(i); });
+                    var u = User; // capture current value
+                    return new Opcode(new OpcodeInfo([44,11+i], null, true, User), function() { op_sto_matrix(i, u); });
                 }
             }
         };
@@ -1990,7 +2005,8 @@
             } else {
                 var i = "qE)^?".indexOf(k);
                 if (i >= 0) {
-                    return new Opcode(new OpcodeInfo([45,11+i]), function() { op_rcl_matrix(i); });
+                    var u = User; // capture current value
+                    return new Opcode(new OpcodeInfo([45,11+i], null, true, User), function() { op_rcl_matrix(i, u); });
                 }
             }
         };
