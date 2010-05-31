@@ -598,7 +598,9 @@
 
     function op_ln() {
         if (Flags[8]) {
-            alert("Unimplemented: complex ln");
+            unopc(function(xr, xi) {
+                return [Math.log(xr*xr + xi*xi)/2, Math.atan2(xi, xr)];
+            });
         } else {
             unop(Math.log);
         }
