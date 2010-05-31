@@ -539,7 +539,7 @@ function verify(test, result, resulti, expected) {
 }
 
 if ($("#testlog").length === 0) {
-    $("body").append('<div><textarea id="testlog" cols="80" rows="10"></div>');
+    $("body").append('<div><textarea id="testlog" cols="80" rows="10"></textarea></div>');
 }
 
 key('f'); key('7'); key('4');
