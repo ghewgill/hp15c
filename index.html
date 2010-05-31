@@ -528,6 +528,12 @@
         StackLift = true;
     }
 
+    function fill(x) {
+        for (i in Stack) {
+            Stack[i] = x;
+        }
+    }
+
     function unop(f) {
         LastX = Stack[0];
         LastXI = StackI[0];
@@ -771,8 +777,46 @@
         }
     }
 
-    function op_solve() {
-        alert("Unimplemented: SOLVE");
+    function op_solve(n) {
+        call = function(n) {
+            op_gsb(n);
+            while (Running) {
+                step();
+            }
+        };
+        // This is http://mathworld.wolfram.com/SecantMethod.html
+        var eps = 1e-9;
+        var maxiter = 100;
+        var x0 = Stack[1];
+        var x1 = Stack[0];
+        while (true) {
+            fill(x0);
+            call(n);
+            var y0 = Stack[0];
+            fill(x1);
+            call(n);
+            var y1 = Stack[0];
+            var x2 = x1 - y1 * ((x1 - x0) / (y1 - y0));
+            fill(x2);
+            call(n);
+            var y2 = Stack[0];
+            //alert("x0=" + x0 + " y0=" + y0 + "\n" +
+            //      "x1=" + x1 + " y1=" + y1 + "\n" +
+            //      "x2=" + x2 + " y2=" + y2 + "\n");
+            x0 = x1;
+            x1 = x2;
+            if (Math.abs(x1 - x0) < eps) {
+                break;
+            }
+            if (--maxiter <= 0) {
+                update_lcd("Error 8");
+                DelayUpdate = 1000;
+                return;
+            }
+        }
+        push(y2);
+        push(x1);
+        push(x2);
     }
 
     function op_le() {
@@ -1679,7 +1723,22 @@
     }
 
     function decode_solve(k) {
-        alert("Unimplemented: SOLVE");
+        var f = 1;
+        Prefix = function(k) {
+            if (k === '.') {
+                f = 10;
+                Prefix = OldPrefix;
+                return null;
+            } else if (k >= '0' && k <= '9') {
+                var i = Number(k) / f;
+                return new Opcode(new OpcodeInfo([42,10,i]), function() { op_solve(i); });
+            } else {
+                var i = "qE)^?".indexOf(k);
+                if (i >= 0) {
+                    return new Opcode(new OpcodeInfo([42,10,11+i]), function() { op_solve(11+i); });
+                }
+            }
+        };
         return null;
     }
 
