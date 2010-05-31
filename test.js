@@ -482,6 +482,51 @@ var Tests = [
     ["1f?", new Complex(2, 3)],
     ["2f?", new Complex(7, 4)],
     ["+", new Complex(9, 7)],
+    // p78
+    ["gPfr","000-"],
+    ["fTq", "001-42.21.11"],
+    ["x",   "002-34"],
+    ["?",   "003-15"],
+    ["g\r", "004-43.36"],
+    ["r",   "005-33"],
+    ["g48", "006-43. 4. 8"],
+    ["^",   "007-14"],
+    ["S2",  "008-44. 2"],
+    ["f-",  "009-42.30"],
+    ["S3",  "010-44. 3"],
+    ["3",   "011- 3"],
+    ["6",   "012- 6"],
+    ["0",   "013- 0"],
+    ["gr",  "014-43.33"],
+    ["/",   "015-10"],
+    ["S4",  "016-44. 4"],
+    ["0",   "017- 0"],
+    ["St",  "018-44.25"],
+    ["fT0", "019-42.21. 0"],
+    ["R4",  "020-45. 4"],
+    ["R*t", "021-45.20.25"],
+    ["f-",  "022-42.30"],
+    ["g\b", "023-43.35"],
+    ["1",   "024- 1"],
+    ["g7",  "025-43. 7"],
+    ["f1",  "026-42. 1"],
+    ["R2",  "027-45. 2"],
+    ["R3",  "028-45. 3"],
+    ["ft",  "029-42.25"],
+    ["*",   "030-20"],
+    ["Rt",  "031-45.25"],
+    ["x",   "032-34"],
+    ["1",   "033- 1"],
+    ["S+t", "034-44.40.25"],
+    ["r",   "035-33"],
+    ["P",   "036-31"],
+    ["G0",  "037-22. 0"],
+    ["gP"],
+    ["100\r1", 1],
+    ["fq", new Complex(1, 0)],
+    ["P", new Complex(0.9980, 0.0628), 0.001],
+    ["50St", 50],
+    ["P", new Complex(-1, 0), 0.0001],
 
     // http://en.wikipedia.org/wiki/Gamma_function#Particular_values
     ["5\r2/_1-f0", -0.945, 0.001],
@@ -517,6 +562,13 @@ function MatrixCheck(label, rows, cols) {
 }
 
 function verify(test, result, resulti, expected) {
+    tolerance = function(r, e, t) {
+        if (e === 0) {
+            return Math.abs(r) < t;
+        } else {
+            return Math.abs(r / e - 1) < t;
+        }
+    };
     if (expected instanceof MatrixCheck) {
         return result instanceof Descriptor
             && result.label === expected.label
@@ -524,14 +576,14 @@ function verify(test, result, resulti, expected) {
             && g_Matrix[result.label].cols === expected.cols;
     } else if (expected instanceof Complex) {
         if (test.length >= 3) {
-            return Math.abs(result / expected.re - 1) < test[2]
-                && Math.abs(resulti / expected.im - 1) < test[2];
+            return tolerance(result, expected.re, test[2])
+                && tolerance(resulti, expected.im, test[2]);
         } else {
             return result === expected.re && resulti === expected.im;
         }
     } else {
         if (test.length >= 3) {
-            return Math.abs(result / expected - 1) < test[2];
+            return tolerance(result, expected, test[2]);
         } else {
             return result === expected;
         }
