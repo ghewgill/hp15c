@@ -1394,6 +1394,14 @@
         g_Matrix[m].set(Stack[0], y, x);
     }
 
+    function op_sto_matrix_all(m) {
+        for (var j = 1; j <= g_Matrix[m].rows; j++) {
+            for (var i = 1; i <= g_Matrix[m].cols; i++) {
+                g_Matrix[m].set(j, i, Stack[0]);
+            }
+        }
+    }
+
     function op_frac() {
         unop(function(x) {
             return x - trunc(x);
@@ -1941,6 +1949,14 @@
             } else if (k === '+' || k === '-' || k === '*' || k === '/') {
                 op = k;
                 Prefix = OldPrefix;
+                return null;
+            } else if (k === '_') {
+                Prefix = function(k) {
+                    var i = "qE)^?".indexOf(k);
+                    if (i >= 0) {
+                        return new Opcode(new OpcodeInfo([44,16,11+i]), function() { op_sto_matrix_all(i); });
+                    }
+                }
                 return null;
             } else if (k === 'c') {
                 if (op !== null) {
