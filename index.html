@@ -1937,7 +1937,7 @@
             } else if (k === 't') {
                 if (op !== null) {
                     var opindex = {'/':10, '*':20, '-':30, '+':40};
-                    return new Opcode(new OpcodeInfo([44,opindex[op],24]), function() { op_sto_op_reg(op, 'I'); });
+                    return new Opcode(new OpcodeInfo([44,opindex[op],25]), function() { op_sto_op_reg(op, 'I'); });
                 } else {
                     return new Opcode(new OpcodeInfo([44,25]), function() { op_sto_reg('I'); });
                 }
@@ -1991,14 +1991,14 @@
             } else if (k === 'c') {
                 if (op !== null) {
                     var opindex = {'/':10, '*':20, '-':30, '+':40};
-                    return new Opcode(new OpcodeInfo([45,opindex[op],i]), function() { op_rcl_op_index(op); });
+                    return new Opcode(new OpcodeInfo([45,opindex[op],24]), function() { op_rcl_op_index(op); });
                 } else {
                     return new Opcode(new OpcodeInfo([45,24]), op_rcl_index);
                 }
             } else if (k === 't') {
                 if (op !== null) {
                     var opindex = {'/':10, '*':20, '-':30, '+':40};
-                    return new Opcode(new OpcodeInfo([45,opindex[op],i]), function() { op_rcl_op_reg(op, 'I'); });
+                    return new Opcode(new OpcodeInfo([45,opindex[op],25]), function() { op_rcl_op_reg(op, 'I'); });
                 } else {
                     return new Opcode(new OpcodeInfo([45,25]), function() { op_rcl_reg('I'); });
                 }
