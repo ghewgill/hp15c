@@ -1658,7 +1658,7 @@
                 var i = Number(k) / f;
                 return new Opcode(new OpcodeInfo([42,21,i]), function() {});
             } else {
-                var i = "qE)y?".indexOf(k);
+                var i = "qE)^?".indexOf(k);
                 if (i >= 0) {
                     return new Opcode(new OpcodeInfo([42,21,11+i]), function() {});
                 }
@@ -1698,7 +1698,7 @@
             } else if (k === 't') {
                 return new Opcode(new OpcodeInfo([22,25]), function() { op_gto_index(); });
             } else {
-                var x = "qE)y?".indexOf(k);
+                var x = "qE)^?".indexOf(k);
                 if (x >= 0) {
                     return new Opcode(new OpcodeInfo([22,11+x]), function() { op_gto_label(11+x); });
                 }
@@ -1731,7 +1731,7 @@
 
     function decode_dim(k) {
         Prefix = function(k) {
-            var i = "qE)y?".indexOf(k);
+            var i = "qE)^?".indexOf(k);
             if (i >= 0) {
                 return new Opcode(new OpcodeInfo([42,23,11+i]), function() { op_dim(i); });
             }
@@ -1741,7 +1741,7 @@
 
     function decode_result(k) {
         Prefix = function(k) {
-            var i = "qE)y?".indexOf(k);
+            var i = "qE)^?".indexOf(k);
             if (i >= 0) {
                 return new Opcode(new OpcodeInfo([42,26,11+i]), function() { op_result(i); });
             }
@@ -1860,7 +1860,7 @@
             } else if (k === 't') {
                 return new Opcode(new OpcodeInfo([32,25]), function() { op_gsb_index(); });
             } else {
-                var i = "qE)y?".indexOf(k);
+                var i = "qE)^?".indexOf(k);
                 if (i >= 0) {
                     return new Opcode(new OpcodeInfo([32,11+i]), function() { op_gsb(11+i); });
                 }
@@ -1928,7 +1928,7 @@
                     return new Opcode(new OpcodeInfo([44,25]), function() { op_sto_reg('I'); });
                 }
             } else {
-                var i = "qE)y?".indexOf(k);
+                var i = "qE)^?".indexOf(k);
                 if (i >= 0) {
                     return new Opcode(new OpcodeInfo([44,16,11+i]), function() { op_sto_matrix(i); });
                 }
@@ -1959,7 +1959,7 @@
                 return null;
             } else if (k === '_') {
                 Prefix = function(k) {
-                    var i = "qE)y?".indexOf(k);
+                    var i = "qE)^?".indexOf(k);
                     if (i >= 0) {
                         return new Opcode(new OpcodeInfo([45,16,11+i]), function() { op_rcl_descriptor(i); });
                     }
@@ -1967,7 +1967,7 @@
                 return null;
             } else if (k === 's') {
                 Prefix = function(k) {
-                    var i = "qE)y?".indexOf(k);
+                    var i = "qE)^?".indexOf(k);
                     if (i >= 0) {
                         return new Opcode(new OpcodeInfo([45,23,11+i]), function() { op_rcl_dim(i); });
                     }
@@ -1988,7 +1988,7 @@
                     return new Opcode(new OpcodeInfo([45,25]), function() { op_rcl_reg('I'); });
                 }
             } else {
-                var i = "qE)y?".indexOf(k);
+                var i = "qE)^?".indexOf(k);
                 if (i >= 0) {
                     return new Opcode(new OpcodeInfo([45,11+i]), function() { op_rcl_matrix(i); });
                 }
