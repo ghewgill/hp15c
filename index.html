@@ -898,7 +898,7 @@
 
     function op_cosh() {
         if (Flags[8]) {
-            alert("Unimplemented: complex sinh");
+            alert("Unimplemented: complex cosh");
         } else {
             unop(function(x) {
                 return (Math.exp(x) + Math.exp(-x)) / 2;
@@ -908,7 +908,7 @@
 
     function op_tanh() {
         if (Flags[8]) {
-            alert("Unimplemented: complex sinh");
+            alert("Unimplemented: complex tanh");
         } else {
             unop(function(x) {
                 return (Math.exp(2*x) - 1) / (Math.exp(2*x) + 1);
@@ -918,7 +918,7 @@
 
     function op_asinh() {
         if (Flags[8]) {
-            alert("Unimplemented: complex sinh");
+            alert("Unimplemented: complex asinh");
         } else {
             unop(function(x) {
                 return Math.log(x + Math.sqrt(x*x + 1));
@@ -928,7 +928,7 @@
 
     function op_acosh() {
         if (Flags[8]) {
-            alert("Unimplemented: complex sinh");
+            alert("Unimplemented: complex acosh");
         } else {
             unop(function(x) {
                 return Math.log(x + Math.sqrt(x*x - 1));
@@ -938,7 +938,7 @@
 
     function op_atanh() {
         if (Flags[8]) {
-            alert("Unimplemented: complex sinh");
+            alert("Unimplemented: complex atanh");
         } else {
             unop(function(x) {
                 return Math.log((1 + x) / (1 - x)) / 2;
@@ -948,7 +948,7 @@
 
     function op_sin() {
         if (Flags[8]) {
-            alert("Unimplemented: complex sinh");
+            alert("Unimplemented: complex sin");
         } else {
             unop(function(x) {
                 return Math.sin(x * TrigFactor);
@@ -962,7 +962,7 @@
 
     function op_asin() {
         if (Flags[8]) {
-            alert("Unimplemented: complex sinh");
+            alert("Unimplemented: complex asin");
         } else {
             unop(function(x) {
                 return Math.asin(x) / TrigFactor;
@@ -972,7 +972,7 @@
 
     function op_cos() {
         if (Flags[8]) {
-            alert("Unimplemented: complex sinh");
+            alert("Unimplemented: complex cos");
         } else {
             unop(function(x) {
                 return Math.cos(x * TrigFactor);
@@ -990,7 +990,7 @@
 
     function op_acos() {
         if (Flags[8]) {
-            alert("Unimplemented: complex sinh");
+            alert("Unimplemented: complex acos");
         } else {
             unop(function(x) {
                 return Math.acos(x) / TrigFactor;
@@ -1000,7 +1000,7 @@
 
     function op_tan() {
         if (Flags[8]) {
-            alert("Unimplemented: complex sinh");
+            alert("Unimplemented: complex tan");
         } else {
             unop(function(x) {
                 return Math.tan(x * TrigFactor);
@@ -1018,7 +1018,7 @@
 
     function op_atan() {
         if (Flags[8]) {
-            alert("Unimplemented: complex sinh");
+            alert("Unimplemented: complex atan");
         } else {
             unop(function(x) {
                 return Math.atan(x) / TrigFactor;
