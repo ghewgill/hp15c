@@ -1930,7 +1930,7 @@
             } else {
                 var i = "qE)^?".indexOf(k);
                 if (i >= 0) {
-                    return new Opcode(new OpcodeInfo([44,16,11+i]), function() { op_sto_matrix(i); });
+                    return new Opcode(new OpcodeInfo([44,11+i]), function() { op_sto_matrix(i); });
                 }
             }
         };
