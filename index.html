@@ -2279,7 +2279,9 @@
     }
 
     function run_test() {
-        $.getScript("test.js");
+        $.getScript("test.js", function() {
+            do_tests();
+        });
     }
 
     $(document).ready(function() {

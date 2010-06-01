@@ -692,63 +692,65 @@ function verify(test, result, resulti, expected) {
     }
 }
 
-if ($("#testlog").length === 0) {
-    $("body").append('<div><textarea id="testlog" cols="80" rows="10"></textarea></div>');
-}
-
-key('f'); key('7'); key('4');
-var oldalert = alert;
-var log = function(msg) { $("#testlog").append(msg + "\n"); };
-//alert = function(msg) { log(msg); };
-var pass = true;
-for (var t in Tests) {
-    var test = Tests[t];
-    var keys = test[0];
-    log(keys);
-    for (var i = 0; i < keys.length; i++) {
-        key(keys.substr(i, 1));
-        while (Running) {
-            if (RunTimer !== null) {
-                clearTimeout(RunTimer);
-                RunTimer = null;
-            }
-            var p = PC;
-            if (p === 0) {
-                p = 1;
-            }
-            log(sprintf("%03d-%s", p, Program[p].info.keys));
-            step();
-        }
+function do_tests() {
+    if ($("#testlog").length === 0) {
+        $("body").append('<div><textarea id="testlog" cols="80" rows="10"></textarea></div>');
     }
-    if (test.length > 1) {
-        var expected = test[1];
-        if (typeof(expected) === "string") {
-            if (expected !== LcdDisplay) {
-                alert("fail: " + keys + "\nresult: " + LcdDisplay + "\nexpected: " + expected);
-                pass = false;
+
+    key('f'); key('7'); key('4');
+    var oldalert = alert;
+    var log = function(msg) { $("#testlog").append(msg + "\n"); };
+    //alert = function(msg) { log(msg); };
+    var pass = true;
+    for (var t in Tests) {
+        var test = Tests[t];
+        var keys = test[0];
+        log(keys);
+        for (var i = 0; i < keys.length; i++) {
+            key(keys.substr(i, 1));
+            while (Running) {
+                if (RunTimer !== null) {
+                    clearTimeout(RunTimer);
+                    RunTimer = null;
+                }
+                var p = PC;
+                if (p === 0) {
+                    p = 1;
+                }
+                log(sprintf("%03d-%s", p, Program[p].info.keys));
+                step();
             }
-        } else if (typeof(expected) === "function") {
-            if (!expected()) {
-                alert("fail: " + keys + "\nresult: " + LcdDisplay + "\nexpected: " + expected);
-                pass = false;
-            }
-        } else {
-            if (!$.isArray(expected)) {
-                expected = [expected];
-            }
-            for (var i in expected) {
-                if (!verify(test, Stack[i], StackI[i], expected[i])) {
-                    alert("fail: " + keys + "\nresult: " + Stack[i] + "\nexpected: " + expected[i] + "\ndiff: " + Math.abs(Stack[i] / expected[i] - 1));
+        }
+        if (test.length > 1) {
+            var expected = test[1];
+            if (typeof(expected) === "string") {
+                if (expected !== LcdDisplay) {
+                    alert("fail: " + keys + "\nresult: " + LcdDisplay + "\nexpected: " + expected);
                     pass = false;
+                }
+            } else if (typeof(expected) === "function") {
+                if (!expected()) {
+                    alert("fail: " + keys + "\nresult: " + LcdDisplay + "\nexpected: " + expected);
+                    pass = false;
+                }
+            } else {
+                if (!$.isArray(expected)) {
+                    expected = [expected];
+                }
+                for (var i in expected) {
+                    if (!verify(test, Stack[i], StackI[i], expected[i])) {
+                        alert("fail: " + keys + "\nresult: " + Stack[i] + "\nexpected: " + expected[i] + "\ndiff: " + Math.abs(Stack[i] / expected[i] - 1));
+                        pass = false;
+                    }
                 }
             }
         }
+        if (!pass) {
+            break;
+        }
     }
-    if (!pass) {
-        break;
+    alert = oldalert;
+    if (pass) {
+        alert("pass");
     }
-}
-alert = oldalert;
-if (pass) {
-    alert("pass");
 }
