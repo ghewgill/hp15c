@@ -698,7 +698,7 @@ function do_tests() {
     }
 
     key('f'); key('7'); key('4');
-    var oldalert = alert;
+    //var oldalert = alert;
     var log = function(msg) { $("#testlog").append(msg + "\n"); };
     //alert = function(msg) { log(msg); };
     var pass = true;
@@ -749,7 +749,7 @@ function do_tests() {
             break;
         }
     }
-    alert = oldalert;
+    //alert = oldalert;
     if (pass) {
         alert("pass");
     }
