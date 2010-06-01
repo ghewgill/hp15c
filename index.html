@@ -104,6 +104,12 @@
     var ReturnStack = [];
     var Result = 0;
 
+    function CalcError(n) {
+        this.name = "CalcError";
+        this.message = "Error " + n;
+        this.code = n;
+    }
+
     function OpcodeInfo(keys, defn, programmable, user) {
         this.keys = keys;
         this.defn = defn;
@@ -338,15 +344,18 @@
             OldStackLift = StackLift;
             NewDigitEntry = false;
             NewStackLift = true;
-            if (this.fn === undefined) {
-                this.info.defn();
-            } else {
-                this.fn();
-            }
-            DigitEntry = NewDigitEntry;
-            StackLift = NewStackLift;
-            if (DigitEntry) {
-                Stack[0] = Number(Entry);
+            try {
+                if (this.fn === undefined) {
+                    this.info.defn();
+                } else {
+                    this.fn();
+                }
+            } finally {
+                DigitEntry = NewDigitEntry;
+                StackLift = NewStackLift;
+                if (DigitEntry) {
+                    Stack[0] = Number(Entry);
+                }
             }
         }
     }
@@ -389,7 +398,7 @@
         var d = 0;
         for (var i = 0; i < s.length && d < 10; i++) {
             var c = s.charAt(i);
-            if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'E') || c === 'u') {
+            if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'E') || c === 'o' || c === 'r' || c === 'u') {
                 if (eex) {
                     Display[8].attr("src", Display[9].attr("src"));
                     Display[9].attr("src", Digits[c].src);
@@ -537,13 +546,21 @@
     function unop(f) {
         LastX = Stack[0];
         LastXI = StackI[0];
-        Stack[0] = f(Stack[0]);
+        var r = f(Stack[0]);
+        if (isNaN(r) || r === Infinity || r === -Infinity) {
+            throw new CalcError(0);
+        }
+        Stack[0] = r;
     }
 
     function binop(f) {
         LastX = Stack[0];
         LastXI = StackI[0];
-        Stack[0] = f(Stack[1], Stack[0]);
+        var r = f(Stack[1], Stack[0]);
+        if (isNaN(r) || r === Infinity || r === -Infinity) {
+            throw new CalcError(0);
+        }
+        Stack[0] = r;
         Stack[1] = Stack[2]; StackI[1] = StackI[2];
         Stack[2] = Stack[3]; StackI[2] = StackI[3];
     }
@@ -797,6 +814,9 @@
             call(n);
             var y1 = Stack[0];
             var x2 = x1 - y1 * ((x1 - x0) / (y1 - y0));
+            if (isNaN(x2) || x2 === Infinity || x2 === -Infinity) {
+                throw new CalcError(8);
+            }
             fill(x2);
             call(n);
             var y2 = Stack[0];
@@ -809,9 +829,7 @@
                 break;
             }
             if (--maxiter <= 0) {
-                update_lcd("Error 8");
-                DelayUpdate = 1000;
-                return;
+                throw new CalcError(8);
             }
         }
         push(y2);
@@ -2231,20 +2249,31 @@
             return;
         }
         if (op !== null) {
-            if (Prgm && op.info.programmable) {
-                PC++;
-                Program.splice(PC, 0, op);
-            } else {
-                op.exec();
-                if (Running) {
-                    RunTimer = setTimeout(run, 0);
+            try {
+                if (Prgm && op.info.programmable) {
+                    PC++;
+                    Program.splice(PC, 0, op);
+                } else {
+                    op.exec();
+                    if (Running) {
+                        RunTimer = setTimeout(run, 0);
+                    }
+                }
+            } catch (e) {
+                if (e.name === "CalcError") {
+                    update_lcd("Error " + e.code);
+                    DelayUpdate = -1;
+                } else {
+                    throw e;
                 }
             }
         }
         if (DelayUpdate === 0) {
             update_display();
         } else {
-            setTimeout(update_display, DelayUpdate);
+            if (DelayUpdate > 0) {
+                setTimeout(update_display, DelayUpdate);
+            }
             DelayUpdate = 0;
         }
     }
@@ -2254,7 +2283,7 @@
     }
 
     $(document).ready(function() {
-        var digits = "0123456789-ABCDEu";
+        var digits = "0123456789-ABCDEoru";
         for (var i = 0; i < digits.length; i++) {
             var c = digits.substr(i, 1);
             Digits[c] = new Image(20, 30);
