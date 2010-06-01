@@ -485,6 +485,18 @@ var Tests = [
     ["g8", 3.1416, 0.0001],
     ["f*1", 1.3825, 0.0001],
     ["ge/", 0.4401, 0.001],
+    // p199
+    ["gPfr","000-"],
+    ["fT.2","001-42.21.0.2"],
+    ["s",   "002-23"],
+    ["x",   "003-34"],
+    ["/",   "004-10"],
+    ["gU",  "005-43.32"],
+    ["gP"],
+    ["0\r", 0],
+    ["2", 2],
+    ["g8", 2],
+    //["f*.2", 1.6054, 0.0001], // TODO: integrate against limit where function is undefined
 
     // Page references from HP-15C Advanced Functions Handbook (November 1985)
     // p66
