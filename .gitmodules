@@ -1,0 +1,3 @@
+[submodule "jsmat"]
+	path = jsmat
+	url = git://github.com/ghewgill/jsmat.git
