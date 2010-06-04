@@ -53,6 +53,257 @@ function IllegalArgumentException(message) {
     this.getMessage = function() { return message; }
 }
 
+function hypot(a, b) {
+    var r;
+    if (Math.abs(a) > Math.abs(b)) {
+        r = b/a;
+        r = Math.abs(a)*Math.sqrt(1+r*r);
+    } else if (b != 0) {
+        r = a/b;
+        r = Math.abs(b)*Math.sqrt(1+r*r);
+    } else {
+        r = 0.0;
+    }
+    return r;
+}
+
+function LUDecomposition(A) {
+
+/* ------------------------
+   Class variables
+ * ------------------------ */
+
+    /** Array for internal storage of decomposition.
+    @serial internal array storage.
+    */
+    this.LU = null;
+
+    /** Row and column dimensions, and pivot sign.
+    @serial column dimension.
+    @serial row dimension.
+    @serial pivot sign.
+    */
+    this.m = 0;
+    this.n = 0;
+    this.pivsign = 0;
+
+    /** Internal storage of pivot vector.
+    @serial pivot vector.
+    */
+    this.piv = null;
+
+/* ------------------------
+   Constructor
+ * ------------------------ */
+
+    /** LU Decomposition
+    @param  A   Rectangular matrix
+    @return     Structure to access L, U and piv.
+    */
+
+    // Use a "left-looking", dot-product, Crout/Doolittle algorithm.
+
+    this.LU = A.getArrayCopy();
+    this.m = A.getRowDimension();
+    this.n = A.getColumnDimension();
+    this.piv = new Array(this.m);
+    for (var i = 0; i < this.m; i++) {
+        this.piv[i] = i;
+    }
+    this.pivsign = 1;
+    var LUrowi = null;
+    var LUcolj = new Array(this.m);
+
+    // Outer loop.
+
+    for (var j = 0; j < this.n; j++) {
+
+        // Make a copy of the j-th column to localize references.
+
+        for (var i = 0; i < this.m; i++) {
+            LUcolj[i] = this.LU[i][j];
+        }
+
+        // Apply previous transformations.
+
+        for (var i = 0; i < this.m; i++) {
+            LUrowi = this.LU[i];
+
+            // Most of the time is spent in the following dot product.
+
+            var kmax = Math.min(i,j);
+            var s = 0.0;
+            for (var k = 0; k < kmax; k++) {
+                s += LUrowi[k]*LUcolj[k];
+            }
+
+            LUrowi[j] = LUcolj[i] -= s;
+        }
+
+        // Find pivot and exchange if necessary.
+
+        var p = j;
+        for (var i = j+1; i < this.m; i++) {
+            if (Math.abs(LUcolj[i]) > Math.abs(LUcolj[p])) {
+                p = i;
+            }
+        }
+        if (p != j) {
+            for (var k = 0; k < this.n; k++) {
+                var t = this.LU[p][k]; this.LU[p][k] = this.LU[j][k]; this.LU[j][k] = t;
+            }
+            var k = this.piv[p]; this.piv[p] = this.piv[j]; this.piv[j] = k;
+            this.pivsign = -this.pivsign;
+        }
+
+        // Compute multipliers.
+     
+        if (j < this.m & this.LU[j][j] != 0.0) {
+            for (var i = j+1; i < this.m; i++) {
+                this.LU[i][j] /= this.LU[j][j];
+            }
+        }
+    }
+
+/* ------------------------
+   Public Methods
+ * ------------------------ */
+
+//   /** Is the matrix nonsingular?
+//   @return     true if U, and hence A, is nonsingular.
+//   */
+//
+//   public boolean isNonsingular () {
+//      for (int j = 0; j < n; j++) {
+//         if (LU[j][j] == 0)
+//            return false;
+//      }
+//      return true;
+//   }
+//
+//   /** Return lower triangular factor
+//   @return     L
+//   */
+//
+//   public Matrix getL () {
+//      Matrix X = new Matrix(m,n);
+//      double[][] L = X.getArray();
+//      for (int i = 0; i < m; i++) {
+//         for (int j = 0; j < n; j++) {
+//            if (i > j) {
+//               L[i][j] = LU[i][j];
+//            } else if (i == j) {
+//               L[i][j] = 1.0;
+//            } else {
+//               L[i][j] = 0.0;
+//            }
+//         }
+//      }
+//      return X;
+//   }
+//
+//   /** Return upper triangular factor
+//   @return     U
+//   */
+//
+//   public Matrix getU () {
+//      Matrix X = new Matrix(n,n);
+//      double[][] U = X.getArray();
+//      for (int i = 0; i < n; i++) {
+//         for (int j = 0; j < n; j++) {
+//            if (i <= j) {
+//               U[i][j] = LU[i][j];
+//            } else {
+//               U[i][j] = 0.0;
+//            }
+//         }
+//      }
+//      return X;
+//   }
+//
+//   /** Return pivot permutation vector
+//   @return     piv
+//   */
+//
+//   public int[] getPivot () {
+//      int[] p = new int[m];
+//      for (int i = 0; i < m; i++) {
+//         p[i] = piv[i];
+//      }
+//      return p;
+//   }
+//
+//   /** Return pivot permutation vector as a one-dimensional double array
+//   @return     (double) piv
+//   */
+//
+//   public double[] getDoublePivot () {
+//      double[] vals = new double[m];
+//      for (int i = 0; i < m; i++) {
+//         vals[i] = (double) piv[i];
+//      }
+//      return vals;
+//   }
+
+    /** Determinant
+    @return     det(A)
+    @exception  IllegalArgumentException  Matrix must be square
+    */
+
+    this.det = function() {
+        if (this.m != this.n) {
+            throw new IllegalArgumentException("Matrix must be square.");
+        }
+        var d = this.pivsign;
+        for (var j = 0; j < this.n; j++) {
+            d *= this.LU[j][j];
+        }
+        return d;
+    }
+//
+//   /** Solve A*X = B
+//   @param  B   A Matrix with as many rows as A and any number of columns.
+//   @return     X so that L*U*X = B(piv,:)
+//   @exception  IllegalArgumentException Matrix row dimensions must agree.
+//   @exception  RuntimeException  Matrix is singular.
+//   */
+//
+//   public Matrix solve (Matrix B) {
+//      if (B.getRowDimension() != m) {
+//         throw new IllegalArgumentException("Matrix row dimensions must agree.");
+//      }
+//      if (!this.isNonsingular()) {
+//         throw new RuntimeException("Matrix is singular.");
+//      }
+//
+//      // Copy right hand side with pivoting
+//      int nx = B.getColumnDimension();
+//      Matrix Xmat = B.getMatrix(piv,0,nx-1);
+//      double[][] X = Xmat.getArray();
+//
+//      // Solve L*Y = B(piv,:)
+//      for (int k = 0; k < n; k++) {
+//         for (int i = k+1; i < n; i++) {
+//            for (int j = 0; j < nx; j++) {
+//               X[i][j] -= X[k][j]*LU[i][k];
+//            }
+//         }
+//      }
+//      // Solve U*X = Y;
+//      for (int k = n-1; k >= 0; k--) {
+//         for (int j = 0; j < nx; j++) {
+//            X[k][j] /= LU[k][k];
+//         }
+//         for (int i = 0; i < k; i++) {
+//            for (int j = 0; j < nx; j++) {
+//               X[i][j] -= X[k][j]*LU[i][k];
+//            }
+//         }
+//      }
+//      return Xmat;
+//   }
+}
+
 function Matrix() {
 
 /* ------------------------
@@ -85,6 +336,9 @@ function Matrix() {
         this.A = Array(m);
         for (var i = 0; i < m; i++) {
             this.A[i] = Array(n);
+            for (var j = 0; j < n; j++) {
+                this.A[i][j] = 0.;
+            }
         }
 
         /** Construct an m-by-n constant matrix.
@@ -97,7 +351,7 @@ function Matrix() {
             var s = arguments[2];
             for (var i = 0; i < m; i++) {
                 for (var j = 0; j < n; j++) {
-                    A[i][j] = s;
+                    this.A[i][j] = s;
                 }
             }
         }
@@ -188,21 +442,21 @@ function Matrix() {
       }
       return X;
    }
-//
-//   /** Make a deep copy of a matrix
-//   */
-//
-//   public Matrix copy () {
-//      Matrix X = new Matrix(m,n);
-//      double[][] C = X.getArray();
-//      for (int i = 0; i < m; i++) {
-//         for (int j = 0; j < n; j++) {
-//            C[i][j] = A[i][j];
-//         }
-//      }
-//      return X;
-//   }
-//
+
+   /** Make a deep copy of a matrix
+   */
+
+   this.copy = function() {
+      var X = new Matrix(this.m,this.n);
+      var C = X.getArray();
+      for (var i = 0; i < m; i++) {
+         for (var j = 0; j < n; j++) {
+            C[i][j] = this.A[i][j];
+         }
+      }
+      return X;
+   }
+
 //   /** Clone the Matrix object.
 //   */
 //
@@ -403,112 +657,139 @@ function Matrix() {
         }
 
     }
-//
-//   /** Set a single element.
-//   @param i    Row index.
-//   @param j    Column index.
-//   @param s    A(i,j).
-//   @exception  ArrayIndexOutOfBoundsException
-//   */
-//
-//   public void set (int i, int j, double s) {
-//      A[i][j] = s;
-//   }
-//
-//   /** Set a submatrix.
-//   @param i0   Initial row index
-//   @param i1   Final row index
-//   @param j0   Initial column index
-//   @param j1   Final column index
-//   @param X    A(i0:i1,j0:j1)
-//   @exception  ArrayIndexOutOfBoundsException Submatrix indices
-//   */
-//
-//   public void setMatrix (int i0, int i1, int j0, int j1, Matrix X) {
-//      try {
-//         for (int i = i0; i <= i1; i++) {
-//            for (int j = j0; j <= j1; j++) {
-//               A[i][j] = X.get(i-i0,j-j0);
-//            }
-//         }
-//      } catch(ArrayIndexOutOfBoundsException e) {
-//         throw new ArrayIndexOutOfBoundsException("Submatrix indices");
-//      }
-//   }
-//
-//   /** Set a submatrix.
-//   @param r    Array of row indices.
-//   @param c    Array of column indices.
-//   @param X    A(r(:),c(:))
-//   @exception  ArrayIndexOutOfBoundsException Submatrix indices
-//   */
-//
-//   public void setMatrix (int[] r, int[] c, Matrix X) {
-//      try {
-//         for (int i = 0; i < r.length; i++) {
-//            for (int j = 0; j < c.length; j++) {
-//               A[r[i]][c[j]] = X.get(i,j);
-//            }
-//         }
-//      } catch(ArrayIndexOutOfBoundsException e) {
-//         throw new ArrayIndexOutOfBoundsException("Submatrix indices");
-//      }
-//   }
-//
-//   /** Set a submatrix.
-//   @param r    Array of row indices.
-//   @param j0   Initial column index
-//   @param j1   Final column index
-//   @param X    A(r(:),j0:j1)
-//   @exception  ArrayIndexOutOfBoundsException Submatrix indices
-//   */
-//
-//   public void setMatrix (int[] r, int j0, int j1, Matrix X) {
-//      try {
-//         for (int i = 0; i < r.length; i++) {
-//            for (int j = j0; j <= j1; j++) {
-//               A[r[i]][j] = X.get(i,j-j0);
-//            }
-//         }
-//      } catch(ArrayIndexOutOfBoundsException e) {
-//         throw new ArrayIndexOutOfBoundsException("Submatrix indices");
-//      }
-//   }
-//
-//   /** Set a submatrix.
-//   @param i0   Initial row index
-//   @param i1   Final row index
-//   @param c    Array of column indices.
-//   @param X    A(i0:i1,c(:))
-//   @exception  ArrayIndexOutOfBoundsException Submatrix indices
-//   */
-//
-//   public void setMatrix (int i0, int i1, int[] c, Matrix X) {
-//      try {
-//         for (int i = i0; i <= i1; i++) {
-//            for (int j = 0; j < c.length; j++) {
-//               A[i][c[j]] = X.get(i-i0,j);
-//            }
-//         }
-//      } catch(ArrayIndexOutOfBoundsException e) {
-//         throw new ArrayIndexOutOfBoundsException("Submatrix indices");
-//      }
-//   }
-//
-//   /** Matrix transpose.
-//   @return    A'
-//   */
-//
-//   public Matrix transpose () {
-//      Matrix X = new Matrix(n,m);
-//      double[][] C = X.getArray();
-//      for (int i = 0; i < m; i++) {
-//         for (int j = 0; j < n; j++) {
-//            C[j][i] = A[i][j];
-//         }
-//      }
-//      return X;
-//   }
+
+    /** Set a single element.
+    @param i    Row index.
+    @param j    Column index.
+    @param s    A(i,j).
+    @exception  ArrayIndexOutOfBoundsException
+    */
+
+    this.set = function(i, j, s) {
+        if (i < 0 || i >= this.A.length) {
+            throw new ArrayIndexOutOfBoundsException(i);
+        }
+        if (j < 0 || j >= this.A[i].length) {
+            throw new ArrayIndexOutOfBoundsException(j);
+        }
+        this.A[i][j] = s;
+    }
+
+    this.setMatrix = function() {
+
+        /** Set a submatrix.
+        @param i0   Initial row index
+        @param i1   Final row index
+        @param j0   Initial column index
+        @param j1   Final column index
+        @param X    A(i0:i1,j0:j1)
+        @exception  ArrayIndexOutOfBoundsException Submatrix indices
+        */
+
+        if (typeof(arguments[0]) === "number" && typeof(arguments[1]) === "number" && typeof(arguments[2]) === "number" && typeof(arguments[3]) === "number" && typeof(arguments[4]) === "object") {
+
+            var i0 = arguments[0];
+            var i1 = arguments[1];
+            var j0 = arguments[2];
+            var j1 = arguments[3];
+            var X = arguments[4];
+
+            for (var i = i0; i <= i1; i++) {
+                for (var j = j0; j <= j1; j++) {
+                    if (i < 0 || i >= this.m || j < 0 || j >= this.n) {
+                        throw new ArrayIndexOutOfBoundsException("Submatrix indices");
+                    }
+                    this.A[i][j] = X.get(i-i0,j-j0);
+                }
+            }
+
+        /** Set a submatrix.
+        @param r    Array of row indices.
+        @param c    Array of column indices.
+        @param X    A(r(:),c(:))
+        @exception  ArrayIndexOutOfBoundsException Submatrix indices
+        */
+
+        } else if (typeof(arguments[0]) === "object" && typeof(arguments[1]) === "object" && typeof(arguments[2]) === "object") {
+
+            var r = arguments[0];
+            var c = arguments[1];
+            var X = arguments[2];
+
+            for (var i = 0; i < r.length; i++) {
+                for (var j = 0; j < c.length; j++) {
+                    if (r[i] < 0 || r[i] >= this.m || c[j] < 0 || c[j] >= this.n) {
+                        throw new ArrayIndexOutOfBoundsException("Submatrix indices");
+                    }
+                    this.A[r[i]][c[j]] = X.get(i,j);
+                }
+            }
+
+        /** Set a submatrix.
+        @param r    Array of row indices.
+        @param j0   Initial column index
+        @param j1   Final column index
+        @param X    A(r(:),j0:j1)
+        @exception  ArrayIndexOutOfBoundsException Submatrix indices
+        */
+
+        } else if (typeof(arguments[0]) === "object" && typeof(arguments[1]) === "number" && typeof(arguments[2]) === "number" && typeof(arguments[3]) === "object") {
+
+            var r = arguments[0];
+            var j0 = arguments[1];
+            var j1 = arguments[2];
+            var X = arguments[3];
+
+            for (var i = 0; i < r.length; i++) {
+                for (var j = j0; j <= j1; j++) {
+                    if (r[i] < 0 || r[i] >= this.m || j < 0 || j >= this.n) {
+                        throw new ArrayIndexOutOfBoundsException("Submatrix indices");
+                    }
+                    this.A[r[i]][j] = X.get(i,j-j0);
+                }
+            }
+
+        /** Set a submatrix.
+        @param i0   Initial row index
+        @param i1   Final row index
+        @param c    Array of column indices.
+        @param X    A(i0:i1,c(:))
+        @exception  ArrayIndexOutOfBoundsException Submatrix indices
+        */
+
+        } else if (typeof(arguments[0]) === "number" && typeof(arguments[1]) === "number" && typeof(arguments[2]) === "object" && typeof(arguments[2]) === "object") {
+
+            var i0 = arguments[0];
+            var i1 = arguments[1];
+            var c = arguments[2];
+            var X = arguments[3];
+
+            for (var i = i0; i <= i1; i++) {
+                for (var j = 0; j < c.length; j++) {
+                    if (i < 0 || i >= this.m || c[j] < 0 || c[j] >= this.n) {
+                        throw new ArrayIndexOutOfBoundsException("Submatrix indices");
+                    }
+                    this.A[i][c[j]] = X.get(i-i0,j);
+                }
+            }
+
+        }
+    }
+
+    /** Matrix transpose.
+    @return    A'
+    */
+
+    this.transpose = function() {
+        var X = new Matrix(this.n,this.m);
+        var C = X.getArray();
+        for (var i = 0; i < this.m; i++) {
+            for (var j = 0; j < this.n; j++) {
+                C[j][i] = this.A[i][j];
+            }
+        }
+        return X;
+    }
 
     /** One norm
     @return    maximum column sum.
@@ -533,83 +814,83 @@ function Matrix() {
 //   public double norm2 () {
 //      return (new SingularValueDecomposition(this).norm2());
 //   }
-//
-//   /** Infinity norm
-//   @return    maximum row sum.
-//   */
-//
-//   public double normInf () {
-//      double f = 0;
-//      for (int i = 0; i < m; i++) {
-//         double s = 0;
-//         for (int j = 0; j < n; j++) {
-//            s += Math.abs(A[i][j]);
-//         }
-//         f = Math.max(f,s);
-//      }
-//      return f;
-//   }
-//
-//   /** Frobenius norm
-//   @return    sqrt of sum of squares of all elements.
-//   */
-//
-//   public double normF () {
-//      double f = 0;
-//      for (int i = 0; i < m; i++) {
-//         for (int j = 0; j < n; j++) {
-//            f = Maths.hypot(f,A[i][j]);
-//         }
-//      }
-//      return f;
-//   }
-//
-//   /**  Unary minus
-//   @return    -A
-//   */
-//
-//   public Matrix uminus () {
-//      Matrix X = new Matrix(m,n);
-//      double[][] C = X.getArray();
-//      for (int i = 0; i < m; i++) {
-//         for (int j = 0; j < n; j++) {
-//            C[i][j] = -A[i][j];
-//         }
-//      }
-//      return X;
-//   }
-//
-//   /** C = A + B
-//   @param B    another matrix
-//   @return     A + B
-//   */
-//
-//   public Matrix plus (Matrix B) {
-//      checkMatrixDimensions(B);
-//      Matrix X = new Matrix(m,n);
-//      double[][] C = X.getArray();
-//      for (int i = 0; i < m; i++) {
-//         for (int j = 0; j < n; j++) {
-//            C[i][j] = A[i][j] + B.A[i][j];
-//         }
-//      }
-//      return X;
-//   }
-//
-//   /** A = A + B
-//   @param B    another matrix
-//   @return     A + B
-//   */
-//
-//   public Matrix plusEquals (Matrix B) {
-//      checkMatrixDimensions(B);
-//      for (int i = 0; i < m; i++) {
-//         for (int j = 0; j < n; j++) {
-//            A[i][j] = A[i][j] + B.A[i][j];
-//         }
-//      }
-//      return this;
-//   }
+
+    /** Infinity norm
+    @return    maximum row sum.
+    */
+
+    this.normInf = function() {
+        var f = 0;
+        for (var i = 0; i < this.m; i++) {
+            var s = 0;
+            for (var j = 0; j < this.n; j++) {
+                s += Math.abs(this.A[i][j]);
+            }
+            f = Math.max(f,s);
+        }
+        return f;
+    }
+
+    /** Frobenius norm
+    @return    sqrt of sum of squares of all elements.
+    */
+
+    this.normF = function() {
+        var f = 0;
+        for (var i = 0; i < this.m; i++) {
+            for (var j = 0; j < this.n; j++) {
+                f = hypot(f,this.A[i][j]);
+            }
+        }
+        return f;
+    }
+
+    /**  Unary minus
+    @return    -A
+    */
+
+    this.uminus = function() {
+        var X = new Matrix(this.m,this.n);
+        var C = X.getArray();
+        for (var i = 0; i < this.m; i++) {
+            for (var j = 0; j < this.n; j++) {
+                C[i][j] = -this.A[i][j];
+            }
+        }
+        return X;
+    }
+
+    /** C = A + B
+    @param B    another matrix
+    @return     A + B
+    */
+
+    this.plus = function(B) {
+        this.checkMatrixDimensions(B);
+        var X = new Matrix(this.m,this.n);
+        var C = X.getArray();
+        for (var i = 0; i < this.m; i++) {
+            for (var j = 0; j < this.n; j++) {
+                C[i][j] = this.A[i][j] + B.A[i][j];
+            }
+        }
+        return X;
+    }
+
+    /** A = A + B
+    @param B    another matrix
+    @return     A + B
+    */
+
+    this.plusEquals = function(B) {
+        this.checkMatrixDimensions(B);
+        for (var i = 0; i < this.m; i++) {
+            for (var j = 0; j < this.n; j++) {
+                this.A[i][j] = this.A[i][j] + B.A[i][j];
+            }
+        }
+        return this;
+    }
 
     /** C = A - B
     @param B    another matrix
@@ -622,138 +903,138 @@ function Matrix() {
         var C = X.getArray();
         for (var i = 0; i < this.m; i++) {
             for (var j = 0; j < this.n; j++) {
-                C[i][j] = A[i][j] - B.A[i][j];
+                C[i][j] = this.A[i][j] - B.A[i][j];
             }
         }
         return X;
     }
-//
-//   /** A = A - B
-//   @param B    another matrix
-//   @return     A - B
-//   */
-//
-//   public Matrix minusEquals (Matrix B) {
-//      checkMatrixDimensions(B);
-//      for (int i = 0; i < m; i++) {
-//         for (int j = 0; j < n; j++) {
-//            A[i][j] = A[i][j] - B.A[i][j];
-//         }
-//      }
-//      return this;
-//   }
-//
-//   /** Element-by-element multiplication, C = A.*B
-//   @param B    another matrix
-//   @return     A.*B
-//   */
-//
-//   public Matrix arrayTimes (Matrix B) {
-//      checkMatrixDimensions(B);
-//      Matrix X = new Matrix(m,n);
-//      double[][] C = X.getArray();
-//      for (int i = 0; i < m; i++) {
-//         for (int j = 0; j < n; j++) {
-//            C[i][j] = A[i][j] * B.A[i][j];
-//         }
-//      }
-//      return X;
-//   }
-//
-//   /** Element-by-element multiplication in place, A = A.*B
-//   @param B    another matrix
-//   @return     A.*B
-//   */
-//
-//   public Matrix arrayTimesEquals (Matrix B) {
-//      checkMatrixDimensions(B);
-//      for (int i = 0; i < m; i++) {
-//         for (int j = 0; j < n; j++) {
-//            A[i][j] = A[i][j] * B.A[i][j];
-//         }
-//      }
-//      return this;
-//   }
-//
-//   /** Element-by-element right division, C = A./B
-//   @param B    another matrix
-//   @return     A./B
-//   */
-//
-//   public Matrix arrayRightDivide (Matrix B) {
-//      checkMatrixDimensions(B);
-//      Matrix X = new Matrix(m,n);
-//      double[][] C = X.getArray();
-//      for (int i = 0; i < m; i++) {
-//         for (int j = 0; j < n; j++) {
-//            C[i][j] = A[i][j] / B.A[i][j];
-//         }
-//      }
-//      return X;
-//   }
-//
-//   /** Element-by-element right division in place, A = A./B
-//   @param B    another matrix
-//   @return     A./B
-//   */
-//
-//   public Matrix arrayRightDivideEquals (Matrix B) {
-//      checkMatrixDimensions(B);
-//      for (int i = 0; i < m; i++) {
-//         for (int j = 0; j < n; j++) {
-//            A[i][j] = A[i][j] / B.A[i][j];
-//         }
-//      }
-//      return this;
-//   }
-//
-//   /** Element-by-element left division, C = A.\B
-//   @param B    another matrix
-//   @return     A.\B
-//   */
-//
-//   public Matrix arrayLeftDivide (Matrix B) {
-//      checkMatrixDimensions(B);
-//      Matrix X = new Matrix(m,n);
-//      double[][] C = X.getArray();
-//      for (int i = 0; i < m; i++) {
-//         for (int j = 0; j < n; j++) {
-//            C[i][j] = B.A[i][j] / A[i][j];
-//         }
-//      }
-//      return X;
-//   }
-//
-//   /** Element-by-element left division in place, A = A.\B
-//   @param B    another matrix
-//   @return     A.\B
-//   */
-//
-//   public Matrix arrayLeftDivideEquals (Matrix B) {
-//      checkMatrixDimensions(B);
-//      for (int i = 0; i < m; i++) {
-//         for (int j = 0; j < n; j++) {
-//            A[i][j] = B.A[i][j] / A[i][j];
-//         }
-//      }
-//      return this;
-//   }
-//
-//   /** Multiply a matrix by a scalar, C = s*A
-//   @param s    scalar
-//   @return     s*A
-//   */
-//
-//   public Matrix times (double s) {
-//      Matrix X = new Matrix(m,n);
-//      double[][] C = X.getArray();
-//      for (int i = 0; i < m; i++) {
-//         for (int j = 0; j < n; j++) {
-//            C[i][j] = s*A[i][j];
-//         }
-//      }
-//      return X;
-//   }
+
+    /** A = A - B
+    @param B    another matrix
+    @return     A - B
+    */
+
+    this.minusEquals = function(B) {
+        this.checkMatrixDimensions(B);
+        for (var i = 0; i < this.m; i++) {
+            for (var j = 0; j < this.n; j++) {
+                this.A[i][j] = this.A[i][j] - B.A[i][j];
+            }
+        }
+        return this;
+    }
+
+    /** Element-by-element multiplication, C = A.*B
+    @param B    another matrix
+    @return     A.*B
+    */
+
+    this.arrayTimes = function(B) {
+        this.checkMatrixDimensions(B);
+        var X = new Matrix(this.m,this.n);
+        var C = X.getArray();
+        for (var i = 0; i < this.m; i++) {
+            for (var j = 0; j < this.n; j++) {
+                C[i][j] = this.A[i][j] * B.A[i][j];
+            }
+        }
+        return X;
+    }
+
+    /** Element-by-element multiplication in place, A = A.*B
+    @param B    another matrix
+    @return     A.*B
+    */
+
+    this.arrayTimesEquals = function(B) {
+        this.checkMatrixDimensions(B);
+        for (var i = 0; i < this.m; i++) {
+            for (var j = 0; j < this.n; j++) {
+                this.A[i][j] = this.A[i][j] * B.A[i][j];
+            }
+        }
+        return this;
+    }
+
+    /** Element-by-element right division, C = A./B
+    @param B    another matrix
+    @return     A./B
+    */
+
+    this.arrayRightDivide = function(B) {
+        this.checkMatrixDimensions(B);
+        var X = new Matrix(this.m,this.n);
+        var C = X.getArray();
+        for (var i = 0; i < this.m; i++) {
+            for (var j = 0; j < this.n; j++) {
+                C[i][j] = this.A[i][j] / B.A[i][j];
+            }
+        }
+        return X;
+    }
+
+    /** Element-by-element right division in place, A = A./B
+    @param B    another matrix
+    @return     A./B
+    */
+
+    this.arrayRightDivideEquals = function(B) {
+        this.checkMatrixDimensions(B);
+        for (var i = 0; i < this.m; i++) {
+            for (var j = 0; j < this.n; j++) {
+                this.A[i][j] = this.A[i][j] / B.A[i][j];
+            }
+        }
+        return this;
+    }
+
+    /** Element-by-element left division, C = A.\B
+    @param B    another matrix
+    @return     A.\B
+    */
+
+    this.arrayLeftDivide = function(B) {
+        this.checkMatrixDimensions(B);
+        var X = new Matrix(this.m,this.n);
+        var C = X.getArray();
+        for (var i = 0; i < this.m; i++) {
+            for (var j = 0; j < this.n; j++) {
+                C[i][j] = B.A[i][j] / this.A[i][j];
+            }
+        }
+        return X;
+    }
+
+    /** Element-by-element left division in place, A = A.\B
+    @param B    another matrix
+    @return     A.\B
+    */
+
+    this.arrayLeftDivideEquals = function(B) {
+        this.checkMatrixDimensions(B);
+        for (var i = 0; i < this.m; i++) {
+            for (var j = 0; j < this.n; j++) {
+                this.A[i][j] = B.A[i][j] / this.A[i][j];
+            }
+        }
+        return this;
+    }
+
+    /** Multiply a matrix by a scalar, C = s*A
+    @param s    scalar
+    @return     s*A
+    */
+
+    this.timesScalar = function(s) {
+        var X = new Matrix(this.m,this.n);
+        var C = X.getArray();
+        for (var i = 0; i < this.m; i++) {
+            for (var j = 0; j < this.n; j++) {
+                C[i][j] = s*this.A[i][j];
+            }
+        }
+        return X;
+    }
 //
 //   /** Multiply a matrix by a scalar in place, A = s*A
 //   @param s    scalar
@@ -768,35 +1049,35 @@ function Matrix() {
 //      }
 //      return this;
 //   }
-//
-//   /** Linear algebraic matrix multiplication, A * B
-//   @param B    another matrix
-//   @return     Matrix product, A * B
-//   @exception  IllegalArgumentException Matrix inner dimensions must agree.
-//   */
-//
-//   public Matrix times (Matrix B) {
-//      if (B.m != n) {
-//         throw new IllegalArgumentException("Matrix inner dimensions must agree.");
-//      }
-//      Matrix X = new Matrix(m,B.n);
-//      double[][] C = X.getArray();
-//      double[] Bcolj = new double[n];
-//      for (int j = 0; j < B.n; j++) {
-//         for (int k = 0; k < n; k++) {
-//            Bcolj[k] = B.A[k][j];
-//         }
-//         for (int i = 0; i < m; i++) {
-//            double[] Arowi = A[i];
-//            double s = 0;
-//            for (int k = 0; k < n; k++) {
-//               s += Arowi[k]*Bcolj[k];
-//            }
-//            C[i][j] = s;
-//         }
-//      }
-//      return X;
-//   }
+
+    /** Linear algebraic matrix multiplication, A * B
+    @param B    another matrix
+    @return     Matrix product, A * B
+    @exception  IllegalArgumentException Matrix inner dimensions must agree.
+    */
+
+    this.times = function(B) {
+        if (B.m != this.n) {
+            throw new IllegalArgumentException("Matrix inner dimensions must agree.");
+        }
+        var X = new Matrix(this.m,B.n);
+        var C = X.getArray();
+        var Bcolj = new Array(n);
+        for (var j = 0; j < B.n; j++) {
+            for (var k = 0; k < this.n; k++) {
+                Bcolj[k] = B.A[k][j];
+            }
+            for (var i = 0; i < this.m; i++) {
+                var Arowi = this.A[i];
+                var s = 0;
+                for (var k = 0; k < this.n; k++) {
+                    s += Arowi[k]*Bcolj[k];
+                }
+                C[i][j] = s;
+            }
+        }
+        return X;
+    }
 //
 //   /** LU Decomposition
 //   @return     LUDecomposition
@@ -869,14 +1150,14 @@ function Matrix() {
 //   public Matrix inverse () {
 //      return solve(identity(m,m));
 //   }
-//
-//   /** Matrix determinant
-//   @return     determinant
-//   */
-//
-//   public double det () {
-//      return new LUDecomposition(this).det();
-//   }
+
+    /** Matrix determinant
+    @return     determinant
+    */
+
+    this.det = function() {
+        return new LUDecomposition(this).det();
+    }
 //
 //   /** Matrix rank
 //   @return     effective numerical rank, obtained from SVD.
@@ -893,35 +1174,35 @@ function Matrix() {
 //   public double cond () {
 //      return new SingularValueDecomposition(this).cond();
 //   }
-//
-//   /** Matrix trace.
-//   @return     sum of the diagonal elements.
-//   */
-//
-//   public double trace () {
-//      double t = 0;
-//      for (int i = 0; i < Math.min(m,n); i++) {
-//         t += A[i][i];
-//      }
-//      return t;
-//   }
-//
-//   /** Generate matrix with random elements
-//   @param m    Number of rows.
-//   @param n    Number of colums.
-//   @return     An m-by-n matrix with uniformly distributed random elements.
-//   */
-//
-//   public static Matrix random (int m, int n) {
-//      Matrix A = new Matrix(m,n);
-//      double[][] X = A.getArray();
-//      for (int i = 0; i < m; i++) {
-//         for (int j = 0; j < n; j++) {
-//            X[i][j] = Math.random();
-//         }
-//      }
-//      return A;
-//   }
+
+    /** Matrix trace.
+    @return     sum of the diagonal elements.
+    */
+
+    this.trace = function() {
+        var t = 0;
+        for (var i = 0; i < Math.min(this.m,this.n); i++) {
+            t += this.A[i][i];
+        }
+        return t;
+    }
+
+   /** Generate matrix with random elements
+   @param m    Number of rows.
+   @param n    Number of colums.
+   @return     An m-by-n matrix with uniformly distributed random elements.
+   */
+
+   Matrix.random = function(m, n) {
+      var A = new Matrix(m,n);
+      var X = A.getArray();
+      for (var i = 0; i < m; i++) {
+         for (var j = 0; j < n; j++) {
+            X[i][j] = Math.random();
+         }
+      }
+      return A;
+   }
 
    /** Generate identity matrix
    @param m    Number of rows.
