@@ -169,69 +169,69 @@ function LUDecomposition(A) {
    Public Methods
  * ------------------------ */
 
-//   /** Is the matrix nonsingular?
-//   @return     true if U, and hence A, is nonsingular.
-//   */
-//
-//   public boolean isNonsingular () {
-//      for (int j = 0; j < n; j++) {
-//         if (LU[j][j] == 0)
-//            return false;
-//      }
-//      return true;
-//   }
-//
-//   /** Return lower triangular factor
-//   @return     L
-//   */
-//
-//   public Matrix getL () {
-//      Matrix X = new Matrix(m,n);
-//      double[][] L = X.getArray();
-//      for (int i = 0; i < m; i++) {
-//         for (int j = 0; j < n; j++) {
-//            if (i > j) {
-//               L[i][j] = LU[i][j];
-//            } else if (i == j) {
-//               L[i][j] = 1.0;
-//            } else {
-//               L[i][j] = 0.0;
-//            }
-//         }
-//      }
-//      return X;
-//   }
-//
-//   /** Return upper triangular factor
-//   @return     U
-//   */
-//
-//   public Matrix getU () {
-//      Matrix X = new Matrix(n,n);
-//      double[][] U = X.getArray();
-//      for (int i = 0; i < n; i++) {
-//         for (int j = 0; j < n; j++) {
-//            if (i <= j) {
-//               U[i][j] = LU[i][j];
-//            } else {
-//               U[i][j] = 0.0;
-//            }
-//         }
-//      }
-//      return X;
-//   }
-//
-//   /** Return pivot permutation vector
-//   @return     piv
-//   */
-//
-//   public int[] getPivot () {
-//      int[] p = new int[m];
-//      for (int i = 0; i < m; i++) {
-//         p[i] = piv[i];
-//      }
-//      return p;
-//   }
+    /** Is the matrix nonsingular?
+    @return     true if U, and hence A, is nonsingular.
+    */
+
+    this.isNonsingular = function() {
+        for (var j = 0; j < this.n; j++) {
+            if (this.LU[j][j] == 0)
+                return false;
+        }
+        return true;
+    }
+
+    /** Return lower triangular factor
+    @return     L
+    */
+
+    this.getL = function() {
+        var X = new Matrix(this.m,this.n);
+        var L = X.getArray();
+        for (var i = 0; i < this.m; i++) {
+            for (var j = 0; j < this.n; j++) {
+                if (i > j) {
+                    L[i][j] = this.LU[i][j];
+                } else if (i == j) {
+                    L[i][j] = 1.0;
+                } else {
+                    L[i][j] = 0.0;
+                }
+            }
+        }
+        return X;
+    }
+
+    /** Return upper triangular factor
+    @return     U
+    */
+
+    this.getU = function() {
+        var X = new Matrix(this.n,this.n);
+        var U = X.getArray();
+        for (var i = 0; i < this.n; i++) {
+            for (var j = 0; j < this.n; j++) {
+                if (i <= j) {
+                    U[i][j] = this.LU[i][j];
+                } else {
+                    U[i][j] = 0.0;
+                }
+            }
+        }
+        return X;
+    }
+
+    /** Return pivot permutation vector
+    @return     piv
+    */
+
+    this.getPivot = function() {
+        var p = new Array(this.m);
+        for (var i = 0; i < this.m; i++) {
+            p[i] = this.piv[i];
+        }
+        return p;
+    }
 //
 //   /** Return pivot permutation vector as a one-dimensional double array
 //   @return     (double) piv
@@ -260,48 +260,48 @@ function LUDecomposition(A) {
         }
         return d;
     }
-//
-//   /** Solve A*X = B
-//   @param  B   A Matrix with as many rows as A and any number of columns.
-//   @return     X so that L*U*X = B(piv,:)
-//   @exception  IllegalArgumentException Matrix row dimensions must agree.
-//   @exception  RuntimeException  Matrix is singular.
-//   */
-//
-//   public Matrix solve (Matrix B) {
-//      if (B.getRowDimension() != m) {
-//         throw new IllegalArgumentException("Matrix row dimensions must agree.");
-//      }
-//      if (!this.isNonsingular()) {
-//         throw new RuntimeException("Matrix is singular.");
-//      }
-//
-//      // Copy right hand side with pivoting
-//      int nx = B.getColumnDimension();
-//      Matrix Xmat = B.getMatrix(piv,0,nx-1);
-//      double[][] X = Xmat.getArray();
-//
-//      // Solve L*Y = B(piv,:)
-//      for (int k = 0; k < n; k++) {
-//         for (int i = k+1; i < n; i++) {
-//            for (int j = 0; j < nx; j++) {
-//               X[i][j] -= X[k][j]*LU[i][k];
-//            }
-//         }
-//      }
-//      // Solve U*X = Y;
-//      for (int k = n-1; k >= 0; k--) {
-//         for (int j = 0; j < nx; j++) {
-//            X[k][j] /= LU[k][k];
-//         }
-//         for (int i = 0; i < k; i++) {
-//            for (int j = 0; j < nx; j++) {
-//               X[i][j] -= X[k][j]*LU[i][k];
-//            }
-//         }
-//      }
-//      return Xmat;
-//   }
+
+    /** Solve A*X = B
+    @param  B   A Matrix with as many rows as A and any number of columns.
+    @return     X so that L*U*X = B(piv,:)
+    @exception  IllegalArgumentException Matrix row dimensions must agree.
+    @exception  RuntimeException  Matrix is singular.
+    */
+
+    this.solve = function(B) {
+        if (B.getRowDimension() != this.m) {
+            throw new IllegalArgumentException("Matrix row dimensions must agree.");
+        }
+        if (!this.isNonsingular()) {
+            throw new RuntimeException("Matrix is singular.");
+        }
+
+        // Copy right hand side with pivoting
+        var nx = B.getColumnDimension();
+        var Xmat = B.getMatrix(this.piv,0,nx-1);
+        var X = Xmat.getArray();
+
+        // Solve L*Y = B(piv,:)
+        for (var k = 0; k < this.n; k++) {
+            for (var i = k+1; i < this.n; i++) {
+                for (var j = 0; j < nx; j++) {
+                    X[i][j] -= X[k][j]*this.LU[i][k];
+                }
+            }
+        }
+        // Solve U*X = Y;
+        for (var k = this.n-1; k >= 0; k--) {
+            for (var j = 0; j < nx; j++) {
+                X[k][j] /= this.LU[k][k];
+            }
+            for (var i = 0; i < k; i++) {
+                for (var j = 0; j < nx; j++) {
+                    X[i][j] -= X[k][j]*this.LU[i][k];
+                }
+            }
+        }
+        return Xmat;
+    }
 }
 
 function Matrix() {
@@ -597,7 +597,7 @@ function Matrix() {
                     if (r[i] < 0 || r[i] >= this.m || c[j] < 0 || c[j] >= this.n) {
                         throw new ArrayIndexOutOfBoundsException("Submatrix indices");
                     }
-                    B[i][j] = A[r[i]][c[j]];
+                    B[i][j] = this.A[r[i]][c[j]];
                 }
             }
             return X;
@@ -623,7 +623,7 @@ function Matrix() {
                     if (i < 0 || i >= this.m || c[j] < 0 || c[j] >= this.n) {
                         throw new ArrayIndexOutOfBoundsException("Submatrix indices");
                     }
-                    B[i-i0][j] = A[i][c[j]];
+                    B[i-i0][j] = this.A[i][c[j]];
                 }
             }
             return X;
@@ -649,7 +649,7 @@ function Matrix() {
                     if (r[i] < 0 || r[i] >= this.m || j < 0 || j >= this.n) {
                         throw new ArrayIndexOutOfBoundsException("Submatrix indices");
                     }
-                    B[i][j-j0] = A[r[i]][j];
+                    B[i][j-j0] = this.A[r[i]][j];
                 }
             }
             return X;
@@ -1078,15 +1078,15 @@ function Matrix() {
         }
         return X;
     }
-//
-//   /** LU Decomposition
-//   @return     LUDecomposition
-//   @see LUDecomposition
-//   */
-//
-//   public LUDecomposition lu () {
-//      return new LUDecomposition(this);
-//   }
+
+    /** LU Decomposition
+    @return     LUDecomposition
+    @see LUDecomposition
+    */
+
+    this.lu = function() {
+        return new LUDecomposition(this);
+    }
 //
 //   /** QR Decomposition
 //   @return     QRDecomposition
@@ -1123,16 +1123,16 @@ function Matrix() {
 //   public EigenvalueDecomposition eig () {
 //      return new EigenvalueDecomposition(this);
 //   }
-//
-//   /** Solve A*X = B
-//   @param B    right hand side
-//   @return     solution if A is square, least squares solution otherwise
-//   */
-//
-//   public Matrix solve (Matrix B) {
-//      return (m == n ? (new LUDecomposition(this)).solve(B) :
-//                       (new QRDecomposition(this)).solve(B));
-//   }
+
+    /** Solve A*X = B
+    @param B    right hand side
+    @return     solution if A is square, least squares solution otherwise
+    */
+
+    this.solve = function(B) {
+        return (this.m == this.n ? (new LUDecomposition(this)).solve(B) :
+                                   (new QRDecomposition(this)).solve(B));
+    }
 //
 //   /** Solve X*A = B, which is also A'*X' = B'
 //   @param B    right hand side
@@ -1142,14 +1142,14 @@ function Matrix() {
 //   public Matrix solveTranspose (Matrix B) {
 //      return transpose().solve(B.transpose());
 //   }
-//
-//   /** Matrix inverse or pseudoinverse
-//   @return     inverse(A) if A is square, pseudoinverse otherwise.
-//   */
-//
-//   public Matrix inverse () {
-//      return solve(identity(m,m));
-//   }
+
+    /** Matrix inverse or pseudoinverse
+    @return     inverse(A) if A is square, pseudoinverse otherwise.
+    */
+
+    this.inverse = function() {
+        return this.solve(Matrix.identity(this.m,this.m));
+    }
 
     /** Matrix determinant
     @return     determinant

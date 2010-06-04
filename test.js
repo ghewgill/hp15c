@@ -1004,7 +1004,7 @@ try {
     errorCount = try_failure(errorCount,"times(double)...","incorrect Matrix-scalar product calculation");
 }
 
-//A = new Matrix(columnwise,4);
+A = new Matrix(columnwise,4);
 //QRDecomposition QR = A.qr();
 //R = QR.getR();
 //try {
@@ -1022,10 +1022,10 @@ try {
 //}
 //DEF = new Matrix(rankdef);
 //try {
-//   check(DEF.rank(),Math.min(DEF.getRowDimension(),DEF.getColumnDimension())-1);
-//   try_success("rank()...","");
-//} catch ( java.lang.RuntimeException e ) {
-//   errorCount = try_failure(errorCount,"rank()...","incorrect rank calculation");
+//    check_scalar(DEF.rank(),Math.min(DEF.getRowDimension(),DEF.getColumnDimension())-1);
+//    try_success("rank()...","");
+//} catch ( e ) {
+//    errorCount = try_failure(errorCount,"rank()...","incorrect rank calculation");
 //}
 //B = new Matrix(condmat);
 //SVD = B.svd(); 
@@ -1036,34 +1036,33 @@ try {
 //} catch ( java.lang.RuntimeException e ) {
 //   errorCount = try_failure(errorCount,"cond()...","incorrect condition number calculation");
 //}
-//int n = A.getColumnDimension();
-//A = A.getMatrix(0,n-1,0,n-1);
-//A.set(0,0,0.);
-//LUDecomposition LU = A.lu();
-//try {
-//   check(A.getMatrix(LU.getPivot(),0,n-1),LU.getL().times(LU.getU()));
-//   try_success("LUDecomposition...","");
-//} catch ( java.lang.RuntimeException e ) {
-//   errorCount = try_failure(errorCount,"LUDecomposition...","incorrect LU decomposition calculation");
-//}
-//X = A.inverse();
-//try {
-//   check(A.times(X),Matrix.identity(3,3));
-//   try_success("inverse()...","");
-//} catch ( java.lang.RuntimeException e ) {
-//   errorCount = try_failure(errorCount,"inverse()...","incorrect inverse calculation");
-//}
-//O = new Matrix(SUB.getRowDimension(),1,1.0);
-//SOL = new Matrix(sqSolution);
-//SQ = SUB.getMatrix(0,SUB.getRowDimension()-1,0,SUB.getRowDimension()-1);
-//try {
-//   check(SQ.solve(SOL),O); 
-//   try_success("solve()...","");
-//} catch ( java.lang.IllegalArgumentException e1 ) {
-//   errorCount = try_failure(errorCount,"solve()...",e1.getMessage());
-//} catch ( java.lang.RuntimeException e ) {
-//   errorCount = try_failure(errorCount,"solve()...",e.getMessage());
-//}
+var n = A.getColumnDimension();
+A = A.getMatrix(0,n-1,0,n-1);
+A.set(0,0,0.);
+var LU = A.lu();
+try {
+    check_matrix(A.getMatrix(LU.getPivot(),0,n-1),LU.getL().times(LU.getU()));
+    try_success("LUDecomposition...","");
+} catch ( e ) {
+    errorCount = try_failure(errorCount,"LUDecomposition...","incorrect LU decomposition calculation");
+    print(e);
+}
+X = A.inverse();
+try {
+    check_matrix(A.times(X),Matrix.identity(3,3));
+    try_success("inverse()...","");
+} catch ( e ) {
+    errorCount = try_failure(errorCount,"inverse()...","incorrect inverse calculation");
+}
+O = new Matrix(SUB.getRowDimension(),1,1.0);
+SOL = new Matrix(sqSolution);
+SQ = SUB.getMatrix(0,SUB.getRowDimension()-1,0,SUB.getRowDimension()-1);
+try {
+    check_matrix(SQ.solve(SOL),O); 
+    try_success("solve()...","");
+} catch ( e ) {
+    errorCount = try_failure(errorCount,"solve()...",e.getMessage());
+}
 //A = new Matrix(pvals);
 //CholeskyDecomposition Chol = A.chol(); 
 //Matrix L = Chol.getL();
