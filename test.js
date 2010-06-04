@@ -363,9 +363,9 @@ var Tests = [
     ["fe)", -22.1],
     ["R_E", new MatrixCheck(B, 2, 1)],
     ["R_q", new MatrixCheck(A, 2, 2)],
-    /*["/", new MatrixCheck(C, 2, 1)],
-    ["R)", -11.2887],
-    ["R)", 8.2496],*/
+    ["/", new MatrixCheck(C, 2, 1)],
+    ["R)", -11.2887, 0.0001],
+    ["R)", 8.2496, 0.0001],
     ["fR", function() { return !User; }],
     ["f_0"],
     // p142

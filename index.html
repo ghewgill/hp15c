@@ -71,6 +71,7 @@
 <!--script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script-->
 <script type="text/javascript" src="jquery-1.4.2.min.js"></script>
 <script type="text/javascript" src="sprintf-0.6.js"></script>
+<script type="text/javascript" src="jsmat/matrix.js"></script>
 <script type="text/javascript">
 //<![CDATA[
     var Digits = [];
@@ -298,35 +299,43 @@
     var D = 3;
     var E = 4;
 
-    function Matrix(rows, cols) {
-        this.rows = rows;
-        this.cols = cols;
-        this.data = new Array(rows);
-        for (var i = 0; i < rows; i++) {
-            this.data[i] = new Array(cols);
-            for (var j = 0; j < cols; j++) {
-                this.data[i][j] = 0;
-            }
+    function Mat() {
+        if (typeof(arguments[0]) === "number" && typeof(arguments[1]) === "number") {
+            this.rows = arguments[0];
+            this.cols = arguments[1];
+            this.m = new Matrix(this.rows, this.cols);
+        } else if (typeof(arguments[0]) === "object") {
+            this.m = arguments[0];
+            this.rows = this.m.getRowDimension();
+            this.cols = this.m.getColumnDimension();
         }
 
         this.get = function(row, col) {
-            return this.data[row-1][col-1];
+            return this.m.get(row-1, col-1);
+        }
+
+        this.inverse = function() {
+            return new Mat(this.m.inverse());
         }
 
         this.set = function(row, col, value) {
-            this.data[row-1][col-1] = value;
+            this.m.set(row-1, col-1, value);
         };
 
+        this.times = function(B) {
+            return new Mat(this.m.times(B.m));
+        }
+
         this.toString = function() {
-            return "<Matrix " + this.rows + "," + this.cols + ">";
+            return "<Mat " + this.rows + "," + this.cols + ">";
         };
     }
 
-    var g_Matrix = [new Matrix(0, 0),
-                    new Matrix(0, 0),
-                    new Matrix(0, 0),
-                    new Matrix(0, 0),
-                    new Matrix(0, 0)];
+    var g_Matrix = [new Mat(0, 0),
+                    new Mat(0, 0),
+                    new Mat(0, 0),
+                    new Mat(0, 0),
+                    new Mat(0, 0)];
 
     function Descriptor(label) {
         this.label = label;
@@ -583,6 +592,16 @@
         Stack[2] = Stack[3]; StackI[2] = StackI[3];
     }
 
+    function binopm(f) {
+        LastX = Stack[0];
+        LastXI = StackI[0];
+        var r = f(Stack[1], Stack[0]);
+        g_Matrix[Result] = r;
+        Stack[0] = new Descriptor(Result);
+        Stack[1] = Stack[2]; StackI[1] = StackI[2];
+        Stack[2] = Stack[3]; StackI[2] = StackI[3];
+    }
+
     function op_sqrt() {
         if (Flags[8]) {
             unopc(function(xr, xi) {
@@ -716,11 +735,11 @@
     }
 
     function op_matrix_clear() {
-        g_Matrix = [new Matrix(0, 0),
-                    new Matrix(0, 0),
-                    new Matrix(0, 0),
-                    new Matrix(0, 0),
-                    new Matrix(0, 0)];
+        g_Matrix = [new Mat(0, 0),
+                    new Mat(0, 0),
+                    new Mat(0, 0),
+                    new Mat(0, 0),
+                    new Mat(0, 0)];
     }
 
     function op_matrix_home() {
@@ -784,7 +803,15 @@
     }
 
     function op_div() {
-        if (Flags[8]) {
+        if (Stack[0] instanceof Descriptor && Stack[1] instanceof Descriptor) {
+            binopm(function(y, x) {
+                return g_Matrix[x.label].inverse().times(g_Matrix[y.label]);
+            });
+        } else if (Stack[0] instanceof Descriptor) {
+            alert("Unimplemented: matrix div");
+        } else if (Stack[1] instanceof Descriptor) {
+            alert("Unimplemented: matrix div");
+        } else if (Flags[8]) {
             binopc(function(yr, yi, xr, xi) {
                 var d = xr*xr + xi*xi;
                 return [(yr*xr + yi*xi) / d, (yi*xr - yr*xi) / d];
@@ -975,7 +1002,7 @@
     }
 
     function op_dim(m) {
-        g_Matrix[m] = new Matrix(Stack[1], Stack[0]);
+        g_Matrix[m] = new Mat(Stack[1], Stack[0]);
     }
 
     function op_asin() {
