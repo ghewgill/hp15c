@@ -446,6 +446,71 @@ var Tests = [
     ["R^", 92, 0.0001],
     ["R^", 116, 0.0001],
     ["fR", function() { return !User; }],
+    // p163
+    ["f_0"],
+    ["2\r4fsq", 4],
+    ["f_1"],
+    ["fR", function() { return User; }],
+    ["4Sq", 4],
+    ["3Sq", 3],
+    ["7Sq", 7],
+    ["2_Sq", -2],
+    ["1Sq", 1],
+    ["5Sq", 5],
+    ["3Sq", 3],
+    ["8Sq", 8],
+    ["fR", function() { return !User; }],
+    ["R_q", new MatrixCheck(A, 2, 4, [[4, 3, 7, -2], [1, 5, 3, 8]])],
+    ["f+", new MatrixCheck(A, 4, 2, [[4, 7], [1, 3], [3, -2], [5, 8]])],
+    // p165
+    ["R_q", new MatrixCheck(A, 4, 2, [[4, 7], [1, 3], [3, -2], [5, 8]])],
+    ["f_2", new MatrixCheck(A, 4, 4, [[4, 7, -3, 2], [1, 3, -5, -8], [3, -2, 4, 7], [5, 8, 1, 3]])],
+    ["feE"],
+    ["?", new MatrixCheck(B, 4, 4, [[-0.0254, 0.2420, 0.2829, 0.0022], [-0.0122, -0.1017, -0.1691, 0.1315], [-0.2829, -0.0022, -0.0254, 0.2420], [0.1691, -0.1315, -0.0122, -0.1017]], 0.01)],
+    ["f_3", new MatrixCheck(B, 4, 2, [[-0.0254, 0.2420], [-0.0122, -0.1017], [-0.2829, -0.0022], [0.1691, -0.1315]], 0.01)],
+    // p167
+    ["R_q", new MatrixCheck(A, 4, 4, [[4, 7, -3, 2], [1, 3, -5, -8], [3, -2, 4, 7], [5, 8, 1, 3]])],
+    ["R_E", new MatrixCheck(B, 4, 2, [[-0.0254, 0.2420], [-0.0122, -0.1017], [-0.2829, -0.0022], [0.1691, -0.1315]], 0.01)],
+    ["fe)"],
+    ["*", new MatrixCheck(C, 4, 2)],
+    ["fR", function() { return User; }],
+    ["R)", 1, 0.0001],
+    ["R)", 0, 0.0001],
+    ["R)", 0, 0.0001],
+    ["R)", 1, 0.0001],
+    ["R)", 0, 0.0001],
+    ["R)", 0, 0.0001],
+    ["R)", 0, 0.0001],
+    ["R)", 0, 0.0001],
+    ["fR", function() { return !User; }],
+    // p170
+    ["4\r2fsq", 2],
+    ["f_1", 2],
+    ["fR", function() { return User; }],
+    ["10Sq", 10],
+    ["0Sq", 0],
+    ["Sq", 0],
+    ["Sq", 0],
+    ["200Sq", 200],
+    ["_Sq", -200],
+    ["Sq", -200],
+    ["170Sq", 170],
+    ["4\r1fsE", 1],
+    ["0S_E", 0],
+    ["5\r1\r", 1],
+    ["SgE", 5],
+    ["R_E", new MatrixCheck(B, 4, 1, [[5], [0], [0], [0]])],
+    ["R_q", new MatrixCheck(A, 4, 2, [[10, 0], [0, 0], [200, -200], [-200, 170]])],
+    ["f_2", new MatrixCheck(A, 4, 4)],
+    ["fe)"],
+    ["/", new MatrixCheck(C, 4, 1)],
+    ["g+", new MatrixCheck(C, 2, 2)],
+    ["R)", 0.0372, 0.002],
+    ["R)", 0.1311, 0.002],
+    ["R)", 0.0437, 0.002],
+    ["R)", 0.1543, 0.002],
+    ["fR", function() { return !User; }],
+    ["f_0"],
     // p181
     ["gPfr","000-"],
     ["fT0", "001-42.21. 0"],
@@ -701,7 +766,17 @@ function Complex(real, imag) {
     }
 }
 
-function MatrixCheck(label, rows, cols, elements) {
+function tolerance(r, e, t) {
+    if (t === undefined) {
+        return r === e;
+    } else if (e === 0) {
+        return Math.abs(r) < t;
+    } else {
+        return Math.abs(r / e - 1) < t;
+    }
+}
+
+function MatrixCheck(label, rows, cols, elements, eps) {
     this.label = label;
     this.rows = rows;
     this.cols = cols;
@@ -714,7 +789,7 @@ function MatrixCheck(label, rows, cols, elements) {
         if (this.elements !== undefined) {
             for (var i = 1; i <= this.rows; i++) {
                 for (var j = 1; j <= this.cols; j++) {
-                    if (m.get(i, j) !== this.elements[i-1][j-1]) {
+                    if (!tolerance(m.get(i, j), this.elements[i-1][j-1], eps)) {
                         alert("matrix check expected " + this.elements[i-1][j-1] + " but got " + m.get(i, j));
                         return false;
                     }
@@ -730,13 +805,6 @@ function MatrixCheck(label, rows, cols, elements) {
 }
 
 function verify(test, result, resulti, expected) {
-    tolerance = function(r, e, t) {
-        if (e === 0) {
-            return Math.abs(r) < t;
-        } else {
-            return Math.abs(r / e - 1) < t;
-        }
-    };
     if (expected instanceof MatrixCheck) {
         return result instanceof Descriptor
             && result.label === expected.label

@@ -310,6 +310,25 @@
             this.cols = this.m.getColumnDimension();
         }
 
+        this.complex2 = function() {
+            var r = new Matrix(this.rows, this.cols*2);
+            for (var i = 0; i < this.rows; i++) {
+                for (var j = 0; j < this.cols; j++) {
+                    r.set(i, j, this.m.get(i, j));
+                    if (i < this.rows/2) {
+                        r.set(this.rows/2+i, this.cols+j, this.m.get(i, j));
+                    } else {
+                        r.set(i-this.rows/2, this.cols+j, -this.m.get(i, j));
+                    }
+                }
+            }
+            return new Mat(r);
+        }
+
+        this.complex3 = function() {
+            return new Mat(this.m.getMatrix(0, this.rows-1, 0, this.cols/2-1));
+        }
+
         this.copy = function() {
             return new Mat(this.m.copy());
         }
@@ -324,6 +343,17 @@
 
         this.minus = function(B) {
             return new Mat(this.m.minus(B.m));
+        }
+
+        this.partition = function() {
+            var r = new Matrix(this.rows*2, this.cols/2);
+            for (var i = 0; i < this.rows; i++) {
+                for (var j = 0; j < this.cols; j += 2) {
+                    r.set(i, j/2, this.m.get(i, j));
+                    r.set(this.rows+i, j/2, this.m.get(i, j+1));
+                }
+            }
+            return new Mat(r);
         }
 
         this.set = function(row, col, value) {
@@ -345,6 +375,17 @@
         this.toString = function() {
             return "<Mat " + this.rows + "," + this.cols + ">";
         };
+
+        this.unpartition = function() {
+            var r = new Matrix(this.rows/2, this.cols*2);
+            for (var i = 0; i < this.rows/2; i++) {
+                for (var j = 0; j < this.cols; j++) {
+                    r.set(i, j*2, this.m.get(i, j));
+                    r.set(i, j*2+1, this.m.get(this.rows/2+i, j));
+                }
+            }
+            return new Mat(r);
+        }
     }
 
     var g_Matrix = [new Mat(0, 0),
@@ -608,6 +649,14 @@
         Stack[2] = Stack[3]; StackI[2] = StackI[3];
     }
 
+    function unopm(f) {
+        LastX = Stack[0];
+        LastXI = StackI[0];
+        var r = f(Stack[0]);
+        g_Matrix[Result] = r;
+        Stack[0] = new Descriptor(Result);
+    }
+
     function binopm(f) {
         LastX = Stack[0];
         LastXI = StackI[0];
@@ -718,7 +767,9 @@
 
     function op_1x() {
         if (Stack[0] instanceof Descriptor) {
-            alert("Unimplemented: matrix inverse");
+            unopm(function(x) {
+                return g_Matrix[x.label].inverse();
+            });
         } else if (Flags[8]) {
             unopc(function(xr, xi) {
                 var d = xr*xr + xi*xi;
@@ -765,6 +816,16 @@
     function op_matrix_home() {
         Reg[0] = 1;
         Reg[1] = 1;
+    }
+
+    function op_matrix_complex2() {
+        var m = Stack[0].label;
+        g_Matrix[m] = g_Matrix[m].complex2();
+    }
+
+    function op_matrix_complex3() {
+        var m = Stack[0].label;
+        g_Matrix[m] = g_Matrix[m].complex3();
     }
 
     function op_matrix_transpose() {
@@ -1590,7 +1651,7 @@
         var y = Stack[1];
         Stack[0] = Stack[2];
         Stack[1] = Stack[2];
-        g_Matrix[m].set(Stack[0], y, x);
+        g_Matrix[m].set(y, x, Stack[0]);
     }
 
     function op_sto_matrix_all(m) {
@@ -1803,31 +1864,41 @@
     }
 
     function op_Pyx() {
-        binop(function(y, x) {
-            var r = 1;
-            var t = y - x;
-            while (y > t) {
-                r *= y;
-                y--;
-            }
-            return r;
-        });
+        if (Stack[0] instanceof Descriptor) {
+            var m = Stack[0].label;
+            g_Matrix[m] = g_Matrix[m].partition();
+        } else {
+            binop(function(y, x) {
+                var r = 1;
+                var t = y - x;
+                while (y > t) {
+                    r *= y;
+                    y--;
+                }
+                return r;
+            });
+        }
     }
 
     function op_Cyx() {
-        binop(function(y, x) {
-            var r = 1;
-            var t = y - x;
-            while (y > t) {
-                r *= y;
-                y--;
-            }
-            while (x > 1) {
-                r /= x;
-                x--;
-            }
-            return r;
-        });
+        if (Stack[0] instanceof Descriptor) {
+            var m = Stack[0].label;
+            g_Matrix[m] = g_Matrix[m].unpartition();
+        } else {
+            binop(function(y, x) {
+                var r = 1;
+                var t = y - x;
+                while (y > t) {
+                    r *= y;
+                    y--;
+                }
+                while (x > 1) {
+                    r /= x;
+                    x--;
+                }
+                return r;
+            });
+        }
     }
 
     function op_input(c) {
@@ -1846,8 +1917,8 @@
             switch (k) {
                 case '0': return new Opcode(new OpcodeInfo([42,16,0], op_matrix_clear));
                 case '1': return new Opcode(new OpcodeInfo([42,16,1], op_matrix_home));
-                case '2':
-                case '3':
+                case '2': return new Opcode(new OpcodeInfo([42,16,2], op_matrix_complex2));
+                case '3': return new Opcode(new OpcodeInfo([42,16,3], op_matrix_complex3));
                 case '4': return new Opcode(new OpcodeInfo([42,16,4], op_matrix_transpose));
                 case '5': return new Opcode(new OpcodeInfo([42,16,5], op_matrix_transmul));
                 case '6':
