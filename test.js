@@ -398,6 +398,54 @@ var Tests = [
     // p147
     ["2\r1", 1],
     ["Rgq", 4],
+    // p149
+    ["R_q", new MatrixCheck(A, 2, 3, [[1, 2, 3], [4, 5, 9]])],
+    ["S_E", new MatrixCheck(A, 2, 3, [[1, 2, 3], [4, 5, 9]])],
+    ["R_E", new MatrixCheck(B, 2, 3, [[1, 2, 3], [4, 5, 9]])],
+    // p151
+    ["R_E", new MatrixCheck(B, 2, 3, [[1, 2, 3], [4, 5, 9]])],
+    ["f_4", new MatrixCheck(B, 3, 2, [[1, 4], [2, 5], [3, 9]])],
+    // p152
+    ["feE"],
+    ["R_q", new MatrixCheck(A, 2, 3, [[1, 2, 3], [4, 5, 9]])],
+    ["2*", new MatrixCheck(B, 2, 3, [[2, 4, 6], [8, 10, 18]])],
+    ["1-", new MatrixCheck(B, 2, 3, [[1, 3, 5], [7, 9, 17]])],
+    // p153
+    ["fe)"],
+    ["R_E", new MatrixCheck(B, 2, 3, [[1, 3, 5], [7, 9, 17]])],
+    ["R_q", new MatrixCheck(A, 2, 3, [[1, 2, 3], [4, 5, 9]])],
+    ["-", new MatrixCheck(C, 2, 3, [[0, 1, 2], [3, 4, 8]])],
+    // p155
+    ["R_q", new MatrixCheck(A, 2, 3, [[1, 2, 3], [4, 5, 9]])],
+    ["R_E", new MatrixCheck(B, 2, 3, [[1, 3, 5], [7, 9, 17]])],
+    ["fe)"],
+    ["f_5", new MatrixCheck(C, 3, 3, [[29, 39, 73], [37, 51, 95], [66, 90, 168]])],
+    // p157
+    ["2\rfsq", 2],
+    ["f_1", 2],
+    ["fR", function() { return User; }],
+    ["1Sq", 1],
+    ["Sq", 1],
+    [".24Sq", 0.24],
+    [".86Sq", 0.86],
+    ["2\r3fsE", 3],
+    ["274SE", 274],
+    ["233SE", 233],
+    ["331SE", 331],
+    ["120.32SE", 120.32],
+    ["112.96SE", 112.96],
+    ["151.36SE", 151.36],
+    ["fe^", 151.36],
+    ["R_E", new MatrixCheck(B, 2, 3, [[274, 233, 331], [120.32, 112.96, 151.36]])],
+    ["R_q", new MatrixCheck(A, 2, 2, [[1, 1], [0.24, 0.86]])],
+    ["/", new MatrixCheck(D, 2, 3)],
+    ["R^", 186, 0.0001],
+    ["R^", 141, 0.0001],
+    ["R^", 215, 0.0001],
+    ["R^", 88, 0.0001],
+    ["R^", 92, 0.0001],
+    ["R^", 116, 0.0001],
+    ["fR", function() { return !User; }],
     // p181
     ["gPfr","000-"],
     ["fT0", "001-42.21. 0"],
@@ -653,10 +701,28 @@ function Complex(real, imag) {
     }
 }
 
-function MatrixCheck(label, rows, cols) {
+function MatrixCheck(label, rows, cols, elements) {
     this.label = label;
     this.rows = rows;
     this.cols = cols;
+    this.elements = elements;
+
+    this.check = function(m) {
+        if (m.rows !== this.rows || m.cols !== this.cols) {
+            return false;
+        }
+        if (this.elements !== undefined) {
+            for (var i = 1; i <= this.rows; i++) {
+                for (var j = 1; j <= this.cols; j++) {
+                    if (m.get(i, j) !== this.elements[i-1][j-1]) {
+                        alert("matrix check expected " + this.elements[i-1][j-1] + " but got " + m.get(i, j));
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
 
     this.toString = function() {
         return "<MatrixCheck " + this.label + " " + this.rows + "," + this.cols + ">";
@@ -674,8 +740,7 @@ function verify(test, result, resulti, expected) {
     if (expected instanceof MatrixCheck) {
         return result instanceof Descriptor
             && result.label === expected.label
-            && g_Matrix[result.label].rows === expected.rows
-            && g_Matrix[result.label].cols === expected.cols;
+            && expected.check(g_Matrix[result.label]);
     } else if (expected instanceof Complex) {
         if (test.length >= 3) {
             return tolerance(result, expected.re, test[2])

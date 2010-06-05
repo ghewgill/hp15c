@@ -303,11 +303,15 @@
         if (typeof(arguments[0]) === "number" && typeof(arguments[1]) === "number") {
             this.rows = arguments[0];
             this.cols = arguments[1];
-            this.m = new Matrix(this.rows, this.cols);
+            this.m = new Matrix(this.rows, this.cols, arguments[2]);
         } else if (typeof(arguments[0]) === "object") {
             this.m = arguments[0];
             this.rows = this.m.getRowDimension();
             this.cols = this.m.getColumnDimension();
+        }
+
+        this.copy = function() {
+            return new Mat(this.m.copy());
         }
 
         this.get = function(row, col) {
@@ -318,12 +322,24 @@
             return new Mat(this.m.inverse());
         }
 
+        this.minus = function(B) {
+            return new Mat(this.m.minus(B.m));
+        }
+
         this.set = function(row, col, value) {
             this.m.set(row-1, col-1, value);
         };
 
         this.times = function(B) {
             return new Mat(this.m.times(B.m));
+        }
+
+        this.timesScalar = function(s) {
+            return new Mat(this.m.timesScalar(s));
+        }
+
+        this.transpose = function() {
+            return new Mat(this.m.transpose());
         }
 
         this.toString = function() {
@@ -701,7 +717,9 @@
     }
 
     function op_1x() {
-        if (Flags[8]) {
+        if (Stack[0] instanceof Descriptor) {
+            alert("Unimplemented: matrix inverse");
+        } else if (Flags[8]) {
             unopc(function(xr, xi) {
                 var d = xr*xr + xi*xi;
                 return [xr/d, -xi/d];
@@ -729,6 +747,8 @@
                 Entry = '-' + Entry;
             }
             NewDigitEntry = true;
+        } else if (Stack[0] instanceof Descriptor) {
+            alert("Unimplemented: matrix chs");
         } else {
             Stack[0] = -Stack[0];
         }
@@ -745,6 +765,29 @@
     function op_matrix_home() {
         Reg[0] = 1;
         Reg[1] = 1;
+    }
+
+    function op_matrix_transpose() {
+        var m = Stack[0].label;
+        g_Matrix[m] = g_Matrix[m].transpose();
+    }
+
+    function op_matrix_transmul() {
+        binopm(function(y, x) {
+            return g_Matrix[y.label].transpose().times(g_Matrix[x.label]);
+        });
+    }
+
+    function op_matrix_norm() {
+        alert("Unimplemented: matrix norm");
+    }
+
+    function op_matrix_normf() {
+        alert("Unimplemented: matrix normf");
+    }
+
+    function op_matrix_det() {
+        alert("Unimplemented: matrix det");
     }
 
     function op_abs() {
@@ -1158,7 +1201,19 @@
     }
 
     function op_mul() {
-        if (Flags[8]) {
+        if (Stack[0] instanceof Descriptor && Stack[1] instanceof Descriptor) {
+            binopm(function(y, x) {
+                return g_Matrix[y.label].times(g_Matrix[x.label]);
+            });
+        } else if (Stack[0] instanceof Descriptor) {
+            binopm(function(y, x) {
+                return g_Matrix[x.label].timesScalar(Stack[1]);
+            });
+        } else if (Stack[1] instanceof Descriptor) {
+            binopm(function(y, x) {
+                return g_Matrix[y.label].timesScalar(Stack[0]);
+            });
+        } else if (Flags[8]) {
             binopc(function(yr, yi, xr, xi) {
                 return [yr * xr - yi * xi, yr * xi + yi * xr];
             });
@@ -1439,7 +1494,21 @@
     }
 
     function op_sub() {
-        if (Flags[8]) {
+        if (Stack[0] instanceof Descriptor && Stack[1] instanceof Descriptor) {
+            binopm(function(y, x) {
+                return g_Matrix[y.label].minus(g_Matrix[x.label]);
+            });
+        } else if (Stack[0] instanceof Descriptor) {
+            binopm(function(y, x) {
+                var m = g_Matrix[x.label];
+                return new Mat(m.rows, m.cols, Stack[1]).minus(m);
+            });
+        } else if (Stack[1] instanceof Descriptor) {
+            binopm(function(y, x) {
+                var m = g_Matrix[y.label];
+                return m.minus(new Mat(m.rows, m.cols, Stack[0]));
+            });
+        } else if (Flags[8]) {
             binopc(function(yr, yi, xr, xi) {
                 return [yr - xr, yi - xi];
             });
@@ -1525,9 +1594,13 @@
     }
 
     function op_sto_matrix_all(m) {
-        for (var j = 1; j <= g_Matrix[m].rows; j++) {
-            for (var i = 1; i <= g_Matrix[m].cols; i++) {
-                g_Matrix[m].set(j, i, Stack[0]);
+        if (Stack[0] instanceof Descriptor) {
+            g_Matrix[m] = g_Matrix[Stack[0].label].copy();
+        } else {
+            for (var j = 1; j <= g_Matrix[m].rows; j++) {
+                for (var i = 1; i <= g_Matrix[m].cols; i++) {
+                    g_Matrix[m].set(j, i, Stack[0]);
+                }
             }
         }
     }
@@ -1706,7 +1779,21 @@
     }
 
     function op_add() {
-        if (Flags[8]) {
+        if (Stack[0] instanceof Descriptor && Stack[1] instanceof Descriptor) {
+            binopm(function(y, x) {
+                return g_Matrix[y.label].plus(g_Matrix[x.label]);
+            });
+        } else if (Stack[0] instanceof Descriptor) {
+            binopm(function(y, x) {
+                var m = g_Matrix[x.label];
+                return m.plus(new Mat(m.rows, m.cols, Stack[1]));
+            });
+        } else if (Stack[1] instanceof Descriptor) {
+            binopm(function(y, x) {
+                var m = g_Matrix[y.label];
+                return m.plus(new Mat(m.rows, m.cols, Stack[0]));
+            });
+        } else if (Flags[8]) {
             binopc(function(yr, yi, xr, xi) {
                 return [yr + xr, yi + xi];
             });
@@ -1761,12 +1848,12 @@
                 case '1': return new Opcode(new OpcodeInfo([42,16,1], op_matrix_home));
                 case '2':
                 case '3':
-                case '4':
-                case '5':
+                case '4': return new Opcode(new OpcodeInfo([42,16,4], op_matrix_transpose));
+                case '5': return new Opcode(new OpcodeInfo([42,16,5], op_matrix_transmul));
                 case '6':
-                case '7':
-                case '8':
-                case '9': alert("Unimplemented: MATRIX " + k); break;
+                case '7': return new Opcode(new OpcodeInfo([42,16,7], op_matrix_norm));
+                case '8': return new Opcode(new OpcodeInfo([42,16,8], op_matrix_normf));
+                case '9': return new Opcode(new OpcodeInfo([42,16,9], op_matrix_det));
             }
         };
         return null;
