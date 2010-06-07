@@ -597,9 +597,9 @@ function Matrix() {
         @param n    Number of colums.
         */
 
-        this.A = A;
-        this.m = m;
-        this.n = n;
+        this.A = arguments[0];
+        this.m = arguments[1];
+        this.n = arguments[2];
 
     } else if (typeof(arguments[0]) === "object" && typeof(arguments[1]) === "number") {
 
