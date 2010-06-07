@@ -1005,13 +1005,14 @@ try {
 }
 
 A = new Matrix(columnwise,4);
-//QRDecomposition QR = A.qr();
-//R = QR.getR();
-//try {
-//   check(A,QR.getQ().times(R));
-//   try_success("QRDecomposition...","");
-//} catch ( java.lang.RuntimeException e ) {
-//   errorCount = try_failure(errorCount,"QRDecomposition...","incorrect QR decomposition calculation");
+var QR = A.qr();
+R = QR.getR();
+try {
+   check_matrix(A,QR.getQ().times(R));
+   try_success("QRDecomposition...","");
+} catch ( e ) {
+   errorCount = try_failure(errorCount,"QRDecomposition...","incorrect QR decomposition calculation");
+}
 //}
 //SingularValueDecomposition SVD = A.svd();
 //try {
