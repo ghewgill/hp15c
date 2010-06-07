@@ -1086,25 +1086,25 @@ try {
 } catch ( e ) {
     errorCount = try_failure(errorCount,"CholeskyDecomposition solve()...","incorrect Choleskydecomposition solve calculation");
 }
-//EigenvalueDecomposition Eig = A.eig();
-//Matrix D = Eig.getD();
-//Matrix V = Eig.getV();
-//try {
-//   check(A.times(V),V.times(D));
-//   try_success("EigenvalueDecomposition (symmetric)...","");
-//} catch ( java.lang.RuntimeException e ) {
-//   errorCount = try_failure(errorCount,"EigenvalueDecomposition (symmetric)...","incorrect symmetric Eigenvalue decomposition calculation");
-//}
-//A = new Matrix(evals);
-//Eig = A.eig();
-//D = Eig.getD();
-//V = Eig.getV();
-//try {
-//   check(A.times(V),V.times(D));
-//   try_success("EigenvalueDecomposition (nonsymmetric)...","");
-//} catch ( java.lang.RuntimeException e ) {
-//   errorCount = try_failure(errorCount,"EigenvalueDecomposition (nonsymmetric)...","incorrect nonsymmetric Eigenvalue decomposition calculation");
-//}
+var Eig = A.eig();
+var D = Eig.getD();
+var V = Eig.getV();
+try {
+    check_matrix(A.times(V),V.times(D));
+    try_success("EigenvalueDecomposition (symmetric)...","");
+} catch ( e ) {
+    errorCount = try_failure(errorCount,"EigenvalueDecomposition (symmetric)...","incorrect symmetric Eigenvalue decomposition calculation");
+}
+A = new Matrix(evals);
+Eig = A.eig();
+D = Eig.getD();
+V = Eig.getV();
+try {
+    check_matrix(A.times(V),V.times(D));
+    try_success("EigenvalueDecomposition (nonsymmetric)...","");
+} catch ( e ) {
+    errorCount = try_failure(errorCount,"EigenvalueDecomposition (nonsymmetric)...","incorrect nonsymmetric Eigenvalue decomposition calculation");
+}
 
 print("\nTestMatrix completed.\n");
 print("Total errors reported: " + errorCount);
