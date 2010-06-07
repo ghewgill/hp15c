@@ -1070,22 +1070,22 @@ try {
 } catch ( e ) {
     errorCount = try_failure(errorCount,"solve()...",e.getMessage());
 }
-//A = new Matrix(pvals);
-//CholeskyDecomposition Chol = A.chol(); 
-//Matrix L = Chol.getL();
-//try {
-//   check(A,L.times(L.transpose()));
-//   try_success("CholeskyDecomposition...","");
-//} catch ( java.lang.RuntimeException e ) {
-//   errorCount = try_failure(errorCount,"CholeskyDecomposition...","incorrect Cholesky decomposition calculation");
-//}
-//X = Chol.solve(Matrix.identity(3,3));
-//try {
-//   check(A.times(X),Matrix.identity(3,3));
-//   try_success("CholeskyDecomposition solve()...","");
-//} catch ( java.lang.RuntimeException e ) {
-//   errorCount = try_failure(errorCount,"CholeskyDecomposition solve()...","incorrect Choleskydecomposition solve calculation");
-//}
+A = new Matrix(pvals);
+var Chol = A.chol(); 
+var L = Chol.getL();
+try {
+    check_matrix(A,L.times(L.transpose()));
+    try_success("CholeskyDecomposition...","");
+} catch ( e ) {
+    errorCount = try_failure(errorCount,"CholeskyDecomposition...","incorrect Cholesky decomposition calculation");
+}
+X = Chol.solve(Matrix.identity(3,3));
+try {
+    check_matrix(A.times(X),Matrix.identity(3,3));
+    try_success("CholeskyDecomposition solve()...","");
+} catch ( e ) {
+    errorCount = try_failure(errorCount,"CholeskyDecomposition solve()...","incorrect Choleskydecomposition solve calculation");
+}
 //EigenvalueDecomposition Eig = A.eig();
 //Matrix D = Eig.getD();
 //Matrix V = Eig.getV();
