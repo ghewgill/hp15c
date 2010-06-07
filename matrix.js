@@ -2577,6 +2577,10 @@ function Matrix() {
             }
             return X;
 
+        } else {
+
+            throw IllegalArgumentException("Unexpected constructor parameters");
+
         }
 
     }
