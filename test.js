@@ -22,6 +22,11 @@ substantial problem within the implementation that was not anticipated in the te
 The stopping point should give an indication of where the problem exists.
 **/
 
+function RuntimeException(message) {
+    this.name = "RuntimeException";
+    this.message = message;
+}
+
 /** private utility routines **/
 
 function check() {
