@@ -1018,30 +1018,31 @@ try {
 } catch ( e ) {
    errorCount = try_failure(errorCount,"QRDecomposition...","incorrect QR decomposition calculation");
 }
-//}
-//SingularValueDecomposition SVD = A.svd();
-//try {
-//   check(A,SVD.getU().times(SVD.getS().times(SVD.getV().transpose())));
-//   try_success("SingularValueDecomposition...","");
-//} catch ( java.lang.RuntimeException e ) {
-//   errorCount = try_failure(errorCount,"SingularValueDecomposition...","incorrect singular value decomposition calculation");
-//}
-//DEF = new Matrix(rankdef);
-//try {
-//    check_scalar(DEF.rank(),Math.min(DEF.getRowDimension(),DEF.getColumnDimension())-1);
-//    try_success("rank()...","");
-//} catch ( e ) {
-//    errorCount = try_failure(errorCount,"rank()...","incorrect rank calculation");
-//}
-//B = new Matrix(condmat);
-//SVD = B.svd(); 
-//double [] singularvalues = SVD.getSingularValues();
-//try {
-//   check(B.cond(),singularvalues[0]/singularvalues[Math.min(B.getRowDimension(),B.getColumnDimension())-1]);
-//   try_success("cond()...","");
-//} catch ( java.lang.RuntimeException e ) {
-//   errorCount = try_failure(errorCount,"cond()...","incorrect condition number calculation");
-//}
+var SVD = A.svd();
+try {
+    check_matrix(A,SVD.getU().times(SVD.getS().times(SVD.getV().transpose())));
+    try_success("SingularValueDecomposition...","");
+} catch ( e ) {
+    print(e); print(e.name);
+    errorCount = try_failure(errorCount,"SingularValueDecomposition...","incorrect singular value decomposition calculation");
+}
+DEF = new Matrix(rankdef);
+try {
+    check_scalar(DEF.rank(),Math.min(DEF.getRowDimension(),DEF.getColumnDimension())-1);
+    try_success("rank()...","");
+} catch ( e ) {
+    errorCount = try_failure(errorCount,"rank()...","incorrect rank calculation");
+}
+B = new Matrix(condmat);
+SVD = B.svd(); 
+var singularvalues = SVD.getSingularValues();
+try {
+    check_scalar(B.cond(),singularvalues[0]/singularvalues[Math.min(B.getRowDimension(),B.getColumnDimension())-1]);
+    try_success("cond()...","");
+} catch ( e ) {
+    print(e);
+    errorCount = try_failure(errorCount,"cond()...","incorrect condition number calculation");
+}
 var n = A.getColumnDimension();
 A = A.getMatrix(0,n-1,0,n-1);
 A.set(0,0,0.);
