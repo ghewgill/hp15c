@@ -2529,6 +2529,14 @@
                 MouseDown = false;
             }
         });
+        $(document).keydown(function(e) {
+            // backspace in IE isn't exposed in keypress()
+            // so we catch it here instead
+            if (e.which == 8) {
+                key("\b");
+                e.preventDefault();
+            }
+        });
         $(document).keypress(function(e) {
             var c = String.fromCharCode(e.which);
             if (CharTable[c]) {
