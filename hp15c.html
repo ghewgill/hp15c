@@ -107,6 +107,7 @@
     var RunTimer = null;
     var ReturnStack = [];
     var Result = 0;
+    var JustSawKeydown8 = false;
 
     function CalcError(n) {
         this.name = "CalcError";
@@ -2535,15 +2536,25 @@
         $(document).keydown(function(e) {
             // backspace in IE isn't exposed in keypress()
             // so we catch it here instead
+            // also, Opera fires keypress for backspace
+            // even though preventDefault() is called here,
+            // so ignore "\b" in keypress if we already
+            // handled it here
+            JustSawKeydown8 = false;
             if (e.which == 8) {
                 key("\b");
                 e.preventDefault();
+                JustSawKeydown8 = true;
             }
         });
         $(document).keypress(function(e) {
             var c = String.fromCharCode(e.which);
             if (CharTable[c]) {
-                key(c);
+                if (c === "\b" && JustSawKeydown8) {
+                    // ignore
+                } else {
+                    key(c);
+                }
                 e.preventDefault();
             }
             e.stopPropagation();
