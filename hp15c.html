@@ -2523,7 +2523,8 @@
             for (var i in ExtraKeyTable) {
                 var top = 167 + 65*ExtraKeyTable[i][0] + 20*ExtraKeyTable[i][2];
                 var left = 70 + 57*ExtraKeyTable[i][1];
-                frame.append('<div class="help" style="top: ' + top + '; left: ' + left + '">' + ExtraKeyTable[i][3] + '</div>');
+                var colour = ["goldenrod", null, "lightblue"][ExtraKeyTable[i][2]+1];
+                frame.append('<div class="help" style="top: ' + top + '; left: ' + left + '; background: ' + colour + '">' + ExtraKeyTable[i][3] + '</div>');
             }
         }
         $(".help").toggleClass("showhelp");
