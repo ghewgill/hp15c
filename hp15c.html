@@ -2408,11 +2408,12 @@
         if (PC === 0) {
             PC = 1;
         }
-        //alert("PC="+PC+"\n"+Program[PC].info.defn);
-        var p = PC;
-        PC++;
-        Program[p].exec();
-        if (PC >= Program.length) {
+        if (PC < Program.length) {
+            //alert("PC="+PC+"\n"+Program[PC].info.defn);
+            var p = PC;
+            PC++;
+            Program[p].exec();
+        } else {
             op_rtn();
         }
     }
