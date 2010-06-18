@@ -70,6 +70,19 @@
     #program {
         left: 410;
     }
+    .help {
+        position: absolute;
+        display: none;
+        border: thin solid black;
+        background: yellow;
+        color: black;
+        font-family: sans-serif;
+        width: 1em;
+        text-align: center;
+    }
+    .showhelp {
+        display: block;
+    }
 </style>
 <!--script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script-->
 <script type="text/javascript" src="jquery-1.4.2.min.js"></script>
@@ -287,7 +300,8 @@
         'I': _(OpI),
         'l': _(OpLn),
         'p': _(OpPi),
-        '\x12': _(OpRand)
+        '\x12': _(OpRand),
+        'h': help
     };
 
     var KeyTable = [
@@ -295,6 +309,20 @@
         ['T', 'G', 's', 'c', 't', 'e', '4', '5', '6', '*'],
         ['P', 'U', 'r', 'x', '\b','\r','1', '2', '3', '-'],
         [' ', 'f', 'g', 'S', 'R', '\r','0', '.', ';', '+']
+    ];
+    var ExtraKeyTable = [
+        [3, 6, -1, '!'],
+        [0, 0,  1, '@'],
+        [0, 3,  1, '%'],
+        [0, 0, -1, 'A'],
+        [0, 1, -1, 'B'],
+        [0, 2, -1, 'C'],
+        [0, 3, -1, 'D'],
+        [0, 5,  1, 'a'],
+        [3, 3,  1, 'i'],
+        [1, 4, -1, 'I'],
+        [0, 1,  1, 'l'],
+        [1, 5,  1, 'p']
     ];
 
     var A = 0;
@@ -2472,6 +2500,33 @@
         $.getScript("test.js", function() {
             do_tests();
         });
+    }
+
+    function help() {
+        if ($(".help").length === 0) {
+            var frame = $("#frame");
+            for (var i = 0; i < 4; i++) {
+                for (var j = 0; j < 10; j++) {
+                    if (i === 3 && (j === 0 || j === 5)) continue;
+                    var c = KeyTable[i][j];
+                    if (c === "\b") {
+                        c = "\u2190";
+                    } else if (c === "\r") {
+                        c = "\u21b2";
+                    }
+                    var top = 167 + 65*i;
+                    var left = 70 + 57*j;
+                    frame.append('<div class="help" style="top: ' + top + '; left: ' + left + '">' + c + '</div>');
+                }
+            }
+            for (var i in ExtraKeyTable) {
+                var top = 167 + 65*ExtraKeyTable[i][0] + 20*ExtraKeyTable[i][2];
+                var left = 70 + 57*ExtraKeyTable[i][1];
+                frame.append('<div class="help" style="top: ' + top + '; left: ' + left + '">' + ExtraKeyTable[i][3] + '</div>');
+            }
+        }
+        $(".help").toggleClass("showhelp");
+        return null;
     }
 
     $(document).ready(function() {
