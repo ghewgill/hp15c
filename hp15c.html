@@ -252,7 +252,7 @@
         'E': [_(OpEx), _(OpB), _(OpLn)],
         ')': [_(Op10x), _(OpC), _(OpLog)],
         '^': [_(OpYx), _(OpD), _(OpPct)],
-        '?': [_(Op1x), _(OpE), _(OpDpct)],
+        '\\':[_(Op1x), _(OpE), _(OpDpct)],
         '_': [_(OpChs), decode_matrix, _(OpAbs)],
         '7': [_(Op7), decode_fix, _(OpDeg)],
         '8': [_(Op8), decode_sci, _(OpRad)],
@@ -305,7 +305,7 @@
     };
 
     var KeyTable = [
-        ['q', 'E', ')', '^', '?', '_', '7', '8', '9', '/'],
+        ['q', 'E', ')', '^', '\\','_', '7', '8', '9', '/'],
         ['T', 'G', 's', 'c', 't', 'e', '4', '5', '6', '*'],
         ['P', 'U', 'r', 'x', '\b','\r','1', '2', '3', '-'],
         [' ', 'f', 'g', 'S', 'R', '\r','0', '.', ';', '+']
@@ -2009,7 +2009,7 @@
                 var i = Number(k) / f;
                 return new Opcode(new OpcodeInfo([42,10,i]), function() { op_solve(i); });
             } else {
-                var i = "qE)^?".indexOf(k);
+                var i = "qE)^\\".indexOf(k);
                 if (i >= 0) {
                     return new Opcode(new OpcodeInfo([42,10,11+i]), function() { op_solve(11+i); });
                 }
@@ -2029,7 +2029,7 @@
                 var i = Number(k) / f;
                 return new Opcode(new OpcodeInfo([42,21,i]), function() {});
             } else {
-                var i = "qE)^?".indexOf(k);
+                var i = "qE)^\\".indexOf(k);
                 if (i >= 0) {
                     return new Opcode(new OpcodeInfo([42,21,11+i]), function() {});
                 }
@@ -2069,7 +2069,7 @@
             } else if (k === 't') {
                 return new Opcode(new OpcodeInfo([22,25]), function() { op_gto_index(); });
             } else {
-                var x = "qE)^?".indexOf(k);
+                var x = "qE)^\\".indexOf(k);
                 if (x >= 0) {
                     return new Opcode(new OpcodeInfo([22,11+x]), function() { op_gto_label(11+x); });
                 }
@@ -2102,7 +2102,7 @@
 
     function decode_dim(k) {
         Prefix = function(k) {
-            var i = "qE)^?".indexOf(k);
+            var i = "qE)^\\".indexOf(k);
             if (i >= 0) {
                 return new Opcode(new OpcodeInfo([42,23,11+i]), function() { op_dim(i); });
             }
@@ -2112,7 +2112,7 @@
 
     function decode_result(k) {
         Prefix = function(k) {
-            var i = "qE)^?".indexOf(k);
+            var i = "qE)^\\".indexOf(k);
             if (i >= 0) {
                 return new Opcode(new OpcodeInfo([42,26,11+i]), function() { op_result(i); });
             }
@@ -2224,7 +2224,7 @@
                 var i = Number(k) / f;
                 return new Opcode(new OpcodeInfo([42,10,i]), function() { op_integrate(i); });
             } else {
-                var i = "qE)^?".indexOf(k);
+                var i = "qE)^\\".indexOf(k);
                 if (i >= 0) {
                     return new Opcode(new OpcodeInfo([42,10,11+i]), function() { op_integrate(11+i); });
                 }
@@ -2246,7 +2246,7 @@
             } else if (k === 't') {
                 return new Opcode(new OpcodeInfo([32,25]), function() { op_gsb_index(); });
             } else {
-                var i = "qE)^?".indexOf(k);
+                var i = "qE)^\\".indexOf(k);
                 if (i >= 0) {
                     return new Opcode(new OpcodeInfo([32,11+i]), function() { op_gsb(11+i); });
                 }
@@ -2302,7 +2302,7 @@
                 return null;
             } else if (k === '_') {
                 Prefix = function(k) {
-                    var i = "qE)^?".indexOf(k);
+                    var i = "qE)^\\".indexOf(k);
                     if (i >= 0) {
                         return new Opcode(new OpcodeInfo([44,16,11+i]), function() { op_sto_matrix_all(i); });
                     }
@@ -2327,7 +2327,7 @@
                 Prefix = OldPrefix;
                 return null;
             } else {
-                var i = "qE)^?".indexOf(k);
+                var i = "qE)^\\".indexOf(k);
                 if (i >= 0) {
                     if (g) {
                         return new Opcode(new OpcodeInfo([44,43,11+i]), function() { op_sto_matrix_imm(i); });
@@ -2364,7 +2364,7 @@
                 return null;
             } else if (k === '_') {
                 Prefix = function(k) {
-                    var i = "qE)^?".indexOf(k);
+                    var i = "qE)^\\".indexOf(k);
                     if (i >= 0) {
                         return new Opcode(new OpcodeInfo([45,16,11+i]), function() { op_rcl_descriptor(i); });
                     }
@@ -2372,7 +2372,7 @@
                 return null;
             } else if (k === 's') {
                 Prefix = function(k) {
-                    var i = "qE)^?".indexOf(k);
+                    var i = "qE)^\\".indexOf(k);
                     if (i >= 0) {
                         return new Opcode(new OpcodeInfo([45,23,11+i]), function() { op_rcl_dim(i); });
                     }
@@ -2397,7 +2397,7 @@
                 Prefix = OldPrefix;
                 return null;
             } else {
-                var i = "qE)^?".indexOf(k);
+                var i = "qE)^\\".indexOf(k);
                 if (i >= 0) {
                     if (g) {
                         return new Opcode(new OpcodeInfo([45,43,11+i]), function() { op_rcl_matrix_imm(i); });
