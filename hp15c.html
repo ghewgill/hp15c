@@ -2552,8 +2552,8 @@
         neg.css("top", 80);
         $("#calc").mousedown(function(e) {
             var calc = $("#calc");
-            var x = e.clientX - calc.offset().left;
-            var y = e.clientY - calc.offset().top;
+            var x = e.pageX - calc.offset().left;
+            var y = e.pageY - calc.offset().top;
             if (x >= 65 && x < 645 && y >= 155 && y < 405) {
                 var c = Math.floor((x - 65) / 57);
                 var r = Math.floor((y - 155) / 65);
