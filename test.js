@@ -757,6 +757,13 @@ var Tests = [
     ["3f0", 6, 0.001],
 ];
 
+var TestIndex;
+var TestPass;
+
+function test_log(msg) {
+    $("#testlog").append(msg + "\n");
+}
+
 function Complex(real, imag) {
     this.re = real;
     this.im = imag;
@@ -825,22 +832,26 @@ function verify(test, result, resulti, expected) {
     }
 }
 
-function do_tests() {
+function start_tests() {
     if ($("#testlog").length === 0) {
         $("body").append('<div><textarea id="testlog" cols="80" rows="10"></textarea></div>');
     }
 
     key('f'); key('7'); key('4');
     //var oldalert = alert;
-    var log = function(msg) { $("#testlog").append(msg + "\n"); };
-    //alert = function(msg) { log(msg); };
-    var pass = true;
-    for (var t in Tests) {
-        var test = Tests[t];
+    //alert = function(msg) { test_log(msg); };
+    TestIndex = 0;
+    TestPass = true;
+    run_tests();
+}
+
+function run_tests() {
+    if (TestIndex < Tests.length) {
+        var test = Tests[TestIndex];
         var keys = test[0];
-        log(keys);
+        test_log(keys);
         for (var i = 0; i < keys.length; i++) {
-            key(keys.substr(i, 1));
+            key(keys.substr(i, 1), true);
             while (Running) {
                 if (RunTimer !== null) {
                     clearTimeout(RunTimer);
@@ -850,7 +861,7 @@ function do_tests() {
                 if (p === 0) {
                     p = 1;
                 }
-                log(sprintf("%03d-%s", p, Program[p].info.keys));
+                test_log(sprintf("%03d-%s", p, Program[p].info.keys));
                 step();
             }
         }
@@ -859,12 +870,12 @@ function do_tests() {
             if (typeof(expected) === "string") {
                 if (expected !== LcdDisplay) {
                     alert("fail: " + keys + "\nresult: " + LcdDisplay + "\nexpected: " + expected);
-                    pass = false;
+                    TestPass = false;
                 }
             } else if (typeof(expected) === "function") {
                 if (!expected()) {
                     alert("fail: " + keys + "\nresult: " + LcdDisplay + "\nexpected: " + expected);
-                    pass = false;
+                    TestPass = false;
                 }
             } else {
                 if (!$.isArray(expected)) {
@@ -873,17 +884,23 @@ function do_tests() {
                 for (var i in expected) {
                     if (!verify(test, Stack[i], StackI[i], expected[i])) {
                         alert("fail: " + keys + "\nresult: " + Stack[i] + "\nexpected: " + expected[i] + "\ndiff: " + Math.abs(Stack[i] / expected[i] - 1));
-                        pass = false;
+                        TestPass = false;
                     }
                 }
             }
         }
-        if (!pass) {
-            break;
+        TestIndex++;
+        if (TestPass) {
+            setTimeout(run_tests, 0);
+        } else {
+            alert("fail");
+            DisableKeys = false;
         }
-    }
-    //alert = oldalert;
-    if (pass) {
-        alert("pass");
+    } else {
+        //alert = oldalert;
+        if (TestPass) {
+            alert("pass");
+        }
+        DisableKeys = false;
     }
 }

@@ -98,6 +98,7 @@
     var LastX = 0;
     var LastXI = 0;
     var Reg = new Array(60);
+    var DisableKeys;
     var Entry;
     var DigitEntry = false;
     var NewDigitEntry;
@@ -2462,7 +2463,10 @@
         }
     }
 
-    function key(k) {
+    function key(k, override) {
+        if (DisableKeys && !override) {
+            return;
+        }
         var op = decode(k);
         if (op === undefined) {
             alert("undefined decode: "+k);
@@ -2500,7 +2504,7 @@
 
     function run_test() {
         $.getScript("test.js", function() {
-            do_tests();
+            start_tests();
         });
     }
 
