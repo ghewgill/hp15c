@@ -1,0 +1,54 @@
+<html>
+<head>
+<title>HP-15C Calculator</title>
+</head>
+<body>
+<h1>HP-15C Calculator</h1>
+<p><a href="/">Home</a> | About | <a href="http://github.com/ghewgill/hp15c">Source</a></p>
+
+<p>
+This is a simulator for the <a href="http://www.hpmuseum.org/hp15.htm">HP-15C</a> advanced scientific programmable calculator.
+This simulator aims to include all features of the HP-15C including:
+</p>
+
+<ul>
+    <li>Complex arithmetic
+    <li>Matrix math
+    <li>Numerical integration
+    <li>Numeric equation solver
+    <li>Programmability
+    <li>Statistics functions
+</ul>
+
+<h2>History</h2>
+
+<p>
+I bought my HP-15C in 1987 as my first RPN calculator, and used it throughout university.
+I still have my original one, and it continues to operate on the <em>same</em> set of batteries, after 23 years.
+The form factor (horizontal layout) is the distinctive feature of this family of calculators.
+There is even a <a href="http://hp15c.org">Petition to Bring Back the 15C</a>.
+</p>
+
+<p>
+This implementation was inspired by the <a href="http://www.hpmuseum.org/simulate/hp35sim/hp35sim.htm">HP-35 Calculator Simulator</a> at the Museum of HP Calculators.
+</p>
+
+<h2>Known Issues</h2>
+
+<p>
+The following functions are known to be incomplete or nonfunctional:
+</p>
+
+<ul>
+    <li>Numeric range checking
+    <li>Blink flag (flag 9)
+    <li>Engineering (ENG) notation
+    <li>Register access 10-19 using ".n"
+    <li>Indirect GTO through I register
+    <li>Indirect matrix access through I register
+    <li>Complex transcendental functions: ln log abs sin asin cos acos tan atan sinh asinh cosh acosh tanh atanh
+    <li>Matrix functions: chs, residual, row norm, frobenius norm, determinant, scalar /
+</ul>
+
+</body>
+</html>
