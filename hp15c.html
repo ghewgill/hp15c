@@ -1950,6 +1950,9 @@
             }
             Entry = "";
         }
+        if (Entry.length === 0 && c === 'e') {
+            Entry = "1";
+        }
         Entry = Entry + c;
         NewDigitEntry = true;
     }
