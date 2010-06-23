@@ -827,7 +827,14 @@
 
     function op_chs() {
         if (DigitEntry) {
-            if (Entry.charAt(0) === '-') {
+            var i = Entry.indexOf('e');
+            if (i >= 0) {
+                if (i+1 < Entry.length && Entry.charAt(i+1) === '-') {
+                    Entry = Entry.substr(0, i+1) + Entry.substr(i+2);
+                } else {
+                    Entry = Entry.substr(0, i+1) + "-" + Entry.substr(i+1);
+                }
+            } else if (Entry.charAt(0) === '-') {
                 Entry = Entry.substr(1);
             } else {
                 Entry = '-' + Entry;
