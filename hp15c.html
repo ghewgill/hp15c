@@ -497,13 +497,13 @@
         neg.css("display", "none");
         var eex = false;
         var d = 0;
-        for (var i = 0; i < s.length && d < 10; i++) {
+        for (var i = 0; i < s.length; i++) {
             var c = s.charAt(i);
             if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'E') || c === 'o' || c === 'r' || c === 'u') {
                 if (eex) {
                     Display[8].attr("src", Display[9].attr("src"));
                     Display[9].attr("src", Digits[c].src);
-                } else {
+                } else if (d < 10) {
                     Display[d].attr("src", Digits[c].src);
                     Display[d].css("display", "inline");
                     d++;
