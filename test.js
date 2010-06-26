@@ -749,6 +749,26 @@ var Tests = [
     ["50St", 50],
     ["P", new Complex(-1, 0), 0.0001],
 
+    // various particular value tests
+    ["g48"],
+    // complex sin
+    ["0s", new Complex(0, 0)],
+    ["p\r2/s", new Complex(1, 0)],
+    ["p\r2/_s", new Complex(-1, 0)],
+    ["p\r4/s", new Complex(1/Math.sqrt(2), 0)],
+    ["p\r6/s", new Complex(0.5, 0), 1e-10],
+    // complex tanh
+    ["0fGt", new Complex(0, 0)],
+    ["5q1+2/lfGt", new Complex(Math.sqrt(5)/5, 0), 1e-10],
+    // check that real and complex results match
+    ["g58g8"],
+    ["1sS01cS11tS2"],
+    ["g48"],
+    ["1sS31cS41tS5"],
+    ["R0R3/", 1],
+    ["R1R4/", 1],
+    ["R2R5/", 1],
+
     // http://en.wikipedia.org/wiki/Gamma_function#Particular_values
     ["5\r2/_1-f0", -0.945, 0.001],
     ["3\r2/_1-f0", 2.363, 0.001],

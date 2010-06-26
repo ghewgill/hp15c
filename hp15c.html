@@ -486,6 +486,18 @@
         return mag;
     }
 
+    function sinh(x) {
+        return (Math.exp(x) - Math.exp(-x)) / 2;
+    }
+
+    function cosh(x) {
+        return (Math.exp(x) + Math.exp(-x)) / 2;
+    }
+
+    function tanh(x) {
+        return (Math.exp(2*x) - 1) / (Math.exp(2*x) + 1);
+    }
+
     function update_lcd(s) {
         LcdDisplay = s;
         for (var i in Display) {
@@ -895,7 +907,9 @@
 
     function op_abs() {
         if (Flags[8]) {
-            alert("Unimplemented: complex abs");
+            unopc(function(xr, xi) {
+                return [Math.sqrt(xr*xr, xi*xi), 0];
+            });
         } else {
             unop(Math.abs);
         }
@@ -1079,31 +1093,36 @@
 
     function op_sinh() {
         if (Flags[8]) {
-            alert("Unimplemented: complex sinh");
-        } else {
-            unop(function(x) {
-                return (Math.exp(x) - Math.exp(-x)) / 2;
+            unopc(function(xr, xi) {
+                return [sinh(xr)*Math.cos(xi), cosh(xr)*Math.sin(xi)];
             });
+        } else {
+            unop(sinh);
         }
     }
 
     function op_cosh() {
         if (Flags[8]) {
-            alert("Unimplemented: complex cosh");
-        } else {
-            unop(function(x) {
-                return (Math.exp(x) + Math.exp(-x)) / 2;
+            unopc(function(xr, xi) {
+                return [cosh(xr)*Math.cos(xi), sinh(xr)*Math.sin(xi)];
             });
+        } else {
+            unop(cosh);
         }
     }
 
     function op_tanh() {
         if (Flags[8]) {
-            alert("Unimplemented: complex tanh");
-        } else {
-            unop(function(x) {
-                return (Math.exp(2*x) - 1) / (Math.exp(2*x) + 1);
+            unopc(function(xr, xi) {
+                var yr = tanh(xr);
+                var yi = Math.tan(xi);
+                xr = 1;
+                xi = yr * yi;
+                var d = xr*xr + xi*xi;
+                return [(yr*xr + yi*xi) / d, (yi*xr - yr*xi) / d];
             });
+        } else {
+            unop(tanh);
         }
     }
 
@@ -1139,7 +1158,9 @@
 
     function op_sin() {
         if (Flags[8]) {
-            alert("Unimplemented: complex sin");
+            unopc(function(xr, xi) {
+                return [Math.sin(xr)*cosh(xi), Math.cos(xr)*sinh(xi)];
+            });
         } else {
             unop(function(x) {
                 return Math.sin(x * TrigFactor);
@@ -1163,7 +1184,9 @@
 
     function op_cos() {
         if (Flags[8]) {
-            alert("Unimplemented: complex cos");
+            unopc(function(xr, xi) {
+                return [Math.cos(xr)*cosh(xi), -Math.sin(xr)*sinh(xi)];
+            });
         } else {
             unop(function(x) {
                 return Math.cos(x * TrigFactor);
@@ -1191,7 +1214,14 @@
 
     function op_tan() {
         if (Flags[8]) {
-            alert("Unimplemented: complex tan");
+            unopc(function(xr, xi) {
+                var yr = Math.tan(xr);
+                var yi = tanh(xi);
+                xr = 1;
+                xi = -yr * yi;
+                var d = xr*xr + xi*xi;
+                return [(yr*xr + yi*xi) / d, (yi*xr - yr*xi) / d];
+            });
         } else {
             unop(function(x) {
                 return Math.tan(x * TrigFactor);
