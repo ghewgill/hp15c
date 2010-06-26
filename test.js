@@ -324,8 +324,14 @@ var Tests = [
 
     // Part III Advanced Functions
     // p121
+    ["9\r8\r7\r6f\b"],
     ["2\r3I4\r5I+", new Complex(6, 8)],
+    ["\b7-", new Complex(-1, -8)],
+    ["f-\b5f-", new Complex(-1, 5)],
+    ["\b4\r7I", new Complex(4, 7)],
     ["\b8f-\b9gq", new Complex(17, 144)],
+    ["4\r", new Complex(4, 0)],
+    ["10f-", new Complex(0, 10)],
     ["1.2\r4.7I2.7\r3.2I/q", new Complex(1.0491, 0.2406), 0.0001],
     // ["2.404gs", new Complex(1.5708, -1.5239), 0.0001],
     // p135
