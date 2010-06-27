@@ -949,6 +949,19 @@ var Tests = [
     ["f)", 0, 1e-10],
     ["x", -0.1497, 0.001],
     ["fR"],
+    // p85
+    ["gPfr"],
+    ["fTqx-S4f-S5g\rS6f-S70\r1f*0S2rS3rf*1R2IxR3IxgU"],
+    ["fT0U1f-gU"],
+    ["fT1R4R5I*R6R7I+UER4R5I*gU"],
+    ["fTE\\g\r+g\r1f-*Ex/gU"],
+    ["gPf82"],
+    ["1\r", 1],
+    ["1\r6", 6],
+    ["I", new Complex(1, 6)],
+    // TODO: takes too long to run ["fq", new Complex(-3.24e-1, 3.82e-1)],
+    // TODO ["x", new Complex(7.87e-4, 1.23e-3)],
+    ["f74"],
 
     // various particular value tests
     ["g48"],
