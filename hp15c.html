@@ -982,7 +982,7 @@
     }
 
     function op_solve(n) {
-        call = function(n) {
+        var call = function(n) {
             op_gsb(n);
             while (Running) {
                 step();
@@ -1356,7 +1356,7 @@
     }
 
     function op_integrate(n) {
-        call = function(n) {
+        var call = function(n) {
             op_gsb(n);
             while (Running) {
                 step();
