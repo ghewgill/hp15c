@@ -2660,6 +2660,9 @@
                 }
                 e.preventDefault();
             }
+            if (e.which == 20) {
+                run_test();
+            }
             e.stopPropagation();
         });
         update_display();
