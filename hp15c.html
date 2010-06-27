@@ -2265,11 +2265,11 @@
                 return null;
             } else if (k >= '0' && k <= '9') {
                 var i = Number(k) / f;
-                return new Opcode(new OpcodeInfo([42,10,i]), function() { op_integrate(i); });
+                return new Opcode(new OpcodeInfo([42,20,i]), function() { op_integrate(i); });
             } else {
                 var i = "qE)^\\".indexOf(k);
                 if (i >= 0) {
-                    return new Opcode(new OpcodeInfo([42,10,11+i]), function() { op_integrate(11+i); });
+                    return new Opcode(new OpcodeInfo([42,20,11+i]), function() { op_integrate(11+i); });
                 }
             }
         };
