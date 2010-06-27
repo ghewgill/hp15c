@@ -936,6 +936,19 @@ var Tests = [
     ["P", new Complex(0.9980, 0.0628), 0.001],
     ["50St", 50],
     ["P", new Complex(-1, 0), 0.0001],
+    // p82
+    ["gPfr"],
+    ["fTqg58\r+.5+p*\rS18/l_S0xIgU"],
+    ["fTE\r\rR1f-x9+/g\rxl*xR1f-R+0-g\rr+x10+/+gU"],
+    ["fT)\rE9g\r+8x/+g_gU"],
+    ["gPfR", function() { return User; }],
+    ["0fq", 1.6279, 0.0001],
+    ["fE", -0.1487, 0.001],
+    ["fE", -0.1497, 0.001],
+    ["fE", new Complex(-0.1497, 2.8319), 0.001],
+    ["f)", 0, 1e-10],
+    ["x", -0.1497, 0.001],
+    ["fR"],
 
     // various particular value tests
     ["g48"],

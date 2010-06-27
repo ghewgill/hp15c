@@ -1548,6 +1548,9 @@
 
     function op_enter() {
         push(Stack[0], true);
+        // push() only pushes the real part,
+        // so copy the imaginary part too
+        StackI[0] = StackI[1];
         NewStackLift = false;
     }
 
@@ -1753,6 +1756,7 @@
             push(Reg[r]);
         } else {
             Stack[0] = Reg[r];
+            StackI[0] = 0;
             StackLift = true;
         }
     }
