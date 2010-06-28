@@ -993,6 +993,9 @@
         var maxiter = 100;
         var x0 = Stack[1];
         var x1 = Stack[0];
+        if (x1 === x0) {
+            x1 = x0 * 1.01;
+        }
         while (true) {
             fill(x0);
             call(n);
