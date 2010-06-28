@@ -994,6 +994,9 @@ var Tests = [
     ["fe)R_qR_E-", new MatrixCheck(C, 2, 3, [[-1, 0, 1], [0, 0, 3]])],
     ["R_)f_8", 3.3166, 0.0001],
     ["R_)f_7", 3],
+    // p119
+    ["gPfrfT8f_1fT9R0R1g-6g\bg-5efRScfRG9gUgP"],
+    ["3\r3fsqR_qStU8R_q", new MatrixCheck(A, 3, 3, [[1, 0, 0], [0, 1, 0], [0, 0, 1]])],
 
     // various particular value tests
     ["g48"],

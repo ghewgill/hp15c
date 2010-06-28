@@ -1732,8 +1732,12 @@
         }
     }
 
-    function op_sto_index() {
-        op_sto_reg(Math.floor(Math.abs(Reg['I'])));
+    function op_sto_index(user) {
+        if (Reg['I'] instanceof Descriptor) {
+            op_sto_matrix(Reg['I'].label, user);
+        } else {
+            op_sto_reg(Math.floor(Math.abs(Reg['I'])));
+        }
     }
 
     function op_sto_op_index(op) {
@@ -1809,8 +1813,12 @@
         }
     }
 
-    function op_rcl_index() {
-        op_rcl_reg(Math.floor(Math.abs(Reg['I'])));
+    function op_rcl_index(user) {
+        if (Reg['I'] instanceof Descriptor) {
+            op_rcl_matrix(Reg['I'].label, user);
+        } else {
+            op_rcl_reg(Math.floor(Math.abs(Reg['I'])));
+        }
     }
 
     function op_rcl_op_index(op) {
@@ -2399,7 +2407,8 @@
                     var opindex = {'/':10, '*':20, '-':30, '+':40};
                     return new Opcode(new OpcodeInfo([44,opindex[op],24]), function() { op_sto_op_index(op); });
                 } else {
-                    return new Opcode(new OpcodeInfo([44,24]), op_sto_index);
+                    var u = User;
+                    return new Opcode(new OpcodeInfo([44,24]), function() { op_sto_index(u); });
                 }
             } else if (k === 't') {
                 if (op !== null) {
@@ -2469,7 +2478,8 @@
                     var opindex = {'/':10, '*':20, '-':30, '+':40};
                     return new Opcode(new OpcodeInfo([45,opindex[op],24]), function() { op_rcl_op_index(op); });
                 } else {
-                    return new Opcode(new OpcodeInfo([45,24]), op_rcl_index);
+                    var u = User;
+                    return new Opcode(new OpcodeInfo([45,24]), function() { op_rcl_index(u); });
                 }
             } else if (k === 't') {
                 if (op !== null) {
