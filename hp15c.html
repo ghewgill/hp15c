@@ -380,6 +380,14 @@
             return new Mat(this.m.minus(B.m));
         }
 
+        this.norm = function() {
+            return this.m.normInf();
+        }
+
+        this.normF = function() {
+            return this.m.normF();
+        }
+
         this.partition = function() {
             var r = new Matrix(this.rows*2, this.cols/2);
             for (var i = 0; i < this.rows; i++) {
@@ -894,11 +902,15 @@
     }
 
     function op_matrix_norm() {
-        alert("Unimplemented: matrix norm");
+        unop(function(x) {
+            return g_Matrix[x.label].norm();
+        });
     }
 
     function op_matrix_normf() {
-        alert("Unimplemented: matrix normf");
+        unop(function(x) {
+            return g_Matrix[x.label].normF();
+        });
     }
 
     function op_matrix_det() {

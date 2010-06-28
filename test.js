@@ -987,6 +987,13 @@ var Tests = [
         [ 2.0, 0.1000]
     ], 0.001)],
     ["g58"],
+    // Section 4: Using Matrix Operations
+    // p99
+    ["2\r3fsqfRf_11Sq2Sq3Sq4Sq5Sq9SqfR"],
+    ["2\r3fsEfRf_12SE2SE2SE4SE5SE6SEfR"],
+    ["fe)R_qR_E-", new MatrixCheck(C, 2, 3, [[-1, 0, 1], [0, 0, 3]])],
+    ["R_)f_8", 3.3166, 0.0001],
+    ["R_)f_7", 3],
 
     // various particular value tests
     ["g48"],
