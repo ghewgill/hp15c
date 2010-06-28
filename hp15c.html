@@ -463,6 +463,9 @@
                 DigitEntry = NewDigitEntry;
                 StackLift = NewStackLift;
                 if (DigitEntry) {
+                    if (Entry.length > 0 && Entry[Entry.length-1] === "e") {
+                        Entry += "0";
+                    }
                     Stack[0] = Number(Entry);
                 }
             }
