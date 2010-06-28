@@ -983,8 +983,9 @@
 
     function op_solve(n) {
         var call = function(n) {
+            var r = ReturnStack.length;
             op_gsb(n);
-            while (Running) {
+            while (ReturnStack.length > r) {
                 step();
             }
         };
@@ -1005,7 +1006,12 @@
             var y1 = Stack[0];
             var x2 = x1 - y1 * ((x1 - x0) / (y1 - y0));
             if (isNaN(x2) || x2 === Infinity || x2 === -Infinity) {
-                throw new CalcError(8);
+                if (Running) {
+                    PC++;
+                    return;
+                } else {
+                    throw new CalcError(8);
+                }
             }
             fill(x2);
             call(n);
@@ -1019,7 +1025,12 @@
                 break;
             }
             if (--maxiter <= 0) {
-                throw new CalcError(8);
+                if (Running) {
+                    PC++;
+                    return;
+                } else {
+                    throw new CalcError(8);
+                }
             }
         }
         push(y2);
@@ -1360,8 +1371,9 @@
 
     function op_integrate(n) {
         var call = function(n) {
+            var r = ReturnStack.length;
             op_gsb(n);
-            while (Running) {
+            while (ReturnStack.length > r) {
                 step();
             }
         };
@@ -1428,6 +1440,8 @@
     function op_gsb(n) {
         if (Running) {
             ReturnStack.push(PC);
+        } else {
+            ReturnStack.push(0);
         }
         op_gto_label(n);
         Running = true;
@@ -1436,6 +1450,8 @@
     function op_gsb_index() {
         if (Running) {
             ReturnStack.push(PC);
+        } else {
+            ReturnStack.push(0);
         }
         op_gto_index();
         Running = true;
@@ -1455,8 +1471,10 @@
         if (ReturnStack.length > 0) {
             PC = ReturnStack.pop();
         } else {
-            Running = false;
             PC = 0;
+        }
+        if (PC === 0) {
+            Running = false;
         }
     }
 
@@ -1720,6 +1738,9 @@
             } else {
                 Reg[0] = 1;
                 Reg[1] = 1;
+                if (Running) {
+                    PC++;
+                }
             }
         }
     }

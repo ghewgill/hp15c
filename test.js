@@ -962,6 +962,31 @@ var Tests = [
     // TODO: takes too long to run ["fq", new Complex(-3.24e-1, 3.82e-1)],
     // TODO ["x", new Complex(7.87e-4, 1.23e-3)],
     ["f74"],
+    // p90
+    ["gPfr"],
+    ["fTqrS4r2fsqg\bS_qStf_1grS2fRSqfRf-S3fRSqfRG1"],
+    ["fT0R_qgU"],
+    ["fT1f-UES5fT21S+tR4Rt*R2+S6R3\rf/3G41S-t4S/4S*tG2"],
+    ["fT4R6fPfRSqfRrfPS3fRSqfRG2G0"],
+    ["fT3R6xIUER5-gU"],
+    ["fTE\r\\+f-gU"],
+    ["gP"],
+    ["9\r", 9],
+    [".5\r", 0.5],
+    ["2_\r", -2],
+    [".1I", new Complex(-2, 0.1)],
+    ["fqR_q", new MatrixCheck(A, 9, 2, [
+        [-2.0, 0.1000],
+        [-1.5, 0.1343],
+        [-1.0, 0.4484],
+        [-0.5, 0.9161],
+        [ 0.0, 1.0382],
+        [ 0.5, 0.9161],
+        [ 1.0, 0.4484],
+        [ 1.5, 0.1343],
+        [ 2.0, 0.1000]
+    ], 0.001)],
+    ["g58"],
 
     // various particular value tests
     ["g48"],
