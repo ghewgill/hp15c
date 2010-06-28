@@ -997,6 +997,11 @@ var Tests = [
     // p119
     ["gPfrfT8f_1fT9R0R1g-6g\bg-5efRScfRG9gUgP"],
     ["3\r3fsqR_qStU8R_q", new MatrixCheck(A, 3, 3, [[1, 0, 0], [0, 1, 0], [0, 0, 1]])],
+    // p120
+    ["gPfrfTqR_qS_^R_ER_^fe)/feEf_6R_^/R_)+gUgP"],
+    ["3\r3fsqf_1fR33Sq16Sq72Sq24_Sq10_Sq57_Sq8_Sq4_Sq17_SqfR"],
+    ["3\r3fsEf_1fR1SE0SE0SE0SE1SE0SE0SE0SE1SEfR"],
+    ["UqR_)", new MatrixCheck(C, 3, 3, [[-9.6666666, -2.6666666, -32], [8, 2.5, 25.5], [2.6666666, 0.6666666, 9]], 0.000001)],
 
     // various particular value tests
     ["g48"],

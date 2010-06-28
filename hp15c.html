@@ -403,6 +403,10 @@
             return new Mat(this.m.plus(B.m));
         }
 
+        this.residual = function(Y, X) {
+            return new Mat(this.m.minus(Y.m.times(X.m)));
+        }
+
         this.set = function(row, col, value) {
             this.m.set(row-1, col-1, value);
         };
@@ -905,6 +909,15 @@
     function op_matrix_transmul() {
         binopm(function(y, x) {
             return g_Matrix[y.label].transpose().times(g_Matrix[x.label]);
+        });
+    }
+
+    function op_matrix_residual() {
+        binopm(function(y, x) {
+            var Y = g_Matrix[y.label];
+            var X = g_Matrix[x.label];
+            var R = g_Matrix[Result];
+            return R.residual(Y, X);
         });
     }
 
@@ -2051,7 +2064,7 @@
                 case '3': return new Opcode(new OpcodeInfo([42,16,3], op_matrix_complex3));
                 case '4': return new Opcode(new OpcodeInfo([42,16,4], op_matrix_transpose));
                 case '5': return new Opcode(new OpcodeInfo([42,16,5], op_matrix_transmul));
-                case '6':
+                case '6': return new Opcode(new OpcodeInfo([42,16,6], op_matrix_residual));
                 case '7': return new Opcode(new OpcodeInfo([42,16,7], op_matrix_norm));
                 case '8': return new Opcode(new OpcodeInfo([42,16,8], op_matrix_normf));
                 case '9': return new Opcode(new OpcodeInfo([42,16,9], op_matrix_det));
