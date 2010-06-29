@@ -1218,6 +1218,10 @@
         g_Matrix[m] = new Mat(Stack[1], Stack[0]);
     }
 
+    function op_dim_i() {
+        // noop
+    }
+
     function op_asin() {
         if (Flags[8]) {
             alert("Unimplemented: complex asin");
@@ -2213,9 +2217,13 @@
 
     function decode_dim(k) {
         Prefix = function(k) {
-            var i = "qE)^\\".indexOf(k);
-            if (i >= 0) {
-                return new Opcode(new OpcodeInfo([42,23,11+i]), function() { op_dim(i); });
+            if (k == 'c') {
+                return new Opcode(new OpcodeInfo([42,23,24]), op_dim_i);
+            } else {
+                var i = "qE)^\\".indexOf(k);
+                if (i >= 0) {
+                    return new Opcode(new OpcodeInfo([42,23,11+i]), function() { op_dim(i); });
+                }
             }
         };
         return null;
