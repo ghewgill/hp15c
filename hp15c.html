@@ -1215,7 +1215,37 @@
     }
 
     function op_dim(m) {
-        g_Matrix[m] = new Mat(Stack[1], Stack[0]);
+        var oldmat = g_Matrix[m].m;
+        var r = Stack[1];
+        var c = Stack[0];
+        if (oldmat.getRowDimension() > 0 && r > 0 && c > 0) {
+            var a = oldmat.getArray();
+            if (c < a[0].length) {
+                for (var i = 0; i < a.length; i++) {
+                    a[i] = a[i].slice(0, c);
+                }
+            } else if (c > a[0].length) {
+                for (var i = 0; i < a.length; i++) {
+                    for (j = a[i].length; j < c; j++) {
+                        a[i][j] = 0;
+                    }
+                }
+            }
+            if (r < a.length) {
+                a = a.slice(0, r);
+            } else {
+                while (r > a.length) {
+                    var b = new Array(a[0].length);
+                    for (var i = 0; i < c; i++) {
+                        b[i] = 0;
+                    }
+                    a[a.length] = b;
+                }
+            }
+            g_Matrix[m] = new Mat(new Matrix(a));
+        } else {
+            g_Matrix[m] = new Mat(Stack[1], Stack[0]);
+        }
     }
 
     function op_dim_i() {
