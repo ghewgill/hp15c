@@ -1149,21 +1149,25 @@ function run_tests() {
     if (TestIndex < Tests.length) {
         var test = Tests[TestIndex];
         var keys = test[0];
-        test_log(keys);
-        for (var i = 0; i < keys.length; i++) {
-            key(keys.substr(i, 1), true);
-            while (Running) {
-                if (RunTimer !== null) {
-                    clearTimeout(RunTimer);
-                    RunTimer = null;
+        if (typeof(keys) === "string") {
+            test_log(keys);
+            for (var i = 0; i < keys.length; i++) {
+                key(keys.substr(i, 1), true);
+                while (Running) {
+                    if (RunTimer !== null) {
+                        clearTimeout(RunTimer);
+                        RunTimer = null;
+                    }
+                    var p = PC;
+                    if (p === 0) {
+                        p = 1;
+                    }
+                    test_log(sprintf("%03d-%s", p, Program[p].info.keys));
+                    step();
                 }
-                var p = PC;
-                if (p === 0) {
-                    p = 1;
-                }
-                test_log(sprintf("%03d-%s", p, Program[p].info.keys));
-                step();
             }
+        } else if (typeof(keys) === "function") {
+            keys();
         }
         if (test.length > 1) {
             var expected = test[1];
