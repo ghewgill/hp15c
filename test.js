@@ -1,5 +1,6 @@
 var Tests = [
     // Page references from HP-15C Owner's Handbook (November 1985)
+//]; var zz = [
 
     // p13
     ["9\r6-", 3],
@@ -1022,6 +1023,55 @@ var Tests = [
     ["Rq", 3.5519, 0.0001],
     ["Rq", 2.1556e1, 0.0001],
     ["f74fR"],
+    // p128
+    ["gPfrgP"],
+    ["0fsc", 0],
+    ["f_0", 0],
+    ["4\r8", 8],
+    ["fsq", 8],
+    ["f_1", 8],
+    ["fR", 8],
+    [function() {
+        var R1 = 100;
+        var R2 = 1e6;
+        var R3 = 1e5;
+        var wL = 150;
+        var wC1 = 800/3;
+        var wC2 = 8/3;
+        g_Matrix[0].m = new Matrix([
+            [R1, wL-wC1, 0, wC1, 0, 0, 0, 0],
+            [0, wC1, R2, wL-wC1, -R2, 0, 0, 0],
+            [0, 0, -R2, 0, R2, -wC2+wL, 0, -wL],
+            [0, 0, 0, 0, 0, -wL, R3, wL-wC2]
+        ]);
+    }],
+    ["R_q", new MatrixCheck(A, 4, 8)],
+    ["f+", new MatrixCheck(A, 8, 4)],
+    ["f_2", new MatrixCheck(A, 8, 8)],
+    ["Se", new MatrixCheck(A, 8, 8)],
+    ["\\", new MatrixCheck(A, 8, 8)],
+    ["4\r8fsq", 8],
+    ["4\r2fsE", 2],
+    ["f_1", 2],
+    ["10SE", 10],
+    ["R_q", new MatrixCheck(A, 4, 8)],
+    ["R_E", new MatrixCheck(B, 4, 2)],
+    ["f+", new MatrixCheck(B, 8, 1)],
+    ["f_2", new MatrixCheck(B, 8, 2)],
+    ["fe)", new MatrixCheck(B, 8, 2)],
+    ["*", new MatrixCheck(C, 4, 2)],
+    ["f_4", new MatrixCheck(C, 2, 4)],
+    ["f_2", new MatrixCheck(C, 2, 8)],
+    ["1\r8fs)", 8],
+    ["Re", new MatrixCheck(C, 1, 8)],
+    ["f_4", new MatrixCheck(C, 8, 1)],
+    ["g+", new MatrixCheck(C, 4, 2)],
+    ["f_1", new MatrixCheck(C, 4, 2)],
+    ["f84", new MatrixCheck(C, 4, 2)],
+    ["R)", 1.9950e-4, 0.001],
+    ["R)", 4.0964e-3, 0.0001],
+    ["xg1", 4.1014e-3, 0.0001],
+    ["x", 8.7212e1, 0.0001],
 
     // various particular value tests
     ["g48"],
