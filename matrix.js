@@ -2372,8 +2372,8 @@ function Matrix() {
    this.copy = function() {
       var X = new Matrix(this.m,this.n);
       var C = X.getArray();
-      for (var i = 0; i < m; i++) {
-         for (var j = 0; j < n; j++) {
+      for (var i = 0; i < this.m; i++) {
+         for (var j = 0; j < this.n; j++) {
             C[i][j] = this.A[i][j];
          }
       }
