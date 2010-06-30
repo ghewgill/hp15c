@@ -1061,7 +1061,9 @@ var TestIndex;
 var TestPass;
 
 function test_log(msg) {
-    $("#testlog").append(msg + "\n");
+    if (console) {
+        console.log(msg);
+    }
 }
 
 function Complex(real, imag) {
@@ -1133,10 +1135,6 @@ function verify(test, result, resulti, expected) {
 }
 
 function start_tests() {
-    if ($("#testlog").length === 0) {
-        $("body").append('<div><textarea id="testlog" cols="80" rows="10"></textarea></div>');
-    }
-
     key('f'); key('7'); key('4');
     key('g'); key('5'); key('8');
     key('f'); key('r');
