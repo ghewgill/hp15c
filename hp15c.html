@@ -1835,6 +1835,14 @@
         }
     }
 
+    function op_sto_result() {
+        if (Stack[0] instanceof Descriptor) {
+            Result = Stack[0].label;
+        } else {
+            // TODO: error
+        }
+    }
+
     function op_frac() {
         unop(function(x) {
             return x - trunc(x);
@@ -1909,6 +1917,10 @@
         binop(function(y, x) {
             return g_Matrix[m].get(y, x);
         });
+    }
+
+    function op_rcl_result() {
+        push(new Descriptor(Result));
     }
 
     function op_user() {
@@ -2472,6 +2484,8 @@
                 } else {
                     return new Opcode(new OpcodeInfo([44,25]), function() { op_sto_reg('I'); });
                 }
+            } else if (k === 'e') {
+                return new Opcode(new OpcodeInfo([44,26]), op_sto_result);
             } else if (k === 'g') {
                 g = true;
                 Prefix = OldPrefix;
@@ -2543,6 +2557,8 @@
                 } else {
                     return new Opcode(new OpcodeInfo([45,25]), function() { op_rcl_reg('I'); });
                 }
+            } else if (k === 'e') {
+                return new Opcode(new OpcodeInfo([45,26]), op_rcl_result);
             } else if (k === 'g') {
                 g = true;
                 Prefix = OldPrefix;
