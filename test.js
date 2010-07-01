@@ -1111,7 +1111,7 @@ var TestIndex;
 var TestPass;
 
 function test_log(msg) {
-    if (console) {
+    if (window.console) {
         console.log(msg);
     }
 }
