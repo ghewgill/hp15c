@@ -1821,8 +1821,9 @@
     function op_sto_matrix_imm(m) {
         var x = Stack[0];
         var y = Stack[1];
-        Stack[0] = Stack[2];
-        Stack[1] = Stack[2];
+        Stack[0] = Stack[2]; StackI[0] = StackI[2];
+        Stack[1] = Stack[3]; StackI[1] = StackI[3];
+        Stack[2] = Stack[3]; StackI[2] = StackI[3];
         g_Matrix[m].set(y, x, Stack[0]);
     }
 
