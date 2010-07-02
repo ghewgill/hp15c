@@ -872,7 +872,8 @@
             }
             NewDigitEntry = true;
         } else if (Stack[0] instanceof Descriptor) {
-            alert("Unimplemented: matrix chs");
+            var x = Stack[0].label;
+            g_Matrix[x] = g_Matrix[x].timesScalar(-1);
         } else {
             Stack[0] = -Stack[0];
         }
@@ -1000,7 +1001,9 @@
                 return g_Matrix[x.label].inverse().times(g_Matrix[y.label]);
             });
         } else if (Stack[0] instanceof Descriptor) {
-            alert("Unimplemented: matrix div");
+            binopm(function(y, x) {
+                return g_Matrix[x.label].timesScalar(1/y);
+            });
         } else if (Stack[1] instanceof Descriptor) {
             alert("Unimplemented: matrix div");
         } else if (Flags[8]) {
