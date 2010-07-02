@@ -1002,10 +1002,12 @@
             });
         } else if (Stack[0] instanceof Descriptor) {
             binopm(function(y, x) {
-                return g_Matrix[x.label].timesScalar(1/y);
+                return g_Matrix[x.label].inverse().timesScalar(y);
             });
         } else if (Stack[1] instanceof Descriptor) {
-            alert("Unimplemented: matrix div");
+            binopm(function(y, x) {
+                return g_Matrix[y.label].timesScalar(1/x);
+            });
         } else if (Flags[8]) {
             binopc(function(yr, yi, xr, xi) {
                 var d = xr*xr + xi*xi;
