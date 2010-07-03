@@ -939,6 +939,9 @@
     }
 
     function op_abs() {
+        if (Stack[0] instanceof Descriptor) {
+            throw new CalcError(1);
+        }
         if (Flags[8]) {
             unopc(function(xr, xi) {
                 return [Math.sqrt(xr*xr, xi*xi), 0];
