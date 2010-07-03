@@ -758,15 +758,24 @@
                     s = s.substr(0, 3) + "u";
                 }
                 var keys = Program[PC].info.keys;
-                for (var i = 0; i < keys.length; i++) {
-                    if (i > 0) {
-                        s += ".";
-                    }
-                    if (Math.floor(keys[i]) === keys[i]) {
-                        s += sprintf("%2d", keys[i]);
-                    } else {
-                        s += sprintf("%.1f", keys[i]);
-                    }
+                switch (keys.length) {
+                    case 1:
+                        s += sprintf("    %2d", keys[0]);
+                        break;
+                    case 2:
+                        if (Math.floor(keys[1]) === keys[1]) {
+                            s += sprintf(" %2d %2d", keys[0], keys[1]);
+                        } else {
+                            s += sprintf(" %2d  .%d", keys[0], keys[1]*10);
+                        }
+                        break;
+                    case 3:
+                        if (Math.floor(keys[2]) === keys[2]) {
+                            s += sprintf("%2d,%2d,%2d", keys[0], keys[1], keys[2]);
+                        } else {
+                            s += sprintf("%2d,%2d,.%d", keys[0], keys[1], keys[2]*10);
+                        }
+                        break;
                 }
             }
             update_lcd(s);
