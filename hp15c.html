@@ -1607,6 +1607,10 @@
                 Program.splice(PC, 1);
                 PC--;
             }
+            return;
+        } else if (Flags[9]) {
+            Flags[9] = false;
+            return;
         } else if (DigitEntry && Entry.length > 0) {
             Entry = Entry.substr(0, Entry.length-1);
         } else {
