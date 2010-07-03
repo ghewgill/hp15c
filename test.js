@@ -1346,15 +1346,6 @@ function test_log(msg) {
     }
 }
 
-function Complex(real, imag) {
-    this.re = real;
-    this.im = imag;
-
-    this.toString = function() {
-        return "(" + this.re + "," + this.im + ")";
-    }
-}
-
 function tolerance(r, e, t) {
     if (t === undefined) {
         return r === e;

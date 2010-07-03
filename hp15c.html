@@ -330,6 +330,115 @@
         [1, 5,  1, 'p']
     ];
 
+    function sinh(x) {
+        return (Math.exp(x) - Math.exp(-x)) / 2;
+    }
+
+    function cosh(x) {
+        return (Math.exp(x) + Math.exp(-x)) / 2;
+    }
+
+    function tanh(x) {
+        return (Math.exp(2*x) - 1) / (Math.exp(2*x) + 1);
+    }
+
+    function Complex(re, im) {
+        this.re = re;
+        this.im = im;
+
+        this.abs = function() {
+            return Math.sqrt(this.re*this.re + this.im*this.im);
+        }
+
+        this.add = function(that) {
+            return new Complex(this.re + that.re, this.im + that.im);
+        }
+
+        this.arg = function() {
+            return Math.atan2(this.im, this.re);
+        }
+
+        this.cos = function() {
+            return new Complex(Math.cos(this.re)*cosh(this.im), -Math.sin(this.re)*sinh(this.im));
+        }
+
+        this.cosh = function() {
+            return new Complex(cosh(this.re)*Math.cos(this.im), sinh(this.re)*Math.sin(this.im));
+        }
+
+        this.div = function(that) {
+            var d = that.re*that.re + that.im*that.im;
+            return new Complex((this.re*that.re + this.im*that.im) / d, (this.im*that.re - this.re*that.im) / d);
+        }
+
+        this.exp = function() {
+            var r = Math.exp(this.re);
+            return new Complex(r * Math.cos(this.im), r * Math.sin(this.im));
+        }
+
+        this.exp10 = function() {
+            var r = Math.pow(10, this.re);
+            var t = this.im * Math.LN10;
+            return new Complex(r * Math.cos(t), r * Math.sin(t));
+        }
+
+        this.inv = function() {
+            var d = this.re*this.re + this.im*this.im;
+            return new Complex(this.re/d, -this.im/d);
+        }
+
+        this.log = function() {
+            return new Complex(Math.log(this.re*this.re + this.im*this.im)/2, this.arg());
+        }
+
+        this.mul = function(that) {
+            return new Complex(this.re * that.re - this.im * that.im, this.re * that.im + this.im * that.re);
+        }
+
+        this.pow = function(that) {
+            var p = this.arg();
+            var a = this.abs();
+            var r = Math.pow(a, that.re) * Math.exp(-that.im * p);
+            var t = that.re * p + that.im * Math.log(a);
+            return new Complex(r * Math.cos(t), r * Math.sin(t));
+        }
+
+        this.sin = function() {
+            return new Complex(Math.sin(this.re)*cosh(this.im), Math.cos(this.re)*sinh(this.im));
+        }
+
+        this.sinh = function() {
+            return new Complex(sinh(this.re)*Math.cos(this.im), cosh(this.re)*Math.sin(this.im));
+        }
+
+        this.sub = function(that) {
+            return new Complex(this.re - that.re, this.im - that.im);
+        }
+
+        this.sqrt = function() {
+            var a = this.abs();
+            return new Complex(Math.sqrt((this.re + a) / 2), (this.im < 0 ? -1 : 1) * Math.sqrt((-this.re + a) / 2));
+        }
+
+        this.square = function() {
+            return new Complex(this.re*this.re - this.im*this.im, 2*this.re*this.im);
+        }
+
+        this.tan = function() {
+            var u = new Complex(Math.tan(this.re), tanh(this.im));
+            return u.div(new Complex(1, -u.re*u.im));
+        }
+
+        this.tanh = function() {
+            var u = new Complex(tanh(this.re), Math.tan(this.im));
+            return u.div(new Complex(1, u.re*u.im));
+        }
+
+        this.toString = function() {
+            return "(" + this.re + "," + this.im + ")";
+        }
+    }
+
     var A = 0;
     var B = 1;
     var C = 2;
@@ -509,18 +618,6 @@
             }
         }
         return mag;
-    }
-
-    function sinh(x) {
-        return (Math.exp(x) - Math.exp(-x)) / 2;
-    }
-
-    function cosh(x) {
-        return (Math.exp(x) + Math.exp(-x)) / 2;
-    }
-
-    function tanh(x) {
-        return (Math.exp(2*x) - 1) / (Math.exp(2*x) + 1);
     }
 
     function update_lcd(s) {
@@ -706,17 +803,17 @@
     function unopc(f) {
         LastX = Stack[0];
         LastXI = StackI[0];
-        var r = f(Stack[0], StackI[0]);
-        Stack[0] = r[0];
-        StackI[0] = r[1];
+        var r = f(new Complex(Stack[0], StackI[0]));
+        Stack[0] = r.re;
+        StackI[0] = r.im;
     }
 
     function binopc(f) {
         LastX = Stack[0];
         LastXI = StackI[0];
-        var r = f(Stack[1], StackI[1], Stack[0], StackI[0]);
-        Stack[0] = r[0];
-        StackI[0] = r[1];
+        var r = f(new Complex(Stack[1], StackI[1]), new Complex(Stack[0], StackI[0]));
+        Stack[0] = r.re;
+        StackI[0] = r.im;
         Stack[1] = Stack[2]; StackI[1] = StackI[2];
         Stack[2] = Stack[3]; StackI[2] = StackI[3];
     }
@@ -741,9 +838,8 @@
 
     function op_sqrt() {
         if (Flags[8]) {
-            unopc(function(xr, xi) {
-                var a = Math.sqrt(xr*xr + xi*xi);
-                return [Math.sqrt((xr + a) / 2), (xi < 0 ? -1 : 1) * Math.sqrt((-xr + a) / 2)];
+            unopc(function(x) {
+                return x.sqrt();
             });
         } else {
             unop(Math.sqrt);
@@ -756,8 +852,8 @@
 
     function op_x2() {
         if (Flags[8]) {
-            unopc(function(xr, xi) {
-                return [xr*xr - xi*xi, 2*xr*xi];
+            unopc(function(x) {
+                return x.square();
             });
         } else {
             unop(function(x) { return x * x; });
@@ -766,9 +862,8 @@
 
     function op_ex() {
         if (Flags[8]) {
-            unopc(function(xr, xi) {
-                var r = Math.exp(xr);
-                return [r * Math.cos(xi), r * Math.sin(xi)];
+            unopc(function(x) {
+                return x.exp();
             });
         } else {
             unop(Math.exp);
@@ -781,8 +876,8 @@
 
     function op_ln() {
         if (Flags[8]) {
-            unopc(function(xr, xi) {
-                return [Math.log(xr*xr + xi*xi)/2, Math.atan2(xi, xr)];
+            unopc(function(x) {
+                return x.log();
             });
         } else {
             unop(Math.log);
@@ -791,10 +886,8 @@
 
     function op_10x() {
         if (Flags[8]) {
-            unopc(function(xr, xi) {
-                var r = Math.pow(10, xr);
-                var t = xi * Math.LN10;
-                return [r * Math.cos(t), r * Math.sin(t)];
+            unopc(function(x) {
+                return x.exp10();
             });
         } else {
             unop(function(x) { return Math.pow(10, x); });
@@ -815,12 +908,8 @@
 
     function op_yx() {
         if (Flags[8]) {
-            binopc(function(yr, yi, xr, xi) {
-                var p = Math.atan2(yi, yr);
-                var a = Math.sqrt(yr*yr + yi*yi);
-                var r = Math.pow(a, xr) * Math.exp(-xi * p);
-                var t = xr * p + xi * Math.log(a);
-                return [r * Math.cos(t), r * Math.sin(t)];
+            binopc(function(y, x) {
+                return y.pow(x);
             });
         } else {
             binop(Math.pow);
@@ -843,9 +932,8 @@
                 return g_Matrix[x.label].inverse();
             });
         } else if (Flags[8]) {
-            unopc(function(xr, xi) {
-                var d = xr*xr + xi*xi;
-                return [xr/d, -xi/d];
+            unopc(function(x) {
+                return x.inv();
             });
         } else {
             unop(function(x) { return 1 / x; });
@@ -951,8 +1039,8 @@
             throw new CalcError(1);
         }
         if (Flags[8]) {
-            unopc(function(xr, xi) {
-                return [Math.sqrt(xr*xr, xi*xi), 0];
+            unopc(function(x) {
+                return new Complex(x.abs(), 0);
             });
         } else {
             unop(Math.abs);
@@ -1020,9 +1108,8 @@
                 return g_Matrix[y.label].timesScalar(1/x);
             });
         } else if (Flags[8]) {
-            binopc(function(yr, yi, xr, xi) {
-                var d = xr*xr + xi*xi;
-                return [(yr*xr + yi*xi) / d, (yi*xr - yr*xi) / d];
+            binopc(function(y, x) {
+                return y.div(x);
             });
         } else {
             binop(function(y, x) { return y / x; });
@@ -1155,8 +1242,8 @@
 
     function op_sinh() {
         if (Flags[8]) {
-            unopc(function(xr, xi) {
-                return [sinh(xr)*Math.cos(xi), cosh(xr)*Math.sin(xi)];
+            unopc(function(x) {
+                return x.sinh();
             });
         } else {
             unop(sinh);
@@ -1165,8 +1252,8 @@
 
     function op_cosh() {
         if (Flags[8]) {
-            unopc(function(xr, xi) {
-                return [cosh(xr)*Math.cos(xi), sinh(xr)*Math.sin(xi)];
+            unopc(function(x) {
+                return x.cosh();
             });
         } else {
             unop(cosh);
@@ -1175,13 +1262,8 @@
 
     function op_tanh() {
         if (Flags[8]) {
-            unopc(function(xr, xi) {
-                var yr = tanh(xr);
-                var yi = Math.tan(xi);
-                xr = 1;
-                xi = yr * yi;
-                var d = xr*xr + xi*xi;
-                return [(yr*xr + yi*xi) / d, (yi*xr - yr*xi) / d];
+            unopc(function(x) {
+                return x.tanh();
             });
         } else {
             unop(tanh);
@@ -1220,8 +1302,8 @@
 
     function op_sin() {
         if (Flags[8]) {
-            unopc(function(xr, xi) {
-                return [Math.sin(xr)*cosh(xi), Math.cos(xr)*sinh(xi)];
+            unopc(function(x) {
+                return x.sin();
             });
         } else {
             unop(function(x) {
@@ -1280,8 +1362,8 @@
 
     function op_cos() {
         if (Flags[8]) {
-            unopc(function(xr, xi) {
-                return [Math.cos(xr)*cosh(xi), -Math.sin(xr)*sinh(xi)];
+            unopc(function(x) {
+                return x.cos();
             });
         } else {
             unop(function(x) {
@@ -1310,13 +1392,8 @@
 
     function op_tan() {
         if (Flags[8]) {
-            unopc(function(xr, xi) {
-                var yr = Math.tan(xr);
-                var yi = tanh(xi);
-                xr = 1;
-                xi = -yr * yi;
-                var d = xr*xr + xi*xi;
-                return [(yr*xr + yi*xi) / d, (yi*xr - yr*xi) / d];
+            unopc(function(x) {
+                return x.tan();
             });
         } else {
             unop(function(x) {
@@ -1443,8 +1520,8 @@
                 return g_Matrix[y.label].timesScalar(Stack[0]);
             });
         } else if (Flags[8]) {
-            binopc(function(yr, yi, xr, xi) {
-                return [yr * xr - yi * xi, yr * xi + yi * xr];
+            binopc(function(y, x) {
+                return y.mul(x);
             });
         } else {
             binop(function(y, x) { return y * x; });
@@ -1752,8 +1829,8 @@
                 return m.minus(new Mat(m.rows, m.cols, Stack[0]));
             });
         } else if (Flags[8]) {
-            binopc(function(yr, yi, xr, xi) {
-                return [yr - xr, yi - xi];
+            binopc(function(y, x) {
+                return y.sub(x);
             });
         } else {
             binop(function(y, x) { return y - x; });
@@ -2065,8 +2142,8 @@
                 return m.plus(new Mat(m.rows, m.cols, Stack[0]));
             });
         } else if (Flags[8]) {
-            binopc(function(yr, yi, xr, xi) {
-                return [yr + xr, yi + xi];
+            binopc(function(y, x) {
+                return y.add(x);
             });
         } else {
             binop(function(y, x) { return y + x; });
