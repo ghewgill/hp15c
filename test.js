@@ -1282,6 +1282,14 @@ var Tests = [
     ["fRf_0"],
 
     // miscellaneous tests not covered by user manual
+    // complex inverse trig functions
+    ["1\r2Isgs", new Complex(1, 2), 1e-9],
+    ["1\r2Icgc", new Complex(1, 2), 1e-9],
+    ["1\r2Itgt", new Complex(1, 2), 1e-9],
+    ["2\r1IfGsgGs", new Complex(2, 1), 1e-9],
+    ["2\r1IfGcgGc", new Complex(2, 1), 1e-9],
+    ["2\r1IfGtgGt", new Complex(2, 1), 1e-9],
+    ["g58"],
     // matrix determinant
     ["2\rfsq"],
     [function() {

@@ -346,6 +346,16 @@
         this.re = re;
         this.im = im;
 
+        this.acos = function() {
+            var u = Complex.one.add(this).mul(Complex.one.sub(this));
+            var w = u.sqrt().mul(Complex.i).add(this).log();
+            return new Complex(w.im, -w.re);
+        }
+
+        this.acosh = function() {
+            return this.add(Complex.one).mul(this.sub(Complex.one)).sqrt().add(this).log();
+        }
+
         this.abs = function() {
             return Math.sqrt(this.re*this.re + this.im*this.im);
         }
@@ -356,6 +366,27 @@
 
         this.arg = function() {
             return Math.atan2(this.im, this.re);
+        }
+
+        this.asin = function() {
+            var u = Complex.one.add(this).mul(Complex.one.sub(this));
+            var w = new Complex(-this.im, this.re).add(u.sqrt()).log();
+            return new Complex(w.im, -w.re);
+        }
+
+        this.asinh = function() {
+            return this.add(this.square().add(Complex.one).sqrt()).log();
+        }
+
+        this.atan = function() {
+            var u = Complex.i.add(this).div(Complex.i.sub(this));
+            var w = u.log();
+            return new Complex(-w.im/2, w.re/2);
+        }
+
+        this.atanh = function() {
+            var u = Complex.one.add(this).div(Complex.one.sub(this)).log();
+            return new Complex(u.re/2, u.im/2);
         }
 
         this.cos = function() {
@@ -389,6 +420,11 @@
 
         this.log = function() {
             return new Complex(Math.log(this.re*this.re + this.im*this.im)/2, this.arg());
+        }
+
+        this.log10 = function() {
+            var u = this.log();
+            return new Complex(u.re / Math.LN10, u.im / Math.LN10);
         }
 
         this.mul = function(that) {
@@ -438,6 +474,9 @@
             return "(" + this.re + "," + this.im + ")";
         }
     }
+
+    Complex.one = new Complex(1, 0);
+    Complex.i = new Complex(0, 1);
 
     var A = 0;
     var B = 1;
@@ -900,7 +939,9 @@
 
     function op_log() {
         if (Flags[8]) {
-            alert("Unimplemented: complex log");
+            unopc(function(x) {
+                return x.log10();
+            });
         } else {
             unop(function(x) { return Math.log(x) / Math.LN10; });
         }
@@ -1272,7 +1313,9 @@
 
     function op_asinh() {
         if (Flags[8]) {
-            alert("Unimplemented: complex asinh");
+            unopc(function(x) {
+                return x.asinh();
+            });
         } else {
             unop(function(x) {
                 return Math.log(x + Math.sqrt(x*x + 1));
@@ -1282,7 +1325,9 @@
 
     function op_acosh() {
         if (Flags[8]) {
-            alert("Unimplemented: complex acosh");
+            unopc(function(x) {
+                return x.acosh();
+            });
         } else {
             unop(function(x) {
                 return Math.log(x + Math.sqrt(x*x - 1));
@@ -1292,7 +1337,9 @@
 
     function op_atanh() {
         if (Flags[8]) {
-            alert("Unimplemented: complex atanh");
+            unopc(function(x) {
+                return x.atanh();
+            });
         } else {
             unop(function(x) {
                 return Math.log((1 + x) / (1 - x)) / 2;
@@ -1352,7 +1399,9 @@
 
     function op_asin() {
         if (Flags[8]) {
-            alert("Unimplemented: complex asin");
+            unopc(function(x) {
+                return x.asin();
+            });
         } else {
             unop(function(x) {
                 return Math.asin(x) / TrigFactor;
@@ -1382,7 +1431,9 @@
 
     function op_acos() {
         if (Flags[8]) {
-            alert("Unimplemented: complex acos");
+            unopc(function(x) {
+                return x.acos();
+            });
         } else {
             unop(function(x) {
                 return Math.acos(x) / TrigFactor;
@@ -1412,7 +1463,9 @@
 
     function op_atan() {
         if (Flags[8]) {
-            alert("Unimplemented: complex atan");
+            unopc(function(x) {
+                return x.atan();
+            });
         } else {
             unop(function(x) {
                 return Math.atan(x) / TrigFactor;
