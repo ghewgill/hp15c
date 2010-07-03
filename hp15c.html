@@ -368,6 +368,10 @@
             return new Mat(this.m.copy());
         }
 
+        this.det = function() {
+            return this.m.det();
+        }
+
         this.get = function(row, col) {
             return this.m.get(row-1, col-1);
         }
@@ -935,7 +939,9 @@
     }
 
     function op_matrix_det() {
-        alert("Unimplemented: matrix det");
+        unop(function(x) {
+            return g_Matrix[x.label].det();
+        });
     }
 
     function op_abs() {

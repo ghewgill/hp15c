@@ -1281,6 +1281,28 @@ var Tests = [
     ["Rq", 16.6661, 0.0001],
     ["fRf_0"],
 
+    // miscellaneous tests not covered by user manual
+    // matrix determinant
+    ["2\rfsq"],
+    [function() {
+        g_Matrix[0].m = new Matrix([
+            [6, 3],
+            [4, 3]
+        ]);
+    }],
+    ["R_q", new MatrixCheck(A, 2, 2)],
+    ["f_9", 6],
+    ["3\rfsq"],
+    [function() {
+        g_Matrix[0].m = new Matrix([
+            [-2, 2, -3],
+            [-1, 1,  3],
+            [ 2, 0, -1]
+        ]);
+    }],
+    ["R_q", new MatrixCheck(A, 3, 3)],
+    ["f_9", 18],
+
     // various particular value tests
     ["g48"],
     // complex sin
