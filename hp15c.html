@@ -2623,7 +2623,17 @@
             //console.log("PC", PC, Program[PC].info.defn);
             var p = PC;
             PC++;
-            Program[p].exec();
+            try {
+                Program[p].exec();
+            } catch (e) {
+                Running = false;
+                if (e.name === "CalcError") {
+                    update_lcd("Error " + e.code);
+                    DelayUpdate = -1;
+                } else {
+                    throw e;
+                }
+            }
         } else {
             op_rtn();
         }
