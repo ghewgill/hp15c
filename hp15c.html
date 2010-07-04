@@ -712,6 +712,26 @@
         }
     }
 
+    function insert_commas(s) {
+        var sign = "";
+        if (s.charAt(0) === "-") {
+            sign = s.charAt(0);
+            s = s.substr(1);
+        }
+        var d = s.indexOf(".");
+        if (d < 0) {
+            d = s.length;
+        }
+        while (true) {
+            d -= 3;
+            if (d <= 0) {
+                break;
+            }
+            s = s.substr(0, d) + "," + s.substr(d);
+        }
+        return sign + s;
+    }
+
     function update_display_num(n) {
         if (n instanceof Descriptor) {
             update_lcd(sprintf("%c    %2d %2d",
@@ -738,6 +758,7 @@
                     s = '0' + s;
                 }
                 s = s.substr(0, s.length-DisplayDigits) + '.' + s.substr(s.length-DisplayDigits);
+                s = insert_commas(s);
                 break;
             case 2:
                 var x = Math.round(n * Math.pow(10, DisplayDigits - mag));
@@ -801,7 +822,7 @@
             $("#reg_I").val(Reg['I']);
             if (DigitEntry) {
                 if (Entry !== "") {
-                    update_lcd(Entry);
+                    update_lcd(insert_commas(Entry));
                 } else {
                     update_display_num(0);
                 }
