@@ -682,7 +682,11 @@
                     d++;
                 }
             } else if (c === '.') {
-                DisplayDecimal[d].css("display", "inline");
+                DisplayDecimal[d-1].css("display", "inline");
+                DisplayDecimal[d-1].attr("src", "decimal.png");
+            } else if (c === ',') {
+                DisplayDecimal[d-1].css("display", "inline");
+                DisplayDecimal[d-1].attr("src", "comma.png");
             } else if (c === '-') {
                 if (eex) {
                     Display[7].attr("src", Digits["-"].src);
@@ -2258,8 +2262,15 @@
             }
             Entry = "";
         }
-        if (Entry.length === 0 && c === 'e') {
-            Entry = "1";
+        if (Entry.length === 0) {
+            switch (c) {
+                case 'e':
+                    Entry = "1";
+                    break;
+                case '.':
+                    Entry = "0";
+                    break;
+            }
         }
         Entry = Entry + c;
         NewDigitEntry = true;
@@ -2892,7 +2903,7 @@
         }
         for (var i = 0; i < 10; i++) {
             var d = $("#decimal"+i);
-            d.css("left", 169 + i * 27);
+            d.css("left", 196 + i * 27);
             d.css("top", 91);
             DisplayDecimal[DisplayDecimal.length] = d;
         }
@@ -3010,6 +3021,7 @@
 <img class="preload" src="8.png">
 <img class="preload" src="9.png">
 <img class="preload" src="decimal.png">
+<img class="preload" src="comma.png">
 <img class="preload" src="neg.png">
 <div id="frame">
 <img id="calc" src="15.jpg">
@@ -3024,16 +3036,16 @@
 <img id="dig7" class="lcd">
 <img id="dig8" class="lcd">
 <img id="dig9" class="lcd">
-<img id="decimal0" class="lcd" src="decimal.png">
-<img id="decimal1" class="lcd" src="decimal.png">
-<img id="decimal2" class="lcd" src="decimal.png">
-<img id="decimal3" class="lcd" src="decimal.png">
-<img id="decimal4" class="lcd" src="decimal.png">
-<img id="decimal5" class="lcd" src="decimal.png">
-<img id="decimal6" class="lcd" src="decimal.png">
-<img id="decimal7" class="lcd" src="decimal.png">
-<img id="decimal8" class="lcd" src="decimal.png">
-<img id="decimal9" class="lcd" src="decimal.png">
+<img id="decimal0" class="lcd">
+<img id="decimal1" class="lcd">
+<img id="decimal2" class="lcd">
+<img id="decimal3" class="lcd">
+<img id="decimal4" class="lcd">
+<img id="decimal5" class="lcd">
+<img id="decimal6" class="lcd">
+<img id="decimal7" class="lcd">
+<img id="decimal8" class="lcd">
+<img id="decimal9" class="lcd">
 <img id="neg" class="lcd" src="neg.png">
 <div id="user" class="indicator">USER</div>
 <div id="f" class="shift indicator">f</div>

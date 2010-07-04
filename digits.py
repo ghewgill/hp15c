@@ -42,6 +42,15 @@ print >>f, """<?xml version="1.0"?>
 f.close()
 os.system("convert -background none decimal.svg decimal.png")
 
+f = open("comma.svg", "w")
+print >>f, """<?xml version="1.0"?>
+    <svg width="4" height="10">
+        <rect width="4" height="4" fill="black" />
+        <path d="M 0 5 L 4 5 0 9" fill="black" />
+    </svg>"""
+f.close()
+os.system("convert -background none comma.svg comma.png")
+
 f = open("neg.svg", "w")
 print >>f, """<?xml version="1.0"?>
     <svg width="12" height="3">
