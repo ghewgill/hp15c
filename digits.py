@@ -36,17 +36,17 @@ for i in range(len(Digits[0])):
 
 f = open("decimal.svg", "w")
 print >>f, """<?xml version="1.0"?>
-    <svg width="4" height="4">
-        <rect width="100%" height="100%" fill="black" />
+    <svg width="6" height="4">
+        <rect x="2" width="4" height="4" fill="black" />
     </svg>"""
 f.close()
 os.system("convert -background none decimal.svg decimal.png")
 
 f = open("comma.svg", "w")
 print >>f, """<?xml version="1.0"?>
-    <svg width="4" height="10">
-        <rect width="4" height="4" fill="black" />
-        <path d="M 0 5 L 4 5 0 9" fill="black" />
+    <svg width="6" height="10">
+        <rect x="2" width="4" height="4" fill="black" />
+        <path d="M 2 5 L 6 5 1 9 0 9" fill="black" />
     </svg>"""
 f.close()
 os.system("convert -background none comma.svg comma.png")
