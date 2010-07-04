@@ -38,6 +38,9 @@
     #presskey {
         position: absolute;
     }
+    .preload {
+        display: none;
+    }
     .lcd {
         position: absolute;
         display: none;
@@ -93,6 +96,7 @@
 //<![CDATA[
     var Digits = [];
     var Display = [];
+    var DisplayDecimal = [];
     var Stack = [0, 0, 0, 0];
     var StackI = [0, 0, 0, 0];
     var LastX = 0;
@@ -661,12 +665,8 @@
 
     function update_lcd(s) {
         LcdDisplay = s;
-        for (var i in Display) {
-            Display[i].css("display", "none");
-        }
-        var decimal = $("#decimal");
+        $(".lcd").css("display", "none");
         var neg = $("#neg");
-        decimal.css("display", "none");
         neg.css("display", "none");
         var eex = false;
         var d = 0;
@@ -682,9 +682,7 @@
                     d++;
                 }
             } else if (c === '.') {
-                decimal.css("left", 169 + d * 27);
-                decimal.css("top", 91);
-                decimal.css("display", "inline");
+                DisplayDecimal[d].css("display", "inline");
             } else if (c === '-') {
                 if (eex) {
                     Display[7].attr("src", Digits["-"].src);
@@ -2892,6 +2890,12 @@
             d.css("top", 67);
             Display[Display.length] = d;
         }
+        for (var i = 0; i < 10; i++) {
+            var d = $("#decimal"+i);
+            d.css("left", 169 + i * 27);
+            d.css("top", 91);
+            DisplayDecimal[DisplayDecimal.length] = d;
+        }
         var neg = $("#neg");
         neg.css("left", 158);
         neg.css("top", 80);
@@ -2995,20 +2999,41 @@
 <tr><td>I</td><td><input id="reg_I"></td></tr>
 </table>
 </div>
+<img class="preload" src="0.png">
+<img class="preload" src="1.png">
+<img class="preload" src="2.png">
+<img class="preload" src="3.png">
+<img class="preload" src="4.png">
+<img class="preload" src="5.png">
+<img class="preload" src="6.png">
+<img class="preload" src="7.png">
+<img class="preload" src="8.png">
+<img class="preload" src="9.png">
+<img class="preload" src="decimal.png">
+<img class="preload" src="neg.png">
 <div id="frame">
 <img id="calc" src="15.jpg">
 <div id="press"><img id="presskey" src="15.jpg"></div>
-<img id="dig0" class="lcd" src="0.png">
-<img id="dig1" class="lcd" src="1.png">
-<img id="dig2" class="lcd" src="2.png">
-<img id="dig3" class="lcd" src="3.png">
-<img id="dig4" class="lcd" src="4.png">
-<img id="dig5" class="lcd" src="5.png">
-<img id="dig6" class="lcd" src="6.png">
-<img id="dig7" class="lcd" src="7.png">
-<img id="dig8" class="lcd" src="8.png">
-<img id="dig9" class="lcd" src="9.png">
-<img id="decimal" class="lcd" src="decimal.png">
+<img id="dig0" class="lcd">
+<img id="dig1" class="lcd">
+<img id="dig2" class="lcd">
+<img id="dig3" class="lcd">
+<img id="dig4" class="lcd">
+<img id="dig5" class="lcd">
+<img id="dig6" class="lcd">
+<img id="dig7" class="lcd">
+<img id="dig8" class="lcd">
+<img id="dig9" class="lcd">
+<img id="decimal0" class="lcd" src="decimal.png">
+<img id="decimal1" class="lcd" src="decimal.png">
+<img id="decimal2" class="lcd" src="decimal.png">
+<img id="decimal3" class="lcd" src="decimal.png">
+<img id="decimal4" class="lcd" src="decimal.png">
+<img id="decimal5" class="lcd" src="decimal.png">
+<img id="decimal6" class="lcd" src="decimal.png">
+<img id="decimal7" class="lcd" src="decimal.png">
+<img id="decimal8" class="lcd" src="decimal.png">
+<img id="decimal9" class="lcd" src="decimal.png">
 <img id="neg" class="lcd" src="neg.png">
 <div id="user" class="indicator">USER</div>
 <div id="f" class="shift indicator">f</div>
