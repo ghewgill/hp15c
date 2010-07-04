@@ -712,7 +712,10 @@
 
     function update_display_num(n) {
         if (n instanceof Descriptor) {
-            update_lcd(String.fromCharCode("A".charCodeAt(0) + n.label));
+            update_lcd(sprintf("%c    %2d %2d",
+                "A".charCodeAt(0) + n.label,
+                g_Matrix[n.label].rows,
+                g_Matrix[n.label].cols));
         } else {
             var s = n.toString();
             var mag = log10int(n);
@@ -1956,7 +1959,7 @@
 
     function op_sto_matrix(m, user) {
         g_Matrix[m].set(Reg[0], Reg[1], Stack[0]);
-        update_lcd(String.fromCharCode("A".charCodeAt(0) + m) + "\t" + Reg[0] + "," + Reg[1]);
+        update_lcd(sprintf("%c %2d,%d", "A".charCodeAt(0) + m, Reg[0], Reg[1]));
         DelayUpdate = 1000;
         if (user) {
             if (Reg[1] < g_Matrix[m].cols) {
