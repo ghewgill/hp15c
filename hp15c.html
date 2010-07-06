@@ -130,6 +130,9 @@
     var Result = 0;
     var JustSawKeydown8 = false;
 
+    var MAX = 9.999999999e99;
+    var MAX_MAG = 99;
+
     function CalcError(n) {
         this.name = "CalcError";
         this.message = "Error " + n;
@@ -744,6 +747,13 @@
                 g_Matrix[n.label].rows,
                 g_Matrix[n.label].cols));
         } else {
+            if (n > MAX) {
+                n = MAX;
+                Flags[9] = true;
+            } else if (n < -MAX) {
+                n = -MAX;
+                Flags[9] = true;
+            }
             var s = n.toString();
             var mag = log10int(n);
             var sign = "";
@@ -767,6 +777,14 @@
                 break;
             case 2:
                 var x = Math.round(n * Math.pow(10, DisplayDigits - mag));
+                while (log10int(x) > DisplayDigits) {
+                    if (mag >= MAX_MAG) {
+                        x = Math.floor(n * Math.pow(10, DisplayDigits - mag));
+                        break;
+                    }
+                    mag++;
+                    x /= 10;
+                }
                 s = x.toString();
                 while (s.length < DisplayDigits+1) {
                     s = '0' + s;
@@ -1801,6 +1819,11 @@
             return;
         } else if (Flags[9]) {
             Flags[9] = false;
+            if (Stack[0] > MAX) {
+                Stack[0] = MAX;
+            } else if (Stack[0] < -MAX) {
+                Stack[0] = -MAX;
+            }
             return;
         } else if (DigitEntry && Entry.length > 0) {
             Entry = Entry.substr(0, Entry.length-1);
