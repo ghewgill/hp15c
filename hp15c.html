@@ -728,7 +728,10 @@
         }
         var d = s.indexOf(".");
         if (d < 0) {
-            d = s.length;
+            d = s.indexOf("e");
+            if (d < 0) {
+                d = s.length;
+            }
         }
         while (true) {
             d -= 3;
