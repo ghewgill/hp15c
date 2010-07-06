@@ -124,6 +124,8 @@
     var PC = 0;
     var Running = false;
     var RunTimer = null;
+    var BlinkOn = false;
+    var Blinker = null;
     var ReturnStack = [];
     var Result = 0;
     var JustSawKeydown8 = false;
@@ -666,6 +668,9 @@
     function update_lcd(s) {
         LcdDisplay = s;
         $(".lcd").css("display", "none");
+        if (Flags[9] && !BlinkOn) {
+            return;
+        }
         var neg = $("#neg");
         neg.css("display", "none");
         var eex = false;
@@ -833,6 +838,19 @@
         $("#complex").toggleClass("indicator-on", Flags[8]);
         $(".stacki").css("display", Flags[8] ? "inline" : "none");
         $("#program").toggleClass("indicator-on", Prgm);
+        if (Flags[9]) {
+            if (Blinker === null) {
+                Blinker = setInterval(function() {
+                    BlinkOn = !BlinkOn;
+                    update_display();
+                }, 300);
+            }
+        } else {
+            if (Blinker !== null) {
+                clearInterval(Blinker);
+                Blinker = null;
+            }
+        }
     }
 
     function push(x, forcelift) {
