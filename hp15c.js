@@ -1,0 +1,2853 @@
+var Digits = [];
+var Display = [];
+var DisplayDecimal = [];
+var Stack = [0, 0, 0, 0];
+var StackI = [0, 0, 0, 0];
+var LastX = 0;
+var LastXI = 0;
+var Reg = new Array(60);
+var DisableKeys;
+var Entry;
+var DigitEntry = false;
+var NewDigitEntry;
+var StackLift = false;
+var OldStackLift, NewStackLift;
+var DelayUpdate = 0;
+var Shift = 0;
+var Prefix;
+var OldPrefix;
+var LcdDisplay;
+var DisplayMode = 1; // 1=FIX 2=SCI 3=ENG
+var DisplayDigits = 4;
+var TrigFactor = Math.PI / 180;
+var Flags = [false, false, false, false, false, false, false, false, false, false];
+var User = false;
+var Prgm = false;
+var Program = [null];
+var PC = 0;
+var Running = false;
+var RunTimer = null;
+var BlinkOn = false;
+var Blinker = null;
+var ReturnStack = [];
+var Result = 0;
+
+var MAX = 9.999999999e99;
+var MAX_MAG = 99;
+
+function CalcError(n) {
+    this.name = "CalcError";
+    this.message = "Error " + n;
+    this.code = n;
+}
+
+function OpcodeInfo(keys, defn, programmable, user) {
+    this.keys = keys;
+    this.defn = defn;
+    this.programmable = programmable !== false;
+    this.user = user;
+}
+
+var OpSqrt      = new OpcodeInfo([11],      op_sqrt);
+var OpA         = new OpcodeInfo([42,11],   op_A);
+var OpX2        = new OpcodeInfo([43,11],   op_x2);
+var OpEx        = new OpcodeInfo([12],      op_ex);
+var OpB         = new OpcodeInfo([42,12],   op_B);
+var OpLn        = new OpcodeInfo([43,12],   op_ln);
+var Op10x       = new OpcodeInfo([13],      op_10x);
+var OpC         = new OpcodeInfo([42,13],   op_C);
+var OpLog       = new OpcodeInfo([43,13],   op_log);
+var OpYx        = new OpcodeInfo([14],      op_yx);
+var OpD         = new OpcodeInfo([42,14],   op_D);
+var OpPct       = new OpcodeInfo([43,14],   op_pct);
+var Op1x        = new OpcodeInfo([15],      op_1x);
+var OpE         = new OpcodeInfo([42,15],   op_E);
+var OpDpct      = new OpcodeInfo([43,15],   op_dpct);
+var OpChs       = new OpcodeInfo([16],      op_chs);
+//var OpMatrix
+var OpAbs       = new OpcodeInfo([43,16],   op_abs);
+var Op7         = new OpcodeInfo([7],       function() { op_input('7'); });
+//var OpFix
+var OpDeg       = new OpcodeInfo([43,7],    op_deg);
+var Op8         = new OpcodeInfo([8],       function() { op_input('8'); });
+//var OpSci
+var OpRad       = new OpcodeInfo([43,8],    op_rad);
+var Op9         = new OpcodeInfo([9],       function() { op_input('9'); });
+//var OpEng
+var OpGrd       = new OpcodeInfo([43,9],    op_grd);
+var OpDiv       = new OpcodeInfo([10],      op_div);
+//var OpSolve
+var OpLe        = new OpcodeInfo([43,10],   op_le);
+var OpSst       = new OpcodeInfo([21],      op_sst, false);
+//var OpLbl
+var OpBst       = new OpcodeInfo([43,21],   op_bst, false);
+//var OpGto
+//var OpHyp
+//var OpAhyp
+var OpSin       = new OpcodeInfo([23],      op_sin);
+//var OpDim
+var OpAsin      = new OpcodeInfo([43,23],   op_asin);
+var OpCos       = new OpcodeInfo([24],      op_cos);
+var OpIndex     = new OpcodeInfo([42,24],   op_index, false);
+var OpAcos      = new OpcodeInfo([43,24],   op_acos);
+var OpTan       = new OpcodeInfo([25],      op_tan);
+var OpI         = new OpcodeInfo([42,25],   op_I);
+var OpAtan      = new OpcodeInfo([43,25],   op_atan);
+var OpEex       = new OpcodeInfo([26],      op_eex);
+//var OpResult
+var OpPi        = new OpcodeInfo([43,26],   op_pi);
+var Op4         = new OpcodeInfo([4],       function() { op_input('4'); });
+//var OpXchg
+//var OpSf
+var Op5         = new OpcodeInfo([5],       function() { op_input('5'); });
+//var OpDse       = new OpcodeInfo([42,5],    op_dse);
+//var OpCf
+var Op6         = new OpcodeInfo([6],       function() { op_input('6'); });
+//var OpIsg       = new OpcodeInfo([42,6],    op_isg);
+//var OpFtest
+var OpMul       = new OpcodeInfo([20],      op_mul);
+//var OpIntegrate
+var OpEq        = new OpcodeInfo([43,20],   op_eq);
+var OpRs        = new OpcodeInfo([31],      op_rs);
+var OpPse       = new OpcodeInfo([42,31],   op_pse);
+var OpPr        = new OpcodeInfo([43,31],   op_pr, false);
+//var OpGsb
+var OpClearStat = new OpcodeInfo([42,32],   op_clear_stat);
+var OpRtn       = new OpcodeInfo([43,32],   op_rtn);
+var OpRoll      = new OpcodeInfo([33],      op_roll);
+var OpClearPrgm = new OpcodeInfo([42,33],   op_clear_prgm, false);
+var OpRollup    = new OpcodeInfo([43,33],   op_rollup);
+var OpXy        = new OpcodeInfo([34],      op_xy);
+var OpClearReg  = new OpcodeInfo([42,34],   op_clear_reg);
+var OpRnd       = new OpcodeInfo([43,34],   op_rnd);
+var OpBack      = new OpcodeInfo([35],      op_back, false);
+var OpClearPrefix=new OpcodeInfo([42,35],   op_clear_prefix, false);
+var OpClx       = new OpcodeInfo([43,35],   op_clx);
+var OpEnter     = new OpcodeInfo([36],      op_enter);
+var OpRand      = new OpcodeInfo([42,36],   op_rand);
+var OpLastx     = new OpcodeInfo([43,36],   op_lastx);
+var Op1         = new OpcodeInfo([1],       function() { op_input('1'); });
+var OpToR       = new OpcodeInfo([42,1],    op_to_r);
+var OpToP       = new OpcodeInfo([43,1],    op_to_p);
+var Op2         = new OpcodeInfo([2],       function() { op_input('2'); });
+var OpToHms     = new OpcodeInfo([42,2],    op_to_hms);
+var OpToH       = new OpcodeInfo([43,2],    op_to_h);
+var Op3         = new OpcodeInfo([3],       function() { op_input('3'); });
+var OpToRad     = new OpcodeInfo([42,3],    op_to_rad);
+var OpToDeg     = new OpcodeInfo([43,3],    op_to_deg);
+var OpSub       = new OpcodeInfo([30],      op_sub);
+var OpReIm      = new OpcodeInfo([42,30],   op_re_im);
+//var OpTest
+var OpOn        = new OpcodeInfo([41],      op_on, false);
+//var OpSto
+var OpFrac      = new OpcodeInfo([42,44],   op_frac);
+var OpInt       = new OpcodeInfo([43,44],   op_int);
+//var OpRcl
+var OpUser      = new OpcodeInfo([42,46],   op_user, false);
+var OpMem       = new OpcodeInfo([43,46],   op_mem, false);
+var Op0         = new OpcodeInfo([0],       function() { op_input('0'); });
+var OpFact      = new OpcodeInfo([42,0],    op_fact);
+var OpMean      = new OpcodeInfo([43,0],    op_mean);
+var OpDot       = new OpcodeInfo([48],      function() { op_input('.'); });
+var OpYhat      = new OpcodeInfo([42,48],   op_yhat);
+var OpS         = new OpcodeInfo([43,48],   op_s);
+var OpSum       = new OpcodeInfo([49],      op_sum);
+var OpLr        = new OpcodeInfo([42,49],   op_lr);
+var OpSumsub    = new OpcodeInfo([43,49],   op_sumsub);
+var OpAdd       = new OpcodeInfo([40],      op_add);
+var OpPyx       = new OpcodeInfo([42,40],   op_Pyx);
+var OpCyx       = new OpcodeInfo([43,40],   op_Cyx);
+
+function _(x) { return function(k) { return new Opcode(x); }; }
+
+var CharTable = {
+    'q': [_(OpSqrt), _(OpA), _(OpX2)],
+    'E': [_(OpEx), _(OpB), _(OpLn)],
+    ')': [_(Op10x), _(OpC), _(OpLog)],
+    '^': [_(OpYx), _(OpD), _(OpPct)],
+    '\\':[_(Op1x), _(OpE), _(OpDpct)],
+    '_': [_(OpChs), decode_matrix, _(OpAbs)],
+    '7': [_(Op7), decode_fix, _(OpDeg)],
+    '8': [_(Op8), decode_sci, _(OpRad)],
+    '9': [_(Op9), decode_eng, _(OpGrd)],
+    '/': [_(OpDiv), decode_solve, _(OpLe)],
+    'T': [_(OpSst), decode_lbl, _(OpBst)],
+    'G': [decode_gto, decode_hyp, decode_ahyp],
+    's': [_(OpSin), decode_dim, _(OpAsin)],
+    'c': [_(OpCos), _(OpIndex), _(OpAcos)],
+    't': [_(OpTan), _(OpI), _(OpAtan)],
+    'e': [_(OpEex), decode_result, _(OpPi)],
+    '4': [_(Op4), decode_xchg, decode_sf],
+    '5': [_(Op5), decode_dse, decode_cf],
+    '6': [_(Op6), decode_isg, decode_ftest],
+    '*': [_(OpMul), decode_integrate, _(OpEq)],
+    'P': [_(OpRs), _(OpPse), _(OpPr)],
+    'U': [decode_gsb, _(OpClearStat), _(OpRtn)],
+    'r': [_(OpRoll), _(OpClearPrgm), _(OpRollup)],
+    'x': [_(OpXy), _(OpClearReg), _(OpRnd)],
+    '\b': [_(OpBack), _(OpClearPrefix), _(OpClx)],
+    '\r': [_(OpEnter), _(OpRand), _(OpLastx)],
+    '1': [_(Op1), _(OpToR), _(OpToP)],
+    '2': [_(Op2), _(OpToHms), _(OpToH)],
+    '3': [_(Op3), _(OpToRad), _(OpToDeg)],
+    '-': [_(OpSub), _(OpReIm), decode_test],
+    '': [_(OpOn), _(OpOn), _(OpOn)],
+    'f': [decode_f, decode_f, decode_f],
+    'g': [decode_g, decode_g, decode_g],
+    'S': [decode_sto, _(OpFrac), _(OpInt)],
+    'R': [decode_rcl, _(OpUser), _(OpMem)],
+    '0': [_(Op0), _(OpFact), _(OpMean)],
+    '.': [_(OpDot), _(OpYhat), _(OpS)],
+    ';': [_(OpSum), _(OpLr), _(OpSumsub)],
+    '+': [_(OpAdd), _(OpPyx), _(OpCyx)],
+    ' ': _(OpEnter),
+    '!': _(OpFact),
+    '@': _(OpX2),
+    '%': _(OpPct),
+    'A': _(OpA),
+    'B': _(OpB),
+    'C': _(OpC),
+    'D': _(OpD),
+    'L': _(OpLastx),
+    'a': _(OpAbs),
+    'i': _(OpInt),
+    'I': _(OpI),
+    'l': _(OpLn),
+    'p': _(OpPi),
+    '\x12': _(OpRand),
+    'h': help,
+    '?': help
+};
+
+var KeyTable = [
+    ['q', 'E', ')', '^', '\\','_', '7', '8', '9', '/'],
+    ['T', 'G', 's', 'c', 't', 'e', '4', '5', '6', '*'],
+    ['P', 'U', 'r', 'x', '\b','\r','1', '2', '3', '-'],
+    [' ', 'f', 'g', 'S', 'R', '\r','0', '.', ';', '+']
+];
+var ExtraKeyTable = [
+    [3, 6, -1, '!'],
+    [0, 0,  1, '@'],
+    [0, 3,  1, '%'],
+    [0, 0, -1, 'A'],
+    [0, 1, -1, 'B'],
+    [0, 2, -1, 'C'],
+    [0, 3, -1, 'D'],
+    [3, 5,  1, 'L'],
+    [0, 5,  1, 'a'],
+    [3, 3,  1, 'i'],
+    [1, 4, -1, 'I'],
+    [0, 1,  1, 'l'],
+    [1, 5,  1, 'p']
+];
+
+function sinh(x) {
+    return (Math.exp(x) - Math.exp(-x)) / 2;
+}
+
+function cosh(x) {
+    return (Math.exp(x) + Math.exp(-x)) / 2;
+}
+
+function tanh(x) {
+    return (Math.exp(2*x) - 1) / (Math.exp(2*x) + 1);
+}
+
+function Complex(re, im) {
+    this.re = re;
+    this.im = im;
+
+    this.acos = function() {
+        var u = Complex.one.add(this).mul(Complex.one.sub(this));
+        var w = u.sqrt().mul(Complex.i).add(this).log();
+        return new Complex(w.im, -w.re);
+    }
+
+    this.acosh = function() {
+        return this.add(Complex.one).mul(this.sub(Complex.one)).sqrt().add(this).log();
+    }
+
+    this.abs = function() {
+        return Math.sqrt(this.re*this.re + this.im*this.im);
+    }
+
+    this.add = function(that) {
+        return new Complex(this.re + that.re, this.im + that.im);
+    }
+
+    this.arg = function() {
+        return Math.atan2(this.im, this.re);
+    }
+
+    this.asin = function() {
+        var u = Complex.one.add(this).mul(Complex.one.sub(this));
+        var w = new Complex(-this.im, this.re).add(u.sqrt()).log();
+        return new Complex(w.im, -w.re);
+    }
+
+    this.asinh = function() {
+        return this.add(this.square().add(Complex.one).sqrt()).log();
+    }
+
+    this.atan = function() {
+        var u = Complex.i.add(this).div(Complex.i.sub(this));
+        var w = u.log();
+        return new Complex(-w.im/2, w.re/2);
+    }
+
+    this.atanh = function() {
+        var u = Complex.one.add(this).div(Complex.one.sub(this)).log();
+        return new Complex(u.re/2, u.im/2);
+    }
+
+    this.cos = function() {
+        return new Complex(Math.cos(this.re)*cosh(this.im), -Math.sin(this.re)*sinh(this.im));
+    }
+
+    this.cosh = function() {
+        return new Complex(cosh(this.re)*Math.cos(this.im), sinh(this.re)*Math.sin(this.im));
+    }
+
+    this.div = function(that) {
+        var d = that.re*that.re + that.im*that.im;
+        return new Complex((this.re*that.re + this.im*that.im) / d, (this.im*that.re - this.re*that.im) / d);
+    }
+
+    this.exp = function() {
+        var r = Math.exp(this.re);
+        return new Complex(r * Math.cos(this.im), r * Math.sin(this.im));
+    }
+
+    this.exp10 = function() {
+        var r = Math.pow(10, this.re);
+        var t = this.im * Math.LN10;
+        return new Complex(r * Math.cos(t), r * Math.sin(t));
+    }
+
+    this.inv = function() {
+        var d = this.re*this.re + this.im*this.im;
+        return new Complex(this.re/d, -this.im/d);
+    }
+
+    this.log = function() {
+        return new Complex(Math.log(this.re*this.re + this.im*this.im)/2, this.arg());
+    }
+
+    this.log10 = function() {
+        var u = this.log();
+        return new Complex(u.re / Math.LN10, u.im / Math.LN10);
+    }
+
+    this.mul = function(that) {
+        return new Complex(this.re * that.re - this.im * that.im, this.re * that.im + this.im * that.re);
+    }
+
+    this.pow = function(that) {
+        var p = this.arg();
+        var a = this.abs();
+        var r = Math.pow(a, that.re) * Math.exp(-that.im * p);
+        var t = that.re * p + that.im * Math.log(a);
+        return new Complex(r * Math.cos(t), r * Math.sin(t));
+    }
+
+    this.sin = function() {
+        return new Complex(Math.sin(this.re)*cosh(this.im), Math.cos(this.re)*sinh(this.im));
+    }
+
+    this.sinh = function() {
+        return new Complex(sinh(this.re)*Math.cos(this.im), cosh(this.re)*Math.sin(this.im));
+    }
+
+    this.sub = function(that) {
+        return new Complex(this.re - that.re, this.im - that.im);
+    }
+
+    this.sqrt = function() {
+        var a = this.abs();
+        return new Complex(Math.sqrt((this.re + a) / 2), (this.im < 0 ? -1 : 1) * Math.sqrt((-this.re + a) / 2));
+    }
+
+    this.square = function() {
+        return new Complex(this.re*this.re - this.im*this.im, 2*this.re*this.im);
+    }
+
+    this.tan = function() {
+        var u = new Complex(Math.tan(this.re), tanh(this.im));
+        return u.div(new Complex(1, -u.re*u.im));
+    }
+
+    this.tanh = function() {
+        var u = new Complex(tanh(this.re), Math.tan(this.im));
+        return u.div(new Complex(1, u.re*u.im));
+    }
+
+    this.toString = function() {
+        return "(" + this.re + "," + this.im + ")";
+    }
+}
+
+Complex.one = new Complex(1, 0);
+Complex.i = new Complex(0, 1);
+
+var A = 0;
+var B = 1;
+var C = 2;
+var D = 3;
+var E = 4;
+
+function Mat() {
+    if (typeof(arguments[0]) === "number" && typeof(arguments[1]) === "number") {
+        this.rows = arguments[0];
+        this.cols = arguments[1];
+        this.m = new Matrix(this.rows, this.cols, arguments[2]);
+    } else if (typeof(arguments[0]) === "object") {
+        this.m = arguments[0];
+        this.rows = this.m.getRowDimension();
+        this.cols = this.m.getColumnDimension();
+    }
+
+    this.complex2 = function() {
+        var r = new Matrix(this.rows, this.cols*2);
+        for (var i = 0; i < this.rows; i++) {
+            for (var j = 0; j < this.cols; j++) {
+                r.set(i, j, this.m.get(i, j));
+                if (i < this.rows/2) {
+                    r.set(this.rows/2+i, this.cols+j, this.m.get(i, j));
+                } else {
+                    r.set(i-this.rows/2, this.cols+j, -this.m.get(i, j));
+                }
+            }
+        }
+        return new Mat(r);
+    }
+
+    this.complex3 = function() {
+        return new Mat(this.m.getMatrix(0, this.rows-1, 0, this.cols/2-1));
+    }
+
+    this.copy = function() {
+        return new Mat(this.m.copy());
+    }
+
+    this.det = function() {
+        return this.m.det();
+    }
+
+    this.get = function(row, col) {
+        return this.m.get(row-1, col-1);
+    }
+
+    this.inverse = function() {
+        return new Mat(this.m.inverse());
+    }
+
+    this.minus = function(B) {
+        return new Mat(this.m.minus(B.m));
+    }
+
+    this.norm = function() {
+        return this.m.normInf();
+    }
+
+    this.normF = function() {
+        return this.m.normF();
+    }
+
+    this.partition = function() {
+        var r = new Matrix(this.rows*2, this.cols/2);
+        for (var i = 0; i < this.rows; i++) {
+            for (var j = 0; j < this.cols; j += 2) {
+                r.set(i, j/2, this.m.get(i, j));
+                r.set(this.rows+i, j/2, this.m.get(i, j+1));
+            }
+        }
+        return new Mat(r);
+    }
+
+    this.plus = function(B) {
+        return new Mat(this.m.plus(B.m));
+    }
+
+    this.residual = function(Y, X) {
+        return new Mat(this.m.minus(Y.m.times(X.m)));
+    }
+
+    this.set = function(row, col, value) {
+        this.m.set(row-1, col-1, value);
+    };
+
+    this.times = function(B) {
+        return new Mat(this.m.times(B.m));
+    }
+
+    this.timesScalar = function(s) {
+        return new Mat(this.m.timesScalar(s));
+    }
+
+    this.transpose = function() {
+        return new Mat(this.m.transpose());
+    }
+
+    this.toString = function() {
+        return "<Mat " + this.rows + "," + this.cols + ">";
+    };
+
+    this.unpartition = function() {
+        var r = new Matrix(this.rows/2, this.cols*2);
+        for (var i = 0; i < this.rows/2; i++) {
+            for (var j = 0; j < this.cols; j++) {
+                r.set(i, j*2, this.m.get(i, j));
+                r.set(i, j*2+1, this.m.get(this.rows/2+i, j));
+            }
+        }
+        return new Mat(r);
+    }
+}
+
+var g_Matrix = [new Mat(0, 0),
+                new Mat(0, 0),
+                new Mat(0, 0),
+                new Mat(0, 0),
+                new Mat(0, 0)];
+
+function Descriptor(label) {
+    this.label = label;
+
+    this.toString = function() {
+        return "<Descriptor " + this.label + " (" + g_Matrix[this.label].rows + "," + g_Matrix[this.label].cols + ")>";
+    };
+}
+
+function Opcode(info, fn) {
+    this.info = info;
+    this.fn = fn;
+
+    this.exec = function() {
+        OldStackLift = StackLift;
+        NewDigitEntry = false;
+        NewStackLift = true;
+        try {
+            if (this.fn === undefined) {
+                this.info.defn();
+            } else {
+                this.fn();
+            }
+        } finally {
+            DigitEntry = NewDigitEntry;
+            StackLift = NewStackLift;
+            if (DigitEntry) {
+                if (Entry.length > 0 && Entry.charAt(Entry.length-1) === 'e') {
+                    Entry += "0";
+                }
+                Stack[0] = Number(Entry);
+            }
+        }
+    }
+}
+
+function trunc(x) {
+    if (x < 0) {
+        return -Math.floor(-x);
+    } else {
+        return Math.floor(x);
+    }
+}
+
+function log10int(x) {
+    var mag = 0;
+    var x = Math.abs(x);
+    if (x >= 1) {
+        while (x >= 10) {
+            mag++;
+            x /= 10;
+        }
+    } else if (x > 0) {
+        while (x < 1) {
+            mag--;
+            x *= 10;
+        }
+    }
+    return mag;
+}
+
+function update_lcd(s) {
+    LcdDisplay = s;
+    $(".lcd").css("display", "none");
+    if (Flags[9] && !BlinkOn) {
+        return;
+    }
+    var neg = $("#neg");
+    neg.css("display", "none");
+    var eex = false;
+    var d = 0;
+    for (var i = 0; i < s.length; i++) {
+        var c = s.charAt(i);
+        if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'E') || c === 'o' || c === 'r' || c === 'u') {
+            if (eex) {
+                Display[8].attr("src", Display[9].attr("src"));
+                Display[9].attr("src", Digits[c].src);
+            } else if (d < 10) {
+                Display[d].attr("src", Digits[c].src);
+                Display[d].css("display", "inline");
+                d++;
+            }
+        } else if (c === '.') {
+            DisplayDecimal[d-1].css("display", "inline");
+            DisplayDecimal[d-1].attr("src", "decimal.png");
+        } else if (c === ',') {
+            DisplayDecimal[d-1].css("display", "inline");
+            DisplayDecimal[d-1].attr("src", "comma.png");
+        } else if (c === '-') {
+            if (eex) {
+                Display[7].attr("src", Digits["-"].src);
+                Display[7].css("display", "inline");
+            } else if (d > 0) {
+                Display[d].attr("src", Digits["-"].src);
+                Display[d].css("display", "inline");
+                d++;
+            } else {
+                neg.css("display", "inline");
+            }
+        } else if (c === 'e') {
+            eex = true;
+            d = 9;
+            Display[7].css("display", "none");
+            Display[8].attr("src", Digits[0].src);
+            Display[8].css("display", "inline");
+            Display[9].attr("src", Digits[0].src);
+            Display[9].css("display", "inline");
+        } else if (c === ' ') {
+            d++;
+        }
+    }
+}
+
+function insert_commas(s) {
+    var sign = "";
+    if (s.charAt(0) === "-") {
+        sign = s.charAt(0);
+        s = s.substr(1);
+    }
+    var d = s.indexOf(".");
+    if (d < 0) {
+        d = s.indexOf("e");
+        if (d < 0) {
+            d = s.length;
+        }
+    }
+    while (true) {
+        d -= 3;
+        if (d <= 0) {
+            break;
+        }
+        s = s.substr(0, d) + "," + s.substr(d);
+    }
+    return sign + s;
+}
+
+function update_display_num(n) {
+    if (n instanceof Descriptor) {
+        update_lcd(sprintf("%c    %2d %2d",
+            "A".charCodeAt(0) + n.label,
+            g_Matrix[n.label].rows,
+            g_Matrix[n.label].cols));
+    } else {
+        if (n > MAX) {
+            n = MAX;
+            Flags[9] = true;
+        } else if (n < -MAX) {
+            n = -MAX;
+            Flags[9] = true;
+        }
+        var s = n.toString();
+        var mag = log10int(n);
+        var sign = "";
+        if (n < 0) {
+            n = -n;
+            sign = "-";
+        }
+        var dm = DisplayMode;
+        if (dm === 1 && (mag >= 10 || mag < -DisplayDigits)) {
+            dm = 2;
+        }
+        switch (dm) {
+        case 1:
+            var x = Math.round(n * Math.pow(10, DisplayDigits));
+            s = x.toString();
+            while (s.length < DisplayDigits+1) {
+                s = '0' + s;
+            }
+            s = s.substr(0, s.length-DisplayDigits) + '.' + s.substr(s.length-DisplayDigits);
+            s = insert_commas(s);
+            break;
+        case 2:
+            var x = Math.round(n * Math.pow(10, DisplayDigits - mag));
+            while (log10int(x) > DisplayDigits) {
+                if (mag >= MAX_MAG) {
+                    x = Math.floor(n * Math.pow(10, DisplayDigits - mag));
+                    break;
+                }
+                mag++;
+                x /= 10;
+            }
+            s = x.toString();
+            while (s.length < DisplayDigits+1) {
+                s = '0' + s;
+            }
+            s = s.substr(0, 1) + '.' + s.substr(1);
+            s += "e" + mag;
+            break;
+        case 3:
+            break;
+        }
+        update_lcd(sign + s);
+    }
+}
+
+function update_display() {
+    if (Prgm) {
+        var s = sprintf("%03d-", PC);
+        if (PC > 0) {
+            if (Program[PC].info.user) {
+                s = s.substr(0, 3) + "u";
+            }
+            var keys = Program[PC].info.keys;
+            switch (keys.length) {
+                case 1:
+                    s += sprintf("    %2d", keys[0]);
+                    break;
+                case 2:
+                    if (Math.floor(keys[1]) === keys[1]) {
+                        s += sprintf(" %2d %2d", keys[0], keys[1]);
+                    } else {
+                        s += sprintf(" %2d  .%d", keys[0], keys[1]*10);
+                    }
+                    break;
+                case 3:
+                    if (Math.floor(keys[2]) === keys[2]) {
+                        s += sprintf("%2d,%2d,%2d", keys[0], keys[1], keys[2]);
+                    } else {
+                        s += sprintf("%2d,%2d,.%d", keys[0], keys[1], keys[2]*10);
+                    }
+                    break;
+            }
+        }
+        update_lcd(s);
+    } else {
+        for (var i = 0; i < 4; i++) {
+            $("#stack_" + i).val(Stack[i]);
+        }
+        $("#last_x").val(LastX);
+        if (Flags[8]) {
+            for (var i = 0; i < 4; i++) {
+                $("#stacki_" + i).val(StackI[i]);
+            }
+            $("#last_xi").val(LastXI);
+        }
+        for (var i = 0; i < 10; i++) {
+            $("#reg_" + i).val(Reg[i]);
+        }
+        $("#reg_I").val(Reg['I']);
+        if (DigitEntry) {
+            if (Entry !== "") {
+                update_lcd(insert_commas(Entry));
+            } else {
+                update_display_num(0);
+            }
+        } else {
+            update_display_num(Stack[0]);
+        }
+    }
+    $("#complex").toggleClass("indicator-on", Flags[8]);
+    $(".stacki").css("display", Flags[8] ? "inline" : "none");
+    $("#program").toggleClass("indicator-on", Prgm);
+    if (Flags[9]) {
+        if (Blinker === null) {
+            Blinker = setInterval(function() {
+                BlinkOn = !BlinkOn;
+                update_display();
+            }, 300);
+        }
+    } else {
+        if (Blinker !== null) {
+            clearInterval(Blinker);
+            Blinker = null;
+        }
+    }
+}
+
+function push(x, forcelift) {
+    if (forcelift || StackLift) {
+        Stack[3] = Stack[2]; StackI[3] = StackI[2];
+        Stack[2] = Stack[1]; StackI[2] = StackI[1];
+        Stack[1] = Stack[0]; StackI[1] = StackI[0];
+    }
+    Stack[0] = x;
+    StackI[0] = 0;
+    StackLift = true;
+}
+
+function fill(x) {
+    for (i in Stack) {
+        Stack[i] = x;
+    }
+}
+
+function unop(f) {
+    LastX = Stack[0];
+    LastXI = StackI[0];
+    var r = f(Stack[0]);
+    if (isNaN(r) || r === Infinity || r === -Infinity) {
+        throw new CalcError(0);
+    }
+    Stack[0] = r;
+}
+
+function binop(f) {
+    LastX = Stack[0];
+    LastXI = StackI[0];
+    var r = f(Stack[1], Stack[0]);
+    if (isNaN(r) || r === Infinity || r === -Infinity) {
+        throw new CalcError(0);
+    }
+    Stack[0] = r;
+    Stack[1] = Stack[2]; StackI[1] = StackI[2];
+    Stack[2] = Stack[3]; StackI[2] = StackI[3];
+}
+
+function unopc(f) {
+    LastX = Stack[0];
+    LastXI = StackI[0];
+    var r = f(new Complex(Stack[0], StackI[0]));
+    Stack[0] = r.re;
+    StackI[0] = r.im;
+}
+
+function binopc(f) {
+    LastX = Stack[0];
+    LastXI = StackI[0];
+    var r = f(new Complex(Stack[1], StackI[1]), new Complex(Stack[0], StackI[0]));
+    Stack[0] = r.re;
+    StackI[0] = r.im;
+    Stack[1] = Stack[2]; StackI[1] = StackI[2];
+    Stack[2] = Stack[3]; StackI[2] = StackI[3];
+}
+
+function unopm(f) {
+    LastX = Stack[0];
+    LastXI = StackI[0];
+    var r = f(Stack[0]);
+    g_Matrix[Result] = r;
+    Stack[0] = new Descriptor(Result);
+}
+
+function binopm(f) {
+    LastX = Stack[0];
+    LastXI = StackI[0];
+    var r = f(Stack[1], Stack[0]);
+    g_Matrix[Result] = r;
+    Stack[0] = new Descriptor(Result);
+    Stack[1] = Stack[2]; StackI[1] = StackI[2];
+    Stack[2] = Stack[3]; StackI[2] = StackI[3];
+}
+
+function op_sqrt() {
+    if (Flags[8]) {
+        unopc(function(x) {
+            return x.sqrt();
+        });
+    } else {
+        unop(Math.sqrt);
+    }
+}
+
+function op_A() {
+    op_gsb(11);
+}
+
+function op_x2() {
+    if (Flags[8]) {
+        unopc(function(x) {
+            return x.square();
+        });
+    } else {
+        unop(function(x) { return x * x; });
+    }
+}
+
+function op_ex() {
+    if (Flags[8]) {
+        unopc(function(x) {
+            return x.exp();
+        });
+    } else {
+        unop(Math.exp);
+    }
+}
+
+function op_B() {
+    op_gsb(12);
+}
+
+function op_ln() {
+    if (Flags[8]) {
+        unopc(function(x) {
+            return x.log();
+        });
+    } else {
+        unop(Math.log);
+    }
+}
+
+function op_10x() {
+    if (Flags[8]) {
+        unopc(function(x) {
+            return x.exp10();
+        });
+    } else {
+        unop(function(x) { return Math.pow(10, x); });
+    }
+}
+
+function op_C() {
+    op_gsb(13);
+}
+
+function op_log() {
+    if (Flags[8]) {
+        unopc(function(x) {
+            return x.log10();
+        });
+    } else {
+        unop(function(x) { return Math.log(x) / Math.LN10; });
+    }
+}
+
+function op_yx() {
+    if (Flags[8]) {
+        binopc(function(y, x) {
+            return y.pow(x);
+        });
+    } else {
+        binop(Math.pow);
+    }
+}
+
+function op_D() {
+    op_gsb(14);
+}
+
+function op_pct() {
+    LastX = Stack[0];
+    LastXI = StackI[0];
+    Stack[0] = Stack[1] * Stack[0] / 100;
+}
+
+function op_1x() {
+    if (Stack[0] instanceof Descriptor) {
+        unopm(function(x) {
+            return g_Matrix[x.label].inverse();
+        });
+    } else if (Flags[8]) {
+        unopc(function(x) {
+            return x.inv();
+        });
+    } else {
+        unop(function(x) { return 1 / x; });
+    }
+}
+
+function op_E() {
+    op_gsb(15);
+}
+
+function op_dpct() {
+    binop(function(y, x) {
+        return (x - y) / y * 100;
+    });
+}
+
+function op_chs() {
+    if (DigitEntry) {
+        var i = Entry.indexOf('e');
+        if (i >= 0) {
+            if (i+1 < Entry.length && Entry.charAt(i+1) === '-') {
+                Entry = Entry.substr(0, i+1) + Entry.substr(i+2);
+            } else {
+                Entry = Entry.substr(0, i+1) + "-" + Entry.substr(i+1);
+            }
+        } else if (Entry.charAt(0) === '-') {
+            Entry = Entry.substr(1);
+        } else {
+            Entry = '-' + Entry;
+        }
+        NewDigitEntry = true;
+    } else if (Stack[0] instanceof Descriptor) {
+        var x = Stack[0].label;
+        g_Matrix[x] = g_Matrix[x].timesScalar(-1);
+    } else {
+        Stack[0] = -Stack[0];
+    }
+}
+
+function op_matrix_clear() {
+    g_Matrix = [new Mat(0, 0),
+                new Mat(0, 0),
+                new Mat(0, 0),
+                new Mat(0, 0),
+                new Mat(0, 0)];
+}
+
+function op_matrix_home() {
+    Reg[0] = 1;
+    Reg[1] = 1;
+}
+
+function op_matrix_complex2() {
+    var m = Stack[0].label;
+    g_Matrix[m] = g_Matrix[m].complex2();
+}
+
+function op_matrix_complex3() {
+    var m = Stack[0].label;
+    g_Matrix[m] = g_Matrix[m].complex3();
+}
+
+function op_matrix_transpose() {
+    var m = Stack[0].label;
+    g_Matrix[m] = g_Matrix[m].transpose();
+}
+
+function op_matrix_transmul() {
+    binopm(function(y, x) {
+        return g_Matrix[y.label].transpose().times(g_Matrix[x.label]);
+    });
+}
+
+function op_matrix_residual() {
+    binopm(function(y, x) {
+        var Y = g_Matrix[y.label];
+        var X = g_Matrix[x.label];
+        var R = g_Matrix[Result];
+        return R.residual(Y, X);
+    });
+}
+
+function op_matrix_norm() {
+    unop(function(x) {
+        return g_Matrix[x.label].norm();
+    });
+}
+
+function op_matrix_normf() {
+    unop(function(x) {
+        return g_Matrix[x.label].normF();
+    });
+}
+
+function op_matrix_det() {
+    unop(function(x) {
+        return g_Matrix[x.label].det();
+    });
+}
+
+function op_abs() {
+    if (Stack[0] instanceof Descriptor) {
+        throw new CalcError(1);
+    }
+    if (Flags[8]) {
+        unopc(function(x) {
+            return new Complex(x.abs(), 0);
+        });
+    } else {
+        unop(Math.abs);
+    }
+}
+
+function op_fix(n) {
+    DisplayMode = 1;
+    DisplayDigits = n;
+    StackLift = OldStackLift;
+}
+
+function op_fix_index() {
+    op_fix(trunc(Reg['I']));
+}
+
+function op_deg() {
+    TrigFactor = Math.PI / 180;
+    $("#trigmode").removeClass("indicator-on");
+    StackLift = OldStackLift;
+}
+
+function op_sci(n) {
+    DisplayMode = 2;
+    DisplayDigits = n;
+    StackLift = OldStackLift;
+}
+
+function op_sci_index() {
+    op_sci(trunc(Reg['I']));
+}
+
+function op_rad() {
+    TrigFactor = 1;
+    $("#trigmode").addClass("indicator-on").text("RAD");
+    StackLift = OldStackLift;
+}
+
+function op_eng(n) {
+    alert("Unimplemented: ENG");
+    StackLift = OldStackLift;
+}
+
+function op_eng_index() {
+    op_eng(trunc(Reg['I']));
+}
+
+function op_grd() {
+    TrigFactor = Math.PI / 200;
+    $("#trigmode").addClass("indicator-on").text("GRAD");
+    StackLift = OldStackLift;
+}
+
+function op_div() {
+    if (Stack[0] instanceof Descriptor && Stack[1] instanceof Descriptor) {
+        binopm(function(y, x) {
+            return g_Matrix[x.label].inverse().times(g_Matrix[y.label]);
+        });
+    } else if (Stack[0] instanceof Descriptor) {
+        binopm(function(y, x) {
+            return g_Matrix[x.label].inverse().timesScalar(y);
+        });
+    } else if (Stack[1] instanceof Descriptor) {
+        binopm(function(y, x) {
+            return g_Matrix[y.label].timesScalar(1/x);
+        });
+    } else if (Flags[8]) {
+        binopc(function(y, x) {
+            return y.div(x);
+        });
+    } else {
+        binop(function(y, x) { return y / x; });
+    }
+}
+
+function op_solve(n) {
+    var call = function(n) {
+        var r = ReturnStack.length;
+        op_gsb(n);
+        while (ReturnStack.length > r) {
+            step();
+        }
+    };
+    // This is http://mathworld.wolfram.com/SecantMethod.html
+    var eps = 1e-9;
+    var maxiter = 100;
+    var x0 = Stack[1];
+    var x1 = Stack[0];
+    if (x1 === x0) {
+        x1 = x0 * 1.01;
+    }
+    while (true) {
+        fill(x0);
+        call(n);
+        var y0 = Stack[0];
+        fill(x1);
+        call(n);
+        var y1 = Stack[0];
+        var x2 = x1 - y1 * ((x1 - x0) / (y1 - y0));
+        if (isNaN(x2) || x2 === Infinity || x2 === -Infinity) {
+            if (Running) {
+                PC++;
+                return;
+            } else {
+                throw new CalcError(8);
+            }
+        }
+        fill(x2);
+        call(n);
+        var y2 = Stack[0];
+        //alert("x0=" + x0 + " y0=" + y0 + "\n" +
+        //      "x1=" + x1 + " y1=" + y1 + "\n" +
+        //      "x2=" + x2 + " y2=" + y2 + "\n");
+        x0 = x1;
+        x1 = x2;
+        if (Math.abs(x1 - x0) < eps) {
+            break;
+        }
+        if (--maxiter <= 0) {
+            if (Running) {
+                PC++;
+                return;
+            } else {
+                throw new CalcError(8);
+            }
+        }
+    }
+    push(y2);
+    push(x1);
+    push(x2);
+}
+
+function op_le() {
+    if (!(Stack[0] <= Stack[1])) {
+        PC++;
+    }
+}
+
+function op_sst() {
+    if (Prgm) {
+        PC++;
+        if (PC >= Program.length) {
+            PC = 0;
+        }
+    } else {
+        step();
+    }
+    StackLift = OldStackLift;
+}
+
+function op_lbl() {
+    alert("Unimplemented: LBL");
+}
+
+function op_bst() {
+    if (PC > 0) {
+        PC--;
+    }
+    StackLift = OldStackLift;
+}
+
+function op_gto_immediate(n) {
+    PC = n;
+}
+
+function op_gto_label(n) {
+    var p = PC;
+    while (true) {
+        if (p === 0 || p >= Program.length) {
+            p = 1;
+        }
+        if (Program[p].info.keys.toString() === [42,21,n].toString()) {
+            break;
+        }
+        p++;
+        if (p === PC) {
+            alert("error 4");
+            // error 4
+            return;
+        }
+    }
+    PC = p;
+}
+
+function op_gto_index() {
+    var i = trunc(Reg['I']);
+    if (i < 0) {
+        PC = -i;
+    } else if (i < 10) {
+        op_gto_label(i);
+    } else if (i < 20) {
+        op_gto_label((i - 10) / 10);
+    } else if (i < 24) {
+        op_gto_label(i - 9);
+    } else {
+        alert("error 4 ");
+    }
+}
+
+function op_sinh() {
+    if (Flags[8]) {
+        unopc(function(x) {
+            return x.sinh();
+        });
+    } else {
+        unop(sinh);
+    }
+}
+
+function op_cosh() {
+    if (Flags[8]) {
+        unopc(function(x) {
+            return x.cosh();
+        });
+    } else {
+        unop(cosh);
+    }
+}
+
+function op_tanh() {
+    if (Flags[8]) {
+        unopc(function(x) {
+            return x.tanh();
+        });
+    } else {
+        unop(tanh);
+    }
+}
+
+function op_asinh() {
+    if (Flags[8]) {
+        unopc(function(x) {
+            return x.asinh();
+        });
+    } else {
+        unop(function(x) {
+            return Math.log(x + Math.sqrt(x*x + 1));
+        });
+    }
+}
+
+function op_acosh() {
+    if (Flags[8]) {
+        unopc(function(x) {
+            return x.acosh();
+        });
+    } else {
+        unop(function(x) {
+            return Math.log(x + Math.sqrt(x*x - 1));
+        });
+    }
+}
+
+function op_atanh() {
+    if (Flags[8]) {
+        unopc(function(x) {
+            return x.atanh();
+        });
+    } else {
+        unop(function(x) {
+            return Math.log((1 + x) / (1 - x)) / 2;
+        });
+    }
+}
+
+function op_sin() {
+    if (Flags[8]) {
+        unopc(function(x) {
+            return x.sin();
+        });
+    } else {
+        unop(function(x) {
+            return Math.sin(x * TrigFactor);
+        });
+    }
+}
+
+function op_dim(m) {
+    var oldmat = g_Matrix[m].m;
+    var r = Stack[1];
+    var c = Stack[0];
+    if (oldmat.getRowDimension() > 0 && r > 0 && c > 0) {
+        var a = oldmat.getArray();
+        if (c < a[0].length) {
+            for (var i = 0; i < a.length; i++) {
+                a[i] = a[i].slice(0, c);
+            }
+        } else if (c > a[0].length) {
+            for (var i = 0; i < a.length; i++) {
+                for (j = a[i].length; j < c; j++) {
+                    a[i][j] = 0;
+                }
+            }
+        }
+        if (r < a.length) {
+            a = a.slice(0, r);
+        } else {
+            while (r > a.length) {
+                var b = new Array(a[0].length);
+                for (var i = 0; i < c; i++) {
+                    b[i] = 0;
+                }
+                a[a.length] = b;
+            }
+        }
+        g_Matrix[m] = new Mat(new Matrix(a));
+    } else {
+        g_Matrix[m] = new Mat(Stack[1], Stack[0]);
+    }
+}
+
+function op_dim_i() {
+    // noop
+}
+
+function op_asin() {
+    if (Flags[8]) {
+        unopc(function(x) {
+            return x.asin();
+        });
+    } else {
+        unop(function(x) {
+            return Math.asin(x) / TrigFactor;
+        });
+    }
+}
+
+function op_cos() {
+    if (Flags[8]) {
+        unopc(function(x) {
+            return x.cos();
+        });
+    } else {
+        unop(function(x) {
+            return Math.cos(x * TrigFactor);
+        });
+    }
+}
+
+function op_index() {
+    if (Flags[8]) {
+        update_display_num(StackI[0]);
+        DelayUpdate = 1000;
+    }
+    StackLift = OldStackLift;
+}
+
+function op_acos() {
+    if (Flags[8]) {
+        unopc(function(x) {
+            return x.acos();
+        });
+    } else {
+        unop(function(x) {
+            return Math.acos(x) / TrigFactor;
+        });
+    }
+}
+
+function op_tan() {
+    if (Flags[8]) {
+        unopc(function(x) {
+            return x.tan();
+        });
+    } else {
+        unop(function(x) {
+            return Math.tan(x * TrigFactor);
+        });
+    }
+}
+
+function op_I() {
+    Flags[8] = true;
+    StackI[0] = Stack[0];
+    Stack[0] = Stack[1];
+    Stack[1] = Stack[2]; StackI[1] = StackI[2];
+    Stack[2] = Stack[3]; StackI[2] = StackI[3];
+}
+
+function op_atan() {
+    if (Flags[8]) {
+        unopc(function(x) {
+            return x.atan();
+        });
+    } else {
+        unop(function(x) {
+            return Math.atan(x) / TrigFactor;
+        });
+    }
+}
+
+function op_eex() {
+    op_input('e');
+}
+
+function op_result(m) {
+    Result = m;
+}
+
+function op_pi() {
+    push(Math.PI);
+}
+
+function op_xchg(r) {
+    var t = Reg[r];
+    Reg[r] = Stack[0];
+    Stack[0] = t;
+}
+
+function op_xchg_index() {
+    op_xchg(Math.floor(Math.abs(Reg['I'])));
+}
+
+function op_sf(f) {
+    Flags[f] = true;
+}
+
+function op_sf_index() {
+    op_sf(Math.floor(Math.abs(Reg['I'])));
+}
+
+function op_dse(r) {
+    var n = trunc(Reg[r]);
+    var f = Reg[r] - n;
+    var x = Math.floor(f * 1000);
+    var y = Math.round((Reg[r] * 1000 - trunc(Reg[r] * 1000)) * 100);
+    if (y === 0) {
+        y = 1;
+    }
+    n -= y;
+    Reg[r] = n + f;
+    if (n <= x) {
+        PC++;
+    }
+}
+
+function op_dse_index() {
+    op_dse(Math.floor(Math.abs(Reg['I'])));
+}
+
+function op_cf(f) {
+    Flags[f] = false;
+}
+
+function op_cf_index() {
+    op_cf(Math.floor(Math.abs(Reg['I'])));
+}
+
+function op_isg(r) {
+    var n = trunc(Reg[r]);
+    var f = Reg[r] - n;
+    var x = Math.floor(f * 1000);
+    var y = Math.round((Reg[r] * 1000 - trunc(Reg[r] * 1000)) * 100);
+    if (y === 0) {
+        y = 1;
+    }
+    n += y;
+    Reg[r] = n + f;
+    if (n > x) {
+        PC++;
+    }
+}
+
+function op_isg_index() {
+    op_isg(Math.floor(Math.abs(Reg['I'])));
+}
+
+function op_ftest(f) {
+    if (!Flags[f]) {
+        PC++;
+    }
+}
+
+function op_ftest_index() {
+    op_ftest(Math.floor(Math.abs(Reg['I'])));
+}
+
+function op_mul() {
+    if (Stack[0] instanceof Descriptor && Stack[1] instanceof Descriptor) {
+        binopm(function(y, x) {
+            return g_Matrix[y.label].times(g_Matrix[x.label]);
+        });
+    } else if (Stack[0] instanceof Descriptor) {
+        binopm(function(y, x) {
+            return g_Matrix[x.label].timesScalar(Stack[1]);
+        });
+    } else if (Stack[1] instanceof Descriptor) {
+        binopm(function(y, x) {
+            return g_Matrix[y.label].timesScalar(Stack[0]);
+        });
+    } else if (Flags[8]) {
+        binopc(function(y, x) {
+            return y.mul(x);
+        });
+    } else {
+        binop(function(y, x) { return y * x; });
+    }
+}
+
+function op_integrate(n) {
+    var call = function(n) {
+        var r = ReturnStack.length;
+        op_gsb(n);
+        while (ReturnStack.length > r) {
+            step();
+        }
+    };
+    // This is http://mathworld.wolfram.com/SimpsonsRule.html
+    var eps = 1e-9;
+    var x0 = Stack[1];
+    var x1 = Stack[0];
+    var d = 0;
+    var prev = 0;
+    var steps = 32;
+    while (true) {
+        var r = 0;
+        for (var j = 0; j < steps; j += 2) {
+            fill(x0 + (x1-x0)*j/steps);
+            call(n);
+            r += Stack[0];
+            fill(x0 + (x1-x0)*(j+1)/steps);
+            call(n);
+            r += 4 * Stack[0];
+            fill(x0 + (x1-x0)*(j+2)/steps);
+            call(n);
+            r += Stack[0];
+        }
+        r *= ((x1-x0)/steps) / 3;
+        d = Math.abs(r - prev);
+        if (d < eps) {
+            break;
+        }
+        prev = r;
+        steps *= 2;
+    }
+    Stack[3] = x0;
+    Stack[2] = x1;
+    Stack[1] = d;
+    Stack[0] = r;
+}
+
+function op_eq() {
+    if (!(Stack[0] === 0)) {
+        PC++;
+    }
+}
+
+function op_rs() {
+    Running = !Running;
+    StackLift = OldStackLift;
+}
+
+function op_pse() {
+    //alert("Unimplemented: PSE");
+    // TODO set RunningPause?
+    update_display();
+    //if (!confirm("pause. keep going?")) {
+    //    Running = false;
+    //}
+    StackLift = OldStackLift;
+}
+
+function op_pr() {
+    Prgm = !Prgm;
+    StackLift = OldStackLift;
+}
+
+function op_gsb(n) {
+    if (Running) {
+        ReturnStack.push(PC);
+    } else {
+        ReturnStack.push(0);
+    }
+    op_gto_label(n);
+    Running = true;
+}
+
+function op_gsb_index() {
+    if (Running) {
+        ReturnStack.push(PC);
+    } else {
+        ReturnStack.push(0);
+    }
+    op_gto_index();
+    Running = true;
+}
+
+function op_clear_stat() {
+    for (var i in Stack) {
+        Stack[i] = 0;
+    }
+    for (var i = 2; i <= 7; i++) {
+        Reg[i] = 0;
+    }
+    StackLift = OldStackLift;
+}
+
+function op_rtn() {
+    if (ReturnStack.length > 0) {
+        PC = ReturnStack.pop();
+    } else {
+        PC = 0;
+    }
+    if (PC === 0) {
+        Running = false;
+    }
+}
+
+function op_roll() {
+    var t = Stack[0];
+    var ti = StackI[0];
+    Stack[0] = Stack[1]; StackI[0] = StackI[1];
+    Stack[1] = Stack[2]; StackI[1] = StackI[2];
+    Stack[2] = Stack[3]; StackI[2] = StackI[3];
+    Stack[3] = t;
+    StackI[3] = ti;
+}
+
+function op_clear_prgm() {
+    if (Prgm) {
+        Program = [null];
+    }
+    PC = 0;
+}
+
+function op_rollup() {
+    var t = Stack[3];
+    var ti = StackI[3];
+    Stack[3] = Stack[2]; StackI[3] = StackI[2];
+    Stack[2] = Stack[1]; StackI[2] = StackI[1];
+    Stack[1] = Stack[0]; StackI[1] = StackI[0];
+    Stack[0] = t;
+    StackI[0] = ti;
+}
+
+function op_xy() {
+    var t = Stack[0];
+    var ti = StackI[0];
+    Stack[0] = Stack[1]; StackI[0] = StackI[1];
+    Stack[1] = t;
+    StackI[1] = ti;
+}
+
+function op_clear_reg() {
+    for (var i in Reg) {
+        Reg[i] = 0;
+    }
+    StackLift = OldStackLift;
+}
+
+function op_rnd() {
+    unop(function(x) {
+        var factor = Math.pow(10, DisplayDigits + log10int(x));
+        return Math.round(x * factor) / factor;
+    });
+}
+
+function op_back() {
+    if (Prgm) {
+        if (PC > 0) {
+            Program.splice(PC, 1);
+            PC--;
+        }
+        return;
+    } else if (Flags[9]) {
+        Flags[9] = false;
+        if (Stack[0] > MAX) {
+            Stack[0] = MAX;
+        } else if (Stack[0] < -MAX) {
+            Stack[0] = -MAX;
+        }
+        return;
+    } else if (DigitEntry && Entry.length > 0) {
+        Entry = Entry.substr(0, Entry.length-1);
+    } else {
+        op_clx();
+        Entry = "";
+    }
+    NewDigitEntry = true;
+}
+
+function op_clear_prefix() {
+    Prefix = null;
+    var x = Math.abs(Stack[0]);
+    if (x !== 0) {
+        while (x >= 10) {
+            x /= 10;
+        }
+        while (x < 1) {
+            x *= 10;
+        }
+    }
+    var s = x.toString().replace(".", "");
+    while (s.length < 10) {
+        s += '0';
+    }
+    update_lcd(s);
+    DelayUpdate = 1000;
+    StackLift = OldStackLift;
+}
+
+function op_clx() {
+    Stack[0] = 0;
+    NewStackLift = false;
+}
+
+function op_enter() {
+    push(Stack[0], true);
+    // push() only pushes the real part,
+    // so copy the imaginary part too
+    StackI[0] = StackI[1];
+    NewStackLift = false;
+}
+
+function op_rand() {
+    push(Math.random());
+}
+
+function op_lastx() {
+    push(LastX);
+    StackI[0] = LastXI;
+}
+
+function op_to_r() {
+    LastX = Stack[0];
+    LastXI = StackI[0];
+    if (Flags[8]) {
+        var t = StackI[0];
+        var r = Stack[0];
+        StackI[0] = r * Math.sin(t * TrigFactor);
+        Stack[0] = r * Math.cos(t * TrigFactor);
+    } else {
+        var t = Stack[1];
+        var r = Stack[0];
+        Stack[1] = r * Math.sin(t * TrigFactor);
+        Stack[0] = r * Math.cos(t * TrigFactor);
+    }
+}
+
+function op_to_p() {
+    LastX = Stack[0];
+    LastXI = StackI[0];
+    if (Flags[8]) {
+        var y = StackI[0];
+        var x = Stack[0];
+        StackI[0] = Math.atan2(y, x) / TrigFactor;
+        Stack[0] = Math.sqrt(x*x + y*y);
+    } else {
+        var y = Stack[1];
+        var x = Stack[0];
+        Stack[1] = Math.atan2(y, x) / TrigFactor;
+        Stack[0] = Math.sqrt(x*x + y*y);
+    }
+}
+
+function op_to_hms() {
+    unop(function(x) {
+        var r = Math.floor(x);
+        x -= r;
+        x *= 60;
+        r += Math.floor(x) / 100;
+        x -= Math.floor(x);
+        x *= 60;
+        r += x / 10000;
+        return r;
+    });
+}
+
+function op_to_h() {
+    unop(function(x) {
+        var r = Math.floor(x);
+        x -= Math.floor(x);
+        x *= 100;
+        r += Math.floor(x) / 60;
+        x -= Math.floor(x);
+        x *= 100;
+        r += x / 3600;
+        return r;
+    });
+}
+
+function op_to_rad() {
+    unop(function(x) { return x * Math.PI / 180; });
+}
+
+function op_to_deg() {
+    unop(function(x) { return x * 180 / Math.PI; });
+}
+
+function op_sub() {
+    if (Stack[0] instanceof Descriptor && Stack[1] instanceof Descriptor) {
+        binopm(function(y, x) {
+            return g_Matrix[y.label].minus(g_Matrix[x.label]);
+        });
+    } else if (Stack[0] instanceof Descriptor) {
+        binopm(function(y, x) {
+            var m = g_Matrix[x.label];
+            return new Mat(m.rows, m.cols, Stack[1]).minus(m);
+        });
+    } else if (Stack[1] instanceof Descriptor) {
+        binopm(function(y, x) {
+            var m = g_Matrix[y.label];
+            return m.minus(new Mat(m.rows, m.cols, Stack[0]));
+        });
+    } else if (Flags[8]) {
+        binopc(function(y, x) {
+            return y.sub(x);
+        });
+    } else {
+        binop(function(y, x) { return y - x; });
+    }
+}
+
+function op_re_im() {
+    Flags[8] = true;
+    var t = StackI[0];
+    StackI[0] = Stack[0];
+    Stack[0] = t;
+}
+
+function op_test(t) {
+    var b;
+    switch (t) {
+        case 0: b = Stack[0] != 0; break;
+        case 1: b = Stack[0]  > 0; break;
+        case 2: b = Stack[0]  < 0; break;
+        case 3: b = Stack[0] >= 0; break;
+        case 4: b = Stack[0] <= 0; break;
+        case 5: b = Stack[0] == Stack[1]; break;
+        case 6: b = Stack[0] != Stack[1]; break;
+        case 7: b = Stack[0]  > Stack[1]; break;
+        case 8: b = Stack[0]  < Stack[1]; break;
+        case 9: b = Stack[0] >= Stack[1]; break;
+    }
+    if (!b) {
+        PC++;
+    }
+}
+
+function op_on() {
+    alert("Unimplemented: ON");
+}
+
+function op_sto_reg(n) {
+    Reg[n] = Stack[0];
+}
+
+function op_sto_op_reg(op, n) {
+    switch (op) {
+        case '+': Reg[n] += Stack[0]; break;
+        case '-': Reg[n] -= Stack[0]; break;
+        case '*': Reg[n] *= Stack[0]; break;
+        case '/': Reg[n] /= Stack[0]; break;
+    }
+}
+
+function op_sto_index(user) {
+    if (Reg['I'] instanceof Descriptor) {
+        op_sto_matrix(Reg['I'].label, user);
+    } else {
+        op_sto_reg(Math.floor(Math.abs(Reg['I'])));
+    }
+}
+
+function op_sto_op_index(op) {
+    op_sto_op_reg(op, Math.floor(Math.abs(Reg['I'])));
+}
+
+function op_sto_matrix(m, user) {
+    g_Matrix[m].set(Reg[0], Reg[1], Stack[0]);
+    update_lcd(sprintf("%c %2d,%d", "A".charCodeAt(0) + m, Reg[0], Reg[1]));
+    DelayUpdate = 1000;
+    if (user) {
+        if (Reg[1] < g_Matrix[m].cols) {
+            Reg[1]++;
+        } else if (Reg[0] < g_Matrix[m].rows) {
+            Reg[0]++;
+            Reg[1] = 1;
+        } else {
+            Reg[0] = 1;
+            Reg[1] = 1;
+            if (Running) {
+                PC++;
+            }
+        }
+    }
+}
+
+function op_sto_matrix_imm(m) {
+    var x = Stack[0];
+    var y = Stack[1];
+    Stack[0] = Stack[2]; StackI[0] = StackI[2];
+    Stack[1] = Stack[3]; StackI[1] = StackI[3];
+    Stack[2] = Stack[3]; StackI[2] = StackI[3];
+    g_Matrix[m].set(y, x, Stack[0]);
+}
+
+function op_sto_matrix_all(m) {
+    if (Stack[0] instanceof Descriptor) {
+        g_Matrix[m] = g_Matrix[Stack[0].label].copy();
+    } else {
+        for (var j = 1; j <= g_Matrix[m].rows; j++) {
+            for (var i = 1; i <= g_Matrix[m].cols; i++) {
+                g_Matrix[m].set(j, i, Stack[0]);
+            }
+        }
+    }
+}
+
+function op_sto_result() {
+    if (Stack[0] instanceof Descriptor) {
+        Result = Stack[0].label;
+    } else {
+        // TODO: error
+    }
+}
+
+function op_frac() {
+    unop(function(x) {
+        return x - trunc(x);
+    });
+}
+
+function op_int() {
+    unop(trunc);
+}
+
+function op_rcl_reg(r) {
+    if (StackLift) {
+        push(Reg[r]);
+    } else {
+        Stack[0] = Reg[r];
+        StackI[0] = 0;
+        StackLift = true;
+    }
+}
+
+function op_rcl_op_reg(op, r) {
+    switch (op) {
+        case '+': Stack[0] += Reg[r]; break;
+        case '-': Stack[0] -= Reg[r]; break;
+        case '*': Stack[0] *= Reg[r]; break;
+        case '/': Stack[0] /= Reg[r]; break;
+    }
+}
+
+function op_rcl_index(user) {
+    if (Reg['I'] instanceof Descriptor) {
+        op_rcl_matrix(Reg['I'].label, user);
+    } else {
+        op_rcl_reg(Math.floor(Math.abs(Reg['I'])));
+    }
+}
+
+function op_rcl_op_index(op) {
+    op_rcl_op_reg(op, Math.floor(Math.abs(Reg['I'])));
+}
+
+function op_rcl_descriptor(m) {
+    push(new Descriptor(m));
+}
+
+function op_rcl_dim(m) {
+    push(g_Matrix[m].rows);
+    push(g_Matrix[m].cols);
+}
+
+function op_rcl_matrix(m, user) {
+    if (StackLift) {
+        push(g_Matrix[m].get(Reg[0], Reg[1]));
+    } else {
+        Stack[0] = g_Matrix[m].get(Reg[0], Reg[1]);
+        StackLift = true;
+    }
+    if (user) {
+        if (Reg[1] < g_Matrix[m].cols) {
+            Reg[1]++;
+        } else if (Reg[0] < g_Matrix[m].rows) {
+            Reg[0]++;
+            Reg[1] = 1;
+        } else {
+            Reg[0] = 1;
+            Reg[1] = 1;
+            if (Running) {
+                PC++;
+            }
+        }
+    }
+}
+
+function op_rcl_matrix_imm(m) {
+    binop(function(y, x) {
+        return g_Matrix[m].get(y, x);
+    });
+}
+
+function op_rcl_result() {
+    push(new Descriptor(Result));
+}
+
+function op_user() {
+    User = !User;
+    $("#user").toggleClass("indicator-on", User);
+    StackLift = OldStackLift;
+}
+
+function op_mem() {
+    alert("Unimplemented: MEM");
+    StackLift = OldStackLift;
+}
+
+function op_fact() {
+    unop(function(x) {
+        if (x >= 0 && x === Math.floor(x)) {
+            var r = 1;
+            while (x > 1) {
+                r *= x;
+                x -= 1;
+            }
+            return r;
+        } else {
+            x += 1;
+            var gamma = function(z) {
+                // Lanczos approximation
+                // from http://en.wikipedia.org/wiki/Lanczos_approximation
+                var g = 7;
+                var p = [0.99999999999980993, 676.5203681218851, -1259.1392167224028,
+                         771.32342877765313, -176.61502916214059, 12.507343278686905,
+                         -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+                z -= 1;
+                var r = p[0];
+                for (var i = 1; i < g+2; i++) {
+                    r += p[i] / (z + i);
+                }
+                var t = z + g + 0.5;
+                return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * r;
+            };
+            if (x >= 0.5) {
+                return gamma(x);
+            } else {
+                return Math.PI / (gamma(1-x) * Math.sin(Math.PI * x));
+            }
+        }
+    });
+}
+
+function op_mean() {
+    push(Reg[5] / Reg[2]);
+    push(Reg[3] / Reg[2]);
+}
+
+function op_yhat() {
+    LastX = Stack[0];
+    LastXI = StackI[0];
+    var M = Reg[2] * Reg[4] - Reg[3] * Reg[3];
+    var N = Reg[2] * Reg[6] - Reg[5] * Reg[5];
+    var P = Reg[2] * Reg[7] - Reg[3] * Reg[5];
+    push(P / Math.sqrt(M * N));
+    push((M * Reg[5] + P * (Reg[2] * LastX - Reg[3])) / (Reg[2] * M));
+}
+
+function op_s() {
+    var M = Reg[2] * Reg[4] - Reg[3] * Reg[3];
+    var N = Reg[2] * Reg[6] - Reg[5] * Reg[5];
+    push(Math.sqrt(N / (Reg[2] * (Reg[2] - 1))));
+    push(Math.sqrt(M / (Reg[2] * (Reg[2] - 1))));
+}
+
+function op_sum() {
+    LastX = Stack[0];
+    LastXI = StackI[0];
+    Reg[2] += 1;
+    Reg[3] += Stack[0];
+    Reg[4] += Stack[0] * Stack[0];
+    Reg[5] += Stack[1];
+    Reg[6] += Stack[1] * Stack[1];
+    Reg[7] += Stack[0] * Stack[1];
+    Stack[0] = Reg[2];
+    NewStackLift = false;
+}
+
+function op_lr() {
+    var M = Reg[2] * Reg[4] - Reg[3] * Reg[3];
+    var N = Reg[2] * Reg[6] - Reg[5] * Reg[5];
+    var P = Reg[2] * Reg[7] - Reg[3] * Reg[5];
+    push(P / M);
+    push((M * Reg[5] - P * Reg[3]) / (Reg[2] * M));
+}
+
+function op_sumsub() {
+    LastX = Stack[0];
+    LastXI = StackI[0];
+    Reg[2] -= 1;
+    Reg[3] -= Stack[0];
+    Reg[4] -= Stack[0] * Stack[0];
+    Reg[5] -= Stack[1];
+    Reg[6] -= Stack[1] * Stack[1];
+    Reg[7] -= Stack[0] * Stack[1];
+    Stack[0] = Reg[2];
+    NewStackLift = false;
+}
+
+function op_add() {
+    if (Stack[0] instanceof Descriptor && Stack[1] instanceof Descriptor) {
+        binopm(function(y, x) {
+            return g_Matrix[y.label].plus(g_Matrix[x.label]);
+        });
+    } else if (Stack[0] instanceof Descriptor) {
+        binopm(function(y, x) {
+            var m = g_Matrix[x.label];
+            return m.plus(new Mat(m.rows, m.cols, Stack[1]));
+        });
+    } else if (Stack[1] instanceof Descriptor) {
+        binopm(function(y, x) {
+            var m = g_Matrix[y.label];
+            return m.plus(new Mat(m.rows, m.cols, Stack[0]));
+        });
+    } else if (Flags[8]) {
+        binopc(function(y, x) {
+            return y.add(x);
+        });
+    } else {
+        binop(function(y, x) { return y + x; });
+    }
+}
+
+function op_Pyx() {
+    if (Stack[0] instanceof Descriptor) {
+        var m = Stack[0].label;
+        g_Matrix[m] = g_Matrix[m].partition();
+    } else {
+        binop(function(y, x) {
+            var r = 1;
+            var t = y - x;
+            while (y > t) {
+                r *= y;
+                y--;
+            }
+            return r;
+        });
+    }
+}
+
+function op_Cyx() {
+    if (Stack[0] instanceof Descriptor) {
+        var m = Stack[0].label;
+        g_Matrix[m] = g_Matrix[m].unpartition();
+    } else {
+        binop(function(y, x) {
+            var r = 1;
+            var t = y - x;
+            while (y > t) {
+                r *= y;
+                y--;
+            }
+            while (x > 1) {
+                r /= x;
+                x--;
+            }
+            return r;
+        });
+    }
+}
+
+function op_input(c) {
+    if (!DigitEntry) {
+        if (StackLift) {
+            push("");
+        }
+        Entry = "";
+    }
+    if (Entry.length === 0) {
+        switch (c) {
+            case 'e':
+                Entry = "1";
+                break;
+            case '.':
+                Entry = "0";
+                break;
+        }
+    }
+    Entry = Entry + c;
+    NewDigitEntry = true;
+}
+
+function decode_matrix(k) {
+    Prefix = function(k) {
+        switch (k) {
+            case '0': return new Opcode(new OpcodeInfo([42,16,0], op_matrix_clear));
+            case '1': return new Opcode(new OpcodeInfo([42,16,1], op_matrix_home));
+            case '2': return new Opcode(new OpcodeInfo([42,16,2], op_matrix_complex2));
+            case '3': return new Opcode(new OpcodeInfo([42,16,3], op_matrix_complex3));
+            case '4': return new Opcode(new OpcodeInfo([42,16,4], op_matrix_transpose));
+            case '5': return new Opcode(new OpcodeInfo([42,16,5], op_matrix_transmul));
+            case '6': return new Opcode(new OpcodeInfo([42,16,6], op_matrix_residual));
+            case '7': return new Opcode(new OpcodeInfo([42,16,7], op_matrix_norm));
+            case '8': return new Opcode(new OpcodeInfo([42,16,8], op_matrix_normf));
+            case '9': return new Opcode(new OpcodeInfo([42,16,9], op_matrix_det));
+        }
+    };
+    return null;
+}
+
+function decode_fix(k) {
+    Prefix = function(k) {
+        if (k >= '0' && k <= '9') {
+            var i = Number(k);
+            return new Opcode(new OpcodeInfo([42,7,i]), function() { op_fix(i); });
+        } else if (k === 't') {
+            return new Opcode(new OpcodeInfo([42,7,25]), op_fix_index);
+        }
+    };
+    return null;
+}
+
+function decode_sci(k) {
+    Prefix = function(k) {
+        if (k >= '0' && k <= '9') {
+            var i = Number(k);
+            return new Opcode(new OpcodeInfo([42,8,i]), function() { op_sci(i); });
+        } else if (k === 't') {
+            return new Opcode(new OpcodeInfo([42,8,25]), op_sci_index);
+        }
+    };
+    return null;
+}
+
+function decode_eng(k) {
+    Prefix = function(k) {
+        if (k >= '0' && k <= '9') {
+            var i = Number(k);
+            return new Opcode(new OpcodeInfo([42,9,i]), function() { op_eng(i); });
+        } else if (k === 't') {
+            return new Opcode(new OpcodeInfo([42,9,25]), op_eng_index);
+        }
+    };
+    return null;
+}
+
+function decode_solve(k) {
+    var f = 1;
+    Prefix = function(k) {
+        if (k === '.') {
+            f = 10;
+            Prefix = OldPrefix;
+            return null;
+        } else if (k >= '0' && k <= '9') {
+            var i = Number(k) / f;
+            return new Opcode(new OpcodeInfo([42,10,i]), function() { op_solve(i); });
+        } else {
+            var i = "qE)^\\".indexOf(k);
+            if (i >= 0) {
+                return new Opcode(new OpcodeInfo([42,10,11+i]), function() { op_solve(11+i); });
+            }
+        }
+    };
+    return null;
+}
+
+function decode_lbl(k) {
+    var f = 1;
+    Prefix = function(k) {
+        if (k === '.') {
+            f = 10;
+            Prefix = OldPrefix;
+            return null;
+        } else if (k >= '0' && k <= '9') {
+            var i = Number(k) / f;
+            return new Opcode(new OpcodeInfo([42,21,i]), function() {});
+        } else {
+            var i = "qE)^\\".indexOf(k);
+            if (i >= 0) {
+                return new Opcode(new OpcodeInfo([42,21,11+i]), function() {});
+            }
+        }
+    }
+    return null;
+}
+
+function decode_gto() {
+    var f = 1;
+    var immediate = false;
+    var n = 0;
+    var i = 0;
+    Prefix = function(k) {
+        if (k === '_' && n === 0) {
+            immediate = true;
+            Prefix = OldPrefix;
+            return null;
+        } else if (k === '.') {
+            f = 10;
+            Prefix = OldPrefix;
+            return null;
+        } else if (k >= '0' && k <= '9') {
+            var x = Number(k);
+            if (immediate) {
+                n = n * 10 + x;
+                i++;
+                if (i === 3) {
+                    return new Opcode(new OpcodeInfo([22], null, false), function() { op_gto_immediate(n); });
+                }
+                Prefix = OldPrefix;
+                return null;
+            } else {
+                x /= f;
+                return new Opcode(new OpcodeInfo([22,x]), function() { op_gto_label(x); });
+            }
+        } else if (k === 't') {
+            return new Opcode(new OpcodeInfo([22,25]), function() { op_gto_index(); });
+        } else {
+            var x = "qE)^\\".indexOf(k);
+            if (x >= 0) {
+                return new Opcode(new OpcodeInfo([22,11+x]), function() { op_gto_label(11+x); });
+            }
+        }
+    };
+    return null;
+}
+
+function decode_hyp(k) {
+    Prefix = function(k) {
+        switch (k) {
+            case 's': return new Opcode(new OpcodeInfo([42,22,23], op_sinh));
+            case 'c': return new Opcode(new OpcodeInfo([42,22,24], op_cosh));
+            case 't': return new Opcode(new OpcodeInfo([42,22,25], op_tanh));
+        }
+    };
+    return null;
+}
+
+function decode_ahyp(k) {
+    Prefix = function(k) {
+        switch (k) {
+            case 's': return new Opcode(new OpcodeInfo([43,22,23], op_asinh));
+            case 'c': return new Opcode(new OpcodeInfo([43,22,24], op_acosh));
+            case 't': return new Opcode(new OpcodeInfo([43,22,25], op_atanh));
+        }
+    };
+    return null;
+}
+
+function decode_dim(k) {
+    Prefix = function(k) {
+        if (k == 'c') {
+            return new Opcode(new OpcodeInfo([42,23,24]), op_dim_i);
+        } else {
+            var i = "qE)^\\".indexOf(k);
+            if (i >= 0) {
+                return new Opcode(new OpcodeInfo([42,23,11+i]), function() { op_dim(i); });
+            }
+        }
+    };
+    return null;
+}
+
+function decode_result(k) {
+    Prefix = function(k) {
+        var i = "qE)^\\".indexOf(k);
+        if (i >= 0) {
+            return new Opcode(new OpcodeInfo([42,26,11+i]), function() { op_result(i); });
+        }
+    };
+    return null;
+}
+
+function decode_xchg(k) {
+    var f = 0;
+    Prefix = function(k) {
+        if (k === '.') {
+            f = 10;
+            Prefix = OldPrefix;
+            return null;
+        } else if (k >= '0' && k <= '9') {
+            var i = Number(k) + f;
+            return new Opcode(new OpcodeInfo([42,4,i]), function() { op_xchg(i); });
+        } else if (k === 'c') {
+            return new Opcode(new OpcodeInfo([42,4,24]), op_xchg_index);
+        } else if (k === 't') {
+            return new Opcode(new OpcodeInfo([42,4,25]), function() { op_xchg('I'); });
+        }
+    };
+    return null;
+}
+
+function decode_sf(k) {
+    Prefix = function(k) {
+        if (k >= '0' && k <= '9') {
+            var i = Number(k);
+            return new Opcode(new OpcodeInfo([43,4,i]), function() { op_sf(i); });
+        } else if (k === 't') {
+            return new Opcode(new OpcodeInfo([43,4,25]), op_sf_index);
+        }
+    };
+    return null;
+}
+
+function decode_dse(k) {
+    var f = 0;
+    Prefix = function(k) {
+        if (k === '.') {
+            f = 10;
+            Prefix = OldPrefix;
+            return null;
+        } else if (k >= '0' && k <= '9') {
+            var i = Number(k) + f;
+            return new Opcode(new OpcodeInfo([42,5,i]), function() { op_dse(i); });
+        } else if (k === 'c') {
+            return new Opcode(new OpcodeInfo([42,5,24]), op_dse_index);
+        } else if (k === 't') {
+            return new Opcode(new OpcodeInfo([42,5,25]), function() { op_dse('I'); });
+        }
+    };
+    return null;
+}
+
+function decode_cf(k) {
+    Prefix = function(k) {
+        if (k >= '0' && k <= '9') {
+            var i = Number(k);
+            return new Opcode(new OpcodeInfo([43,5,i]), function() { op_cf(i); });
+        } else if (k === 't') {
+            return new Opcode(new OpcodeInfo([43,5,25]), op_cf_index);
+        }
+    };
+    return null;
+}
+
+function decode_isg(k) {
+    var f = 0;
+    Prefix = function(k) {
+        if (k === '.') {
+            f = 10;
+            Prefix = OldPrefix;
+            return null;
+        } else if (k >= '0' && k <= '9') {
+            var i = Number(k) + f;
+            return new Opcode(new OpcodeInfo([42,6,i]), function() { op_isg(i); });
+        } else if (k === 'c') {
+            return new Opcode(new OpcodeInfo([42,6,24]), op_isg_index);
+        } else if (k === 't') {
+            return new Opcode(new OpcodeInfo([42,6,25]), function() { op_isg('I'); });
+        }
+    };
+    return null;
+}
+
+function decode_ftest(k) {
+    Prefix = function(k) {
+        if (k >= '0' && k <= '9') {
+            var i = Number(k);
+            return new Opcode(new OpcodeInfo([43,6,i]), function() { op_ftest(i); });
+        } else if (k === 't') {
+            return new Opcode(new OpcodeInfo([43,6,25]), op_ftest_index);
+        }
+    };
+    return null;
+}
+
+function decode_integrate(k) {
+    var f = 1;
+    Prefix = function(k) {
+        if (k === '.') {
+            f = 10;
+            Prefix = OldPrefix;
+            return null;
+        } else if (k >= '0' && k <= '9') {
+            var i = Number(k) / f;
+            return new Opcode(new OpcodeInfo([42,20,i]), function() { op_integrate(i); });
+        } else {
+            var i = "qE)^\\".indexOf(k);
+            if (i >= 0) {
+                return new Opcode(new OpcodeInfo([42,20,11+i]), function() { op_integrate(11+i); });
+            }
+        }
+    };
+    return null;
+}
+
+function decode_gsb() {
+    var f = 1;
+    Prefix = function(k) {
+        if (k === '.') {
+            f = 10;
+            Prefix = OldPrefix;
+            return null;
+        } else if (k >= '0' && k <= '9') {
+            var i = Number(k) / f;
+            return new Opcode(new OpcodeInfo([32,i]), function() { op_gsb(i); });
+        } else if (k === 't') {
+            return new Opcode(new OpcodeInfo([32,25]), function() { op_gsb_index(); });
+        } else {
+            var i = "qE)^\\".indexOf(k);
+            if (i >= 0) {
+                return new Opcode(new OpcodeInfo([32,11+i]), function() { op_gsb(11+i); });
+            }
+        }
+    };
+    return null;
+}
+
+function decode_test(k) {
+    Prefix = function(k) {
+        if (k >= '0' && k <= '9') {
+            var i = Number(k);
+            return new Opcode(new OpcodeInfo([43,30,i]), function() { op_test(i); });
+        }
+    };
+    return null;
+}
+
+function decode_f() {
+    Shift = 1;
+    $(".shift").removeClass("indicator-on");
+    $("#f").addClass("indicator-on");
+    return null;
+}
+
+function decode_g() {
+    Shift = 2;
+    $(".shift").removeClass("indicator-on");
+    $("#g").addClass("indicator-on");
+    return null;
+}
+
+function decode_sto(k) {
+    var f = 0;
+    var op = null;
+    var g = false;
+    Prefix = function(k) {
+        if (k === '.') {
+            f = 10;
+            Prefix = OldPrefix;
+            return null;
+        } else if (k >= '0' && k <= '9') {
+            var i = Number(k) + f;
+            if (op !== null) {
+                var opindex = {'/':10, '*':20, '-':30, '+':40};
+                return new Opcode(new OpcodeInfo([44,opindex[op],i]), function() { op_sto_op_reg(op, i); });
+            } else {
+                return new Opcode(new OpcodeInfo([44,i]), function() { op_sto_reg(i); });
+            }
+        } else if (k === '+' || k === '-' || k === '*' || k === '/') {
+            op = k;
+            Prefix = OldPrefix;
+            return null;
+        } else if (k === '_') {
+            Prefix = function(k) {
+                var i = "qE)^\\".indexOf(k);
+                if (i >= 0) {
+                    return new Opcode(new OpcodeInfo([44,16,11+i]), function() { op_sto_matrix_all(i); });
+                }
+            }
+            return null;
+        } else if (k === 'c') {
+            if (op !== null) {
+                var opindex = {'/':10, '*':20, '-':30, '+':40};
+                return new Opcode(new OpcodeInfo([44,opindex[op],24]), function() { op_sto_op_index(op); });
+            } else {
+                var u = User;
+                return new Opcode(new OpcodeInfo([44,24]), function() { op_sto_index(u); });
+            }
+        } else if (k === 't') {
+            if (op !== null) {
+                var opindex = {'/':10, '*':20, '-':30, '+':40};
+                return new Opcode(new OpcodeInfo([44,opindex[op],25]), function() { op_sto_op_reg(op, 'I'); });
+            } else {
+                return new Opcode(new OpcodeInfo([44,25]), function() { op_sto_reg('I'); });
+            }
+        } else if (k === 'e') {
+            return new Opcode(new OpcodeInfo([44,26]), op_sto_result);
+        } else if (k === 'g') {
+            g = true;
+            Prefix = OldPrefix;
+            return null;
+        } else {
+            var i = "qE)^\\".indexOf(k);
+            if (i >= 0) {
+                if (g) {
+                    return new Opcode(new OpcodeInfo([44,43,11+i]), function() { op_sto_matrix_imm(i); });
+                } else {
+                    var u = User; // capture current value
+                    return new Opcode(new OpcodeInfo([44,11+i], null, true, User), function() { op_sto_matrix(i, u); });
+                }
+            }
+        }
+    };
+    return null;
+}
+
+function decode_rcl(k) {
+    var f = 0;
+    var op = null;
+    var g = false;
+    Prefix = function(k) {
+        if (k === '.') {
+            f = 10;
+            Prefix = OldPrefix;
+            return null;
+        } else if (k >= '0' && k <= '9') {
+            var i = Number(k) + f;
+            if (op !== null) {
+                var opindex = {'/':10, '*':20, '-':30, '+':40};
+                return new Opcode(new OpcodeInfo([45,opindex[op],i]), function() { op_rcl_op_reg(op, i); });
+            } else {
+                return new Opcode(new OpcodeInfo([45,i]), function() { op_rcl_reg(i); });
+            }
+        } else if (k === '+' || k === '-' || k === '*' || k === '/') {
+            op = k;
+            Prefix = OldPrefix;
+            return null;
+        } else if (k === '_') {
+            Prefix = function(k) {
+                var i = "qE)^\\".indexOf(k);
+                if (i >= 0) {
+                    return new Opcode(new OpcodeInfo([45,16,11+i]), function() { op_rcl_descriptor(i); });
+                }
+            }
+            return null;
+        } else if (k === 's') {
+            Prefix = function(k) {
+                var i = "qE)^\\".indexOf(k);
+                if (i >= 0) {
+                    return new Opcode(new OpcodeInfo([45,23,11+i]), function() { op_rcl_dim(i); });
+                }
+            }
+            return null;
+        } else if (k === 'c') {
+            if (op !== null) {
+                var opindex = {'/':10, '*':20, '-':30, '+':40};
+                return new Opcode(new OpcodeInfo([45,opindex[op],24]), function() { op_rcl_op_index(op); });
+            } else {
+                var u = User;
+                return new Opcode(new OpcodeInfo([45,24]), function() { op_rcl_index(u); });
+            }
+        } else if (k === 't') {
+            if (op !== null) {
+                var opindex = {'/':10, '*':20, '-':30, '+':40};
+                return new Opcode(new OpcodeInfo([45,opindex[op],25]), function() { op_rcl_op_reg(op, 'I'); });
+            } else {
+                return new Opcode(new OpcodeInfo([45,25]), function() { op_rcl_reg('I'); });
+            }
+        } else if (k === 'e') {
+            return new Opcode(new OpcodeInfo([45,26]), op_rcl_result);
+        } else if (k === 'g') {
+            g = true;
+            Prefix = OldPrefix;
+            return null;
+        } else {
+            var i = "qE)^\\".indexOf(k);
+            if (i >= 0) {
+                if (g) {
+                    return new Opcode(new OpcodeInfo([45,43,11+i]), function() { op_rcl_matrix_imm(i); });
+                } else {
+                    var u = User; // capture current value
+                    return new Opcode(new OpcodeInfo([45,11+i], null, true, User), function() { op_rcl_matrix(i, u); });
+                }
+            }
+        }
+    };
+    return null;
+}
+
+function decode(k) {
+    var d = null;
+    var s = Shift;
+    Shift = -1;
+    if (Prefix != null) {
+        d = Prefix;
+    } else if (jQuery.isArray(CharTable[k])) {
+        d = CharTable[k][s];
+    } else {
+        d = CharTable[k];
+    }
+    OldPrefix = Prefix;
+    Prefix = null;
+    var r = d(k);
+    if (Shift === -1) {
+        Shift = 0;
+        $(".shift").removeClass("indicator-on");
+    }
+    return r;
+}
+
+function step() {
+    if (PC === 0) {
+        PC = 1;
+    }
+    if (PC < Program.length) {
+        //console.log("PC", PC, Program[PC].info.defn);
+        var p = PC;
+        PC++;
+        try {
+            Program[p].exec();
+        } catch (e) {
+            Running = false;
+            if (e.name === "CalcError") {
+                update_lcd("Error " + e.code);
+                DelayUpdate = -1;
+            } else {
+                throw e;
+            }
+        }
+    } else {
+        op_rtn();
+    }
+}
+
+function run() {
+    RunTimer = null;
+    if (!Running) {
+        alert("run() called when not Running");
+        return;
+    }
+    step();
+    if (Running) {
+        RunTimer = setTimeout(run, 0);
+    } else {
+        update_display();
+    }
+}
+
+function key(k, override) {
+    if (DisableKeys && !override) {
+        return;
+    }
+    var op = decode(k);
+    if (op === undefined) {
+        alert("undefined decode: "+k);
+        return;
+    }
+    if (op !== null) {
+        try {
+            if (Prgm && op.info.programmable) {
+                PC++;
+                Program.splice(PC, 0, op);
+            } else {
+                op.exec();
+                if (Running) {
+                    RunTimer = setTimeout(run, 0);
+                }
+            }
+        } catch (e) {
+            if (e.name === "CalcError") {
+                update_lcd("Error " + e.code);
+                DelayUpdate = -1;
+            } else {
+                throw e;
+            }
+        }
+    }
+    if (DelayUpdate === 0) {
+        update_display();
+    } else {
+        if (DelayUpdate > 0) {
+            setTimeout(update_display, DelayUpdate);
+        }
+        DelayUpdate = 0;
+    }
+}
+
+function run_test() {
+    $.getScript("test.js", function() {
+        start_tests();
+    });
+}
+
+function help() {
+    if ($(".help").length === 0) {
+        var frame = $("#frame");
+        for (var i = 0; i < 4; i++) {
+            for (var j = 0; j < 10; j++) {
+                if (i === 3 && (j === 0 || j === 5)) continue;
+                var c = KeyTable[i][j];
+                if (c === "\b") {
+                    c = "\u2190";
+                } else if (c === "\r") {
+                    c = "\u21b2";
+                }
+                var top = 167 + 65*i;
+                var left = 70 + 57*j;
+                frame.append('<div class="help" style="top: ' + top + '; left: ' + left + '">' + c + '</div>');
+            }
+        }
+        for (var i in ExtraKeyTable) {
+            var top = 167 + 65*ExtraKeyTable[i][0] + 20*ExtraKeyTable[i][2];
+            var left = 70 + 57*ExtraKeyTable[i][1];
+            var colour = ["goldenrod", null, "lightblue"][ExtraKeyTable[i][2]+1];
+            frame.append('<div class="help" style="top: ' + top + '; left: ' + left + '; background: ' + colour + '">' + ExtraKeyTable[i][3] + '</div>');
+        }
+    }
+    $(".help").toggleClass("showhelp");
+    return null;
+}
