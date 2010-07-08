@@ -723,20 +723,6 @@ function update_display() {
         }
         update_lcd(s);
     } else {
-        for (var i = 0; i < 4; i++) {
-            $("#stack_" + i).val(Stack[i]);
-        }
-        $("#last_x").val(LastX);
-        if (Flags[8]) {
-            for (var i = 0; i < 4; i++) {
-                $("#stacki_" + i).val(StackI[i]);
-            }
-            $("#last_xi").val(LastXI);
-        }
-        for (var i = 0; i < 10; i++) {
-            $("#reg_" + i).val(Reg[i]);
-        }
-        $("#reg_I").val(Reg['I']);
         if (DigitEntry) {
             if (Entry !== "") {
                 update_lcd(insert_commas(Entry));
@@ -748,7 +734,6 @@ function update_display() {
         }
     }
     Display.set_complex(Flags[8]);
-    $(".stacki").css("display", Flags[8] ? "inline" : "none");
     Display.set_prgm(Prgm);
     if (Flags[9]) {
         if (Blinker === null) {
