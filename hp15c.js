@@ -214,9 +214,7 @@ var CharTable = {
     'I': _(OpI),
     'l': _(OpLn),
     'p': _(OpPi),
-    '\x12': _(OpRand),
-    'h': help,
-    '?': help
+    '\x12': _(OpRand)
 };
 
 var KeyTable = [
@@ -2816,38 +2814,4 @@ function key(k, override) {
         }
         DelayUpdate = 0;
     }
-}
-
-function run_test() {
-    $.getScript("test.js", function() {
-        start_tests();
-    });
-}
-
-function help() {
-    if ($(".help").length === 0) {
-        var frame = $("#frame");
-        for (var i = 0; i < 4; i++) {
-            for (var j = 0; j < 10; j++) {
-                if (i === 3 && (j === 0 || j === 5)) continue;
-                var c = KeyTable[i][j];
-                if (c === "\b") {
-                    c = "\u2190";
-                } else if (c === "\r") {
-                    c = "\u21b2";
-                }
-                var top = 167 + 65*i;
-                var left = 70 + 57*j;
-                frame.append('<div class="help" style="top: ' + top + '; left: ' + left + '">' + c + '</div>');
-            }
-        }
-        for (var i in ExtraKeyTable) {
-            var top = 167 + 65*ExtraKeyTable[i][0] + 20*ExtraKeyTable[i][2];
-            var left = 70 + 57*ExtraKeyTable[i][1];
-            var colour = ["goldenrod", null, "lightblue"][ExtraKeyTable[i][2]+1];
-            frame.append('<div class="help" style="top: ' + top + '; left: ' + left + '; background: ' + colour + '">' + ExtraKeyTable[i][3] + '</div>');
-        }
-    }
-    $(".help").toggleClass("showhelp");
-    return null;
 }
