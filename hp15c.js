@@ -1,6 +1,4 @@
-var Digits = [];
-var Display = [];
-var DisplayDecimal = [];
+var Display;
 var Stack = [0, 0, 0, 0];
 var StackI = [0, 0, 0, 0];
 var LastX = 0;
@@ -570,50 +568,43 @@ function log10int(x) {
 
 function update_lcd(s) {
     LcdDisplay = s;
-    $(".lcd").css("display", "none");
+    Display.clear_digits();
     if (Flags[9] && !BlinkOn) {
         return;
     }
-    var neg = $("#neg");
-    neg.css("display", "none");
-    var eex = false;
+    var eex = null;
     var d = 0;
     for (var i = 0; i < s.length; i++) {
         var c = s.charAt(i);
         if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'E') || c === 'o' || c === 'r' || c === 'u') {
-            if (eex) {
-                Display[8].attr("src", Display[9].attr("src"));
-                Display[9].attr("src", Digits[c].src);
+            if (eex !== null) {
+                eex = eex * 10 + c.charCodeAt(0) - "0".charCodeAt(0);
+                var t = sprintf("%02d", eex);
+                Display.set_digit(8, t.charAt(0));
+                Display.set_digit(9, t.charAt(1));
             } else if (d < 10) {
-                Display[d].attr("src", Digits[c].src);
-                Display[d].css("display", "inline");
+                Display.set_digit(d, c);
                 d++;
             }
         } else if (c === '.') {
-            DisplayDecimal[d-1].css("display", "inline");
-            DisplayDecimal[d-1].attr("src", "decimal.png");
+            Display.set_decimal(d-1);
         } else if (c === ',') {
-            DisplayDecimal[d-1].css("display", "inline");
-            DisplayDecimal[d-1].attr("src", "comma.png");
+            Display.set_comma(d-1);
         } else if (c === '-') {
-            if (eex) {
-                Display[7].attr("src", Digits["-"].src);
-                Display[7].css("display", "inline");
+            if (eex !== null) {
+                Display.set_digit(7, "-");
             } else if (d > 0) {
-                Display[d].attr("src", Digits["-"].src);
-                Display[d].css("display", "inline");
+                Display.set_digit(d, "-");
                 d++;
             } else {
-                neg.css("display", "inline");
+                Display.set_neg();
             }
         } else if (c === 'e') {
-            eex = true;
+            eex = 0;
             d = 9;
-            Display[7].css("display", "none");
-            Display[8].attr("src", Digits[0].src);
-            Display[8].css("display", "inline");
-            Display[9].attr("src", Digits[0].src);
-            Display[9].css("display", "inline");
+            Display.clear_digit(7);
+            Display.set_digit(8, "0");
+            Display.set_digit(9, "0");
         } else if (c === ' ') {
             d++;
         }
@@ -756,9 +747,9 @@ function update_display() {
             update_display_num(Stack[0]);
         }
     }
-    $("#complex").toggleClass("indicator-on", Flags[8]);
+    Display.set_complex(Flags[8]);
     $(".stacki").css("display", Flags[8] ? "inline" : "none");
-    $("#program").toggleClass("indicator-on", Prgm);
+    Display.set_prgm(Prgm);
     if (Flags[9]) {
         if (Blinker === null) {
             Blinker = setInterval(function() {
@@ -1074,7 +1065,7 @@ function op_fix_index() {
 
 function op_deg() {
     TrigFactor = Math.PI / 180;
-    $("#trigmode").removeClass("indicator-on");
+    Display.set_trigmode(null);
     StackLift = OldStackLift;
 }
 
@@ -1090,7 +1081,7 @@ function op_sci_index() {
 
 function op_rad() {
     TrigFactor = 1;
-    $("#trigmode").addClass("indicator-on").text("RAD");
+    Display.set_trigmode("RAD");
     StackLift = OldStackLift;
 }
 
@@ -1105,7 +1096,7 @@ function op_eng_index() {
 
 function op_grd() {
     TrigFactor = Math.PI / 200;
-    $("#trigmode").addClass("indicator-on").text("GRAD");
+    Display.set_trigmode("GRAD");
     StackLift = OldStackLift;
 }
 
@@ -2058,7 +2049,7 @@ function op_rcl_result() {
 
 function op_user() {
     User = !User;
-    $("#user").toggleClass("indicator-on", User);
+    Display.set_user(User);
     StackLift = OldStackLift;
 }
 
@@ -2568,15 +2559,15 @@ function decode_test(k) {
 
 function decode_f() {
     Shift = 1;
-    $(".shift").removeClass("indicator-on");
-    $("#f").addClass("indicator-on");
+    Display.clear_shift();
+    Display.set_shift("f");
     return null;
 }
 
 function decode_g() {
     Shift = 2;
-    $(".shift").removeClass("indicator-on");
-    $("#g").addClass("indicator-on");
+    Display.clear_shift();
+    Display.set_shift("g");
     return null;
 }
 
@@ -2734,7 +2725,7 @@ function decode(k) {
     var r = d(k);
     if (Shift === -1) {
         Shift = 0;
-        $(".shift").removeClass("indicator-on");
+        Display.clear_shift();
     }
     return r;
 }

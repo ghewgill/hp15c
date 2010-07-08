@@ -95,8 +95,69 @@
 <script type="text/javascript" src="hp15c.js"></script>
 <script type="text/javascript">
 //<![CDATA[
+    var Digits = [];
+    var UiDisplay = [];
+    var DisplayDecimal = [];
     var MouseDown = false;
     var JustSawKeydown8 = false;
+
+    function CalcDisplay() {
+        this.clear_digit = function(i) {
+            UiDisplay[i].css("display", "none");
+        }
+
+        this.clear_digits = function() {
+            $(".lcd").css("display", "none");
+            $("#neg").css("display", "none");
+        }
+
+        this.clear_shift = function() {
+            $(".shift").removeClass("indicator-on");
+        }
+
+        this.set_complex = function(on) {
+            $("#complex").toggleClass("indicator-on", Flags[8]);
+        }
+
+        this.set_comma = function(i) {
+            DisplayDecimal[i].css("display", "inline");
+            DisplayDecimal[i].attr("src", "comma.png");
+        }
+
+        this.set_decimal = function(i) {
+            DisplayDecimal[i].css("display", "inline");
+            DisplayDecimal[i].attr("src", "decimal.png");
+        }
+
+        this.set_digit = function(i, d) {
+            UiDisplay[i].css("display", "inline");
+            UiDisplay[i].attr("src", Digits[d].src);
+        }
+
+        this.set_neg = function() {
+            $("#neg").css("display", "inline");
+        }
+
+        this.set_prgm = function(on) {
+            $("#program").toggleClass("indicator-on", on);
+        }
+
+        this.set_shift = function(mode) {
+            $("#"+mode).addClass("indicator-on");
+        }
+
+        this.set_trigmode = function(mode) {
+            if (mode === null) {
+                $("#trigmode").removeClass("indicator-on");
+            } else {
+                $("#trigmode").addClass("indicator-on").text(mode);
+            }
+        }
+
+        this.set_user = function(on) {
+            $("#user").toggleClass("indicator-on", on);
+        }
+    }
 
     function run_test() {
         $.getScript("test.js", function() {
@@ -146,7 +207,7 @@
             var d = $("#dig"+i);
             d.css("left", 175 + i * 27);
             d.css("top", 67);
-            Display[Display.length] = d;
+            UiDisplay[UiDisplay.length] = d;
         }
         for (var i = 0; i < 10; i++) {
             var d = $("#decimal"+i);
@@ -157,6 +218,9 @@
         var neg = $("#neg");
         neg.css("left", 158);
         neg.css("top", 80);
+
+        Display = new CalcDisplay();
+
         $("#calc").mousedown(function(e) {
             var calc = $("#calc");
             var x = e.pageX - calc.offset().left;
