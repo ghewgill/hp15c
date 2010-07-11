@@ -1,0 +1,5 @@
+Makefile
+*.moc
+*.o
+qrc_*
+*.app
