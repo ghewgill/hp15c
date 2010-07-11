@@ -2700,7 +2700,7 @@ function decode(k) {
     Shift = -1;
     if (Prefix != null) {
         d = Prefix;
-    } else if (jQuery.isArray(CharTable[k])) {
+    } else if (typeof(CharTable[k]) === "object") {
         d = CharTable[k][s];
     } else {
         d = CharTable[k];

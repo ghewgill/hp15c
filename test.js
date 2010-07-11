@@ -1461,7 +1461,7 @@ function run_tests() {
                     TestPass = false;
                 }
             } else {
-                if (!$.isArray(expected)) {
+                if (expected[0] === undefined) {
                     expected = [expected];
                 }
                 for (var i in expected) {
