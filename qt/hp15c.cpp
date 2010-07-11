@@ -62,7 +62,9 @@ public slots:
     void start_tests();
 protected:
     virtual void keyPressEvent(QKeyEvent *event);
+    virtual void mousePressEvent(QMouseEvent *event);
 private:
+    QPixmap face;
     QLabel calc;
     QLabel *digit[10];
     QLabel *decimal[10];
@@ -79,6 +81,7 @@ CalcWidget *g_CalcWidget;
 
 CalcWidget::CalcWidget(QWidget *parent)
  : QWidget(parent),
+   face(":/15.jpg"),
    calc(parent),
    neg(parent),
    user("USER", parent),
@@ -89,9 +92,10 @@ CalcWidget::CalcWidget(QWidget *parent)
    prgm("PRGM", parent)
 {
     g_CalcWidget = this;
-    QPixmap pm(":/15.jpg");
-    calc.setPixmap(pm);
-    setMinimumSize(pm.size());
+    calc.setPixmap(face);
+    setMinimumSize(face.size());
+    // http://lists.trolltech.com/qt-interest/2008-05/thread00137-0.html
+    calc.setAttribute(Qt::WA_TransparentForMouseEvents);
     for (int i = 0; i < 10; i++) {
         digit[i] = new QLabel(parent);
         digit[i]->move(175 + i * 27, 67);
@@ -214,6 +218,19 @@ void CalcWidget::keyPressEvent(QKeyEvent *event)
         }
         QScriptValue r = script->evaluate(QString("key('%1')").arg(s));
         checkError(r);
+    }
+}
+
+void CalcWidget::mousePressEvent(QMouseEvent *event)
+{
+    int x = event->pos().x();
+    int y = event->pos().y();
+    if (x >= 65 && x < 645 && y >= 155 && y < 405) {
+        int c = (x - 65) / 57;
+        int r = (y - 155) / 65;
+        if (c >= 0 && c < 10 && r >= 0 && r < 4) {
+            script->evaluate(QString().sprintf("key(KeyTable[%d][%d])", r, c));
+        }
     }
 }
 
