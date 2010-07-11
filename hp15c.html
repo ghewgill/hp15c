@@ -215,9 +215,6 @@
             Digits[c] = new Image(20, 30);
             Digits[c].src = c + ".png";
         }
-        for (var i = 0; i < Reg.length; i++) {
-            Reg[i] = 0;
-        }
         for (var i = 0; i < 10; i++) {
             var d = $("#dig"+i);
             d.css("left", 175 + i * 27);
@@ -307,7 +304,8 @@
             }
             e.stopPropagation();
         });
-        update_display();
+
+        init();
     });
 //]]>
 </script>

@@ -2791,3 +2791,10 @@ function key(k, override) {
         DelayUpdate = 0;
     }
 }
+
+function init() {
+    for (var i = 0; i < Reg.length; i++) {
+        Reg[i] = 0;
+    }
+    update_display();
+}
