@@ -74,7 +74,7 @@ CalcWidget::CalcWidget(QWidget *parent)
  : QWidget(parent)
 {
     g_CalcWidget = this;
-    calc.load("../15.jpg");
+    calc.load(":/15.jpg");
     setMinimumSize(calc.size());
     clear_digits();
     setFocus();
@@ -309,10 +309,10 @@ void HP15C::init()
 
     script->globalObject().setProperty("window", script->newQObject(new QObject()));
 
-    load("../sprintf-0.6.js");
-    load("../jsmat/matrix.js");
-    load("../hp15c.js");
-    load("../test.js");
+    load(":/sprintf-0.6.js");
+    load(":/matrix.js");
+    load(":/hp15c.js");
+    load(":/test.js");
 
     script->evaluate("init()");
 }

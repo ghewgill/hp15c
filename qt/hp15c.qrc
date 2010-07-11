@@ -1,0 +1,10 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource>
+        <file alias="15.jpg">../15.jpg</file>
+        <file alias="sprintf-0.6.js">../sprintf-0.6.js</file>
+        <file alias="matrix.js">../jsmat/matrix.js</file>
+        <file alias="hp15c.js">../hp15c.js</file>
+        <file alias="test.js">../test.js</file>
+    </qresource>
+</RCC>

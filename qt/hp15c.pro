@@ -11,3 +11,4 @@ QT += script
 
 # Input
 SOURCES += hp15c.cpp
+RESOURCES += hp15c.qrc
