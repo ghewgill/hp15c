@@ -2,6 +2,7 @@
 #include <QFile>
 #include <QFrame>
 #include <QKeyEvent>
+#include <QLabel>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPainter>
@@ -61,79 +62,139 @@ public slots:
     void start_tests();
 protected:
     virtual void keyPressEvent(QKeyEvent *event);
-    virtual void paintEvent(QPaintEvent *event);
 private:
-    QImage calc;
-    char lcd[10];
-    char lcd_decimal[10];
+    QLabel calc;
+    QLabel *digit[10];
+    QLabel *decimal[10];
+    QLabel neg;
+    QLabel user;
+    QLabel f;
+    QLabel g;
+    QLabel trigmode;
+    QLabel complex;
+    QLabel prgm;
 };
 
 CalcWidget *g_CalcWidget;
 
 CalcWidget::CalcWidget(QWidget *parent)
- : QWidget(parent)
+ : QWidget(parent),
+   calc(parent),
+   neg(parent),
+   user("USER", parent),
+   f("f", parent),
+   g("g", parent),
+   trigmode(parent),
+   complex("C", parent),
+   prgm("PRGM", parent)
 {
     g_CalcWidget = this;
-    calc.load(":/15.jpg");
-    setMinimumSize(calc.size());
+    QPixmap pm(":/15.jpg");
+    calc.setPixmap(pm);
+    setMinimumSize(pm.size());
+    for (int i = 0; i < 10; i++) {
+        digit[i] = new QLabel(parent);
+        digit[i]->move(175 + i * 27, 67);
+        decimal[i] = new QLabel(parent);
+        decimal[i]->move(194 + i * 27, 91);
+    }
+    neg.setPixmap(QPixmap(":/neg.png"));
+    neg.move(158, 80);
+    QFont font("sans", 10);
+    user.setFont(font);
+    f.setFont(font);
+    g.setFont(font);
+    trigmode.setFont(font);
+    complex.setFont(font);
+    prgm.setFont(font);
+    user.move(190, 100);
+    f.move(230, 100);
+    g.move(250, 100);
+    trigmode.move(300, 100);
+    complex.move(390, 100);
+    prgm.move(410, 100);
     clear_digits();
+    set_user(false);
+    clear_shift();
+    set_trigmode("null");
     setFocus();
 }
 
 void CalcWidget::clear_digit(int i)
 {
-    lcd[i] = 0;
+    digit[i]->setVisible(false);
 }
 
 void CalcWidget::clear_digits()
 {
     for (int i = 0; i < 10; i++) {
-        lcd[i] = 0;
-        lcd_decimal[i] = 0;
+        digit[i]->setVisible(false);
+        decimal[i]->setVisible(false);
     }
-    update();
+    neg.setVisible(false);
 }
 
 void CalcWidget::clear_shift()
 {
+    f.setVisible(false);
+    g.setVisible(false);
 }
 
 void CalcWidget::set_comma(int i)
 {
+    decimal[i]->setPixmap(QPixmap(":/comma.png"));
+    decimal[i]->setVisible(true);
 }
 
 void CalcWidget::set_complex(int on)
 {
+    complex.setVisible(on);
 }
 
 void CalcWidget::set_decimal(int i)
 {
+    decimal[i]->setPixmap(QPixmap(":/decimal.png"));
+    decimal[i]->setVisible(true);
 }
 
 void CalcWidget::set_digit(int i, char d)
 {
-    lcd[i] = d;
-    update();
+    digit[i]->setPixmap(QPixmap(QString().sprintf(":/%c.png", d)));
+    digit[i]->setVisible(true);
 }
 
 void CalcWidget::set_neg()
 {
+    neg.setVisible(true);
 }
 
 void CalcWidget::set_prgm(int on)
 {
+    prgm.setVisible(on);
 }
 
 void CalcWidget::set_shift(const QString &mode)
 {
+    if (mode == "f") {
+        f.setVisible(true);
+    } else if (mode == "g") {
+        g.setVisible(true);
+    }
 }
 
 void CalcWidget::set_trigmode(const QString &mode)
 {
+    if (mode == "null") {
+        trigmode.setVisible(false);
+    } else {
+        trigmode.setText(mode);
+        trigmode.setVisible(true);
+    }
 }
 
 void CalcWidget::set_user(int on)
 {
+    user.setVisible(on);
 }
 
 void CalcWidget::start_tests()
@@ -153,17 +214,6 @@ void CalcWidget::keyPressEvent(QKeyEvent *event)
         }
         QScriptValue r = script->evaluate(QString("key('%1')").arg(s));
         checkError(r);
-    }
-}
-
-void CalcWidget::paintEvent(QPaintEvent *event)
-{
-    QPainter painter(this);
-    painter.drawImage(calc.rect(), calc, calc.rect());
-    for (int i = 0; i < 10; i++) {
-        if (lcd[i] != 0) {
-            painter.drawText(QPoint(160+i*20, 80), QChar(lcd[i]));
-        }
     }
 }
 
