@@ -1198,20 +1198,20 @@ function op_gto_immediate(n) {
 }
 
 function op_gto_label(n) {
-    var p = PC;
+    var p = PC + 1;
     while (true) {
-        if (p === 0 || p >= Program.length) {
-            p = 1;
+        if (p >= Program.length) {
+            p = 0;
+        } else {
+            //print(p + ": " + Program[p].info.keys);
+            if (Program[p].info.keys.toString() === [42,21,n].toString()) {
+                break;
+            }
         }
-        if (Program[p].info.keys.toString() === [42,21,n].toString()) {
-            break;
+        if (p === PC) {
+            throw new CalcError(4);
         }
         p++;
-        if (p === PC) {
-            alert("error 4");
-            // error 4
-            return;
-        }
     }
     PC = p;
 }
