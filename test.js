@@ -1345,6 +1345,7 @@ var Tests = [
     ["3f0", 6, 0.001]
 ];
 
+var TestStart;
 var TestIndex;
 var TestPass;
 
@@ -1419,6 +1420,7 @@ function start_tests() {
     key('f'); key('r');
     //var oldalert = alert;
     //alert = function(msg) { test_log(msg); };
+    TestStart = new Date();
     TestIndex = 0;
     TestPass = true;
     run_tests();
@@ -1482,7 +1484,8 @@ function run_tests() {
     } else {
         //alert = oldalert;
         if (TestPass) {
-            alert("pass");
+            var end = new Date();
+            alert("pass: " + ((end.getTime() - TestStart.getTime()) / 1000) + " s");
         }
         DisableKeys = false;
     }
