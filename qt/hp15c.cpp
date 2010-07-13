@@ -115,6 +115,7 @@ private:
     QLabel complex;
     QLabel prgm;
     CalcButton *buttons[40];
+    QLabel *helplabels[40*3];
     QSignalMapper mapper;
 };
 
@@ -160,8 +161,13 @@ CalcWidget::CalcWidget(QWidget *parent)
     complex.move(390, 100);
     prgm.move(410, 100);
 
+    QPalette helpPalette;
+    helpPalette.setColor(QPalette::Window, Qt::yellow);
+    memset(helplabels, 0, sizeof(helplabels));
     for (int r = 0; r < 4; r++) {
         for (int c = 0; c < 10; c++) {
+            int i = r * 10 + c;
+            buttons[i] = NULL;
             int h = 34;
             if (c == 5 && r >= 2) {
                 if (r == 2) {
@@ -171,10 +177,58 @@ CalcWidget::CalcWidget(QWidget *parent)
                 }
             }
             CalcButton *b = new CalcButton(parent, face, r, c, h);
-            mapper.setMapping(b, script->evaluate(QString("KeyTable[%1][%2]").arg(r).arg(c)).toString());
+            QString key = script->evaluate(QString("KeyTable[%1][%2]").arg(r).arg(c)).toString();
+            mapper.setMapping(b, key);
             connect(b, SIGNAL(clicked()), &mapper, SLOT(map()));
-            buttons[r*4+c] = b;
+            buttons[i] = b;
+            if (!(r == 3 && (c == 0 || c == 5))) {
+                QString hk = key;
+                if (hk == "\b") {
+                    hk = QChar(0x2190);
+                } else if (hk == "\r") {
+                    hk = QChar(0x21b2);
+                }
+                QLabel *help = new QLabel(hk, parent);
+                help->move(70 + 57 * c, 167 + 65 * r);
+                help->resize(16, 16);
+                help->setAutoFillBackground(true);
+                help->setPalette(helpPalette);
+                help->setMargin(1);
+                help->setAlignment(Qt::AlignHCenter);
+                help->setFont(QFont("Courier", 14));
+                help->setVisible(false);
+                helplabels[i] = help;
+            }
         }
+    }
+    QPalette helpPalette_f;
+    helpPalette_f.setColor(QPalette::Window, QColor("goldenrod"));
+    QPalette helpPalette_g;
+    helpPalette_g.setColor(QPalette::Window, QColor("lightblue"));
+    int i = 0;
+    while (true) {
+        QScriptValue info = script->evaluate(QString("ExtraKeyTable[%1]").arg(i));
+        if (info.isUndefined()) {
+            break;
+        }
+        qint32 r = info.property(0).toInt32();
+        qint32 c = info.property(1).toInt32();
+        qint32 f = info.property(2).toInt32();
+        QString s = info.property(3).toString();
+        int top = 167 + 65*r + 20*f;
+        int left = 70 + 57*c;
+        QPalette &p = f == 1 ? helpPalette_g : helpPalette_f;
+        QLabel *help = new QLabel(s, parent);
+        help->move(left, top);
+        help->resize(16, 16);
+        help->setAutoFillBackground(true);
+        help->setPalette(p);
+        help->setMargin(1);
+        help->setAlignment(Qt::AlignHCenter);
+        help->setFont(QFont("Courier", 14));
+        help->setVisible(false);
+        helplabels[40+r*10+c+(f>0)*40] = help;
+        i++;
     }
     connect(&mapper, SIGNAL(mapped(const QString &)), this, SLOT(keyPress(const QString &)));
 
@@ -280,7 +334,13 @@ void CalcWidget::keyPress(const QString &key)
 void CalcWidget::keyPressEvent(QKeyEvent *event)
 {
     QString s = event->text();
-    if (s != "") {
+    if (s == "h") {
+        for (size_t i = 0; i < sizeof(helplabels)/sizeof(helplabels[0]); i++) {
+            if (helplabels[i] != NULL) {
+                helplabels[i]->setVisible(!helplabels[i]->isVisible());
+            }
+        }
+    } else if (s != "") {
         if (s == "\b") {
             s = "\\b";
         } else if (s == "\r") {
