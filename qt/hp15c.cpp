@@ -403,10 +403,10 @@ int main(int argc, char **argv)
     frame.setWindowTitle("HP 15C");
     CalcWidget calc(&frame);
 
-    QMenuBar *menubar = new QMenuBar(0);
+    QMenuBar *menubar = new QMenuBar(&frame);
     QMenu *testmenu = menubar->addMenu("Test");
-    QAction *testaction = new QAction("Test", testmenu);
-    testmenu->addAction(testaction);
+    QAction *testaction = testmenu->addAction("&Test");
+    testaction->setShortcut(QString("Ctrl+T"));
     QObject::connect(testaction, SIGNAL(triggered()), &calc, SLOT(start_tests()));
 
     a.init();
