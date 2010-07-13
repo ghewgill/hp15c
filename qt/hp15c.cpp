@@ -1,3 +1,4 @@
+#include <QAbstractButton>
 #include <QApplication>
 #include <QFile>
 #include <QFrame>
@@ -7,6 +8,7 @@
 #include <QMessageBox>
 #include <QPainter>
 #include <QScriptEngine>
+#include <QSignalMapper>
 #include <QTimer>
 
 QScriptEngine *script;
@@ -42,6 +44,43 @@ void Timeout::onTimeout()
     checkError(r);
 }
 
+class CalcButton: public QAbstractButton {
+    Q_OBJECT
+public:
+    CalcButton(QWidget *parent, QPixmap &base, int r, int c, int h);
+protected:
+    virtual void paintEvent(QPaintEvent *event);
+    virtual QSize sizeHint() const;
+private:
+    QPixmap &base;
+    const QPoint pos;
+    const QSize size;
+};
+
+CalcButton::CalcButton(QWidget *parent, QPixmap &b, int r, int c, int h)
+  : QAbstractButton(parent),
+    base(b),
+    pos(81 + c * 57, 169 + r * 65),
+    size(39, h)
+{
+    move(pos);
+}
+
+void CalcButton::paintEvent(QPaintEvent *event)
+{
+    QPainter painter(this);
+    if (isDown()) {
+        painter.drawPixmap(QPoint(0, 0), base, QRect(pos + QPoint(0, 1), size));
+    } else {
+        painter.drawPixmap(QPoint(0, 0), base, QRect(pos, size));
+    }
+}
+
+QSize CalcButton::sizeHint() const
+{
+    return size;
+}
+
 class CalcWidget: public QWidget {
     Q_OBJECT
 public:
@@ -60,9 +99,9 @@ public:
     void set_user(int on);
 public slots:
     void start_tests();
+    void keyPress(const QString &key);
 protected:
     virtual void keyPressEvent(QKeyEvent *event);
-    virtual void mousePressEvent(QMouseEvent *event);
 private:
     QPixmap face;
     QLabel calc;
@@ -75,6 +114,8 @@ private:
     QLabel trigmode;
     QLabel complex;
     QLabel prgm;
+    CalcButton *buttons[40];
+    QSignalMapper mapper;
 };
 
 CalcWidget *g_CalcWidget;
@@ -89,7 +130,8 @@ CalcWidget::CalcWidget(QWidget *parent)
    g("g", parent),
    trigmode(parent),
    complex("C", parent),
-   prgm("PRGM", parent)
+   prgm("PRGM", parent),
+   mapper(this)
 {
     g_CalcWidget = this;
     calc.setPixmap(face);
@@ -117,6 +159,25 @@ CalcWidget::CalcWidget(QWidget *parent)
     trigmode.move(300, 100);
     complex.move(390, 100);
     prgm.move(410, 100);
+
+    for (int r = 0; r < 4; r++) {
+        for (int c = 0; c < 10; c++) {
+            int h = 34;
+            if (c == 5 && r >= 2) {
+                if (r == 2) {
+                    h = 99;
+                } else {
+                    continue;
+                }
+            }
+            CalcButton *b = new CalcButton(parent, face, r, c, h);
+            mapper.setMapping(b, script->evaluate(QString("KeyTable[%1][%2]").arg(r).arg(c)).toString());
+            connect(b, SIGNAL(clicked()), &mapper, SLOT(map()));
+            buttons[r*4+c] = b;
+        }
+    }
+    connect(&mapper, SIGNAL(mapped(const QString &)), this, SLOT(keyPress(const QString &)));
+
     clear_digits();
     set_user(false);
     clear_shift();
@@ -207,6 +268,15 @@ void CalcWidget::start_tests()
     checkError(r);
 }
 
+void CalcWidget::keyPress(const QString &key)
+{
+    QString k = key;
+    if (k == "\r") {
+        k = "\\r";
+    }
+    script->evaluate(QString("key('%1')").arg(k));
+}
+
 void CalcWidget::keyPressEvent(QKeyEvent *event)
 {
     QString s = event->text();
@@ -218,19 +288,6 @@ void CalcWidget::keyPressEvent(QKeyEvent *event)
         }
         QScriptValue r = script->evaluate(QString("key('%1')").arg(s));
         checkError(r);
-    }
-}
-
-void CalcWidget::mousePressEvent(QMouseEvent *event)
-{
-    int x = event->pos().x();
-    int y = event->pos().y();
-    if (x >= 65 && x < 645 && y >= 155 && y < 405) {
-        int c = (x - 65) / 57;
-        int r = (y - 155) / 65;
-        if (c >= 0 && c < 10 && r >= 0 && r < 4) {
-            script->evaluate(QString().sprintf("key(KeyTable[%d][%d])", r, c));
-        }
     }
 }
 
@@ -351,6 +408,11 @@ HP15C::HP15C(int argc, char *argv[])
 {
     script = new QScriptEngine();
     script->globalObject().setProperty("alert", script->newFunction(mylert));
+
+    load(":/sprintf-0.6.js");
+    load(":/matrix.js");
+    load(":/hp15c.js");
+    load(":/test.js");
 }
 
 void HP15C::init()
@@ -375,11 +437,6 @@ void HP15C::init()
     script->globalObject().setProperty("Display", dispval);
 
     script->globalObject().setProperty("window", script->newQObject(new QObject()));
-
-    load(":/sprintf-0.6.js");
-    load(":/matrix.js");
-    load(":/hp15c.js");
-    load(":/test.js");
 
     script->evaluate("init()");
 }
