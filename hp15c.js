@@ -2792,6 +2792,13 @@ function key(k, override) {
     }
 }
 
+function paste(s) {
+    if (!Prgm) {
+        new Opcode(null, function() { push(s); }).exec();
+        update_display();
+    }
+}
+
 function init() {
     for (var i = 0; i < Reg.length; i++) {
         Reg[i] = 0;
