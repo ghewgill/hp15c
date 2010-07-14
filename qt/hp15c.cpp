@@ -1,5 +1,6 @@
 #include <QAbstractButton>
 #include <QApplication>
+#include <QClipboard>
 #include <QFile>
 #include <QFrame>
 #include <QKeyEvent>
@@ -98,6 +99,8 @@ public:
     void set_trigmode(const QString &mode);
     void set_user(int on);
 public slots:
+    void copy();
+    void paste();
     void start_tests();
     void keyPress(const QString &key);
 protected:
@@ -316,6 +319,21 @@ void CalcWidget::set_user(int on)
     user.setVisible(on);
 }
 
+void CalcWidget::copy()
+{
+    QScriptValue x = script->evaluate("Stack[0]");
+    QApplication::clipboard()->setText(x.toString());
+}
+
+void CalcWidget::paste()
+{
+    QString s = QApplication::clipboard()->text();
+    QScriptValueList args;
+    args << s;
+    QScriptValue r = script->evaluate("paste").call(QScriptValue(), args);
+    checkError(r);
+}
+
 void CalcWidget::start_tests()
 {
     QScriptValue r = script->evaluate("start_tests()");
@@ -517,6 +535,13 @@ int main(int argc, char **argv)
     CalcWidget calc(&frame);
 
     QMenuBar *menubar = new QMenuBar(&frame);
+    QMenu *editmenu = menubar->addMenu("Edit");
+    QAction *copyaction = editmenu->addAction("Copy");
+    copyaction->setShortcuts(QKeySequence::Copy);
+    QObject::connect(copyaction, SIGNAL(triggered()), &calc, SLOT(copy()));
+    QAction *pasteaction = editmenu->addAction("Paste");
+    pasteaction->setShortcuts(QKeySequence::Paste);
+    QObject::connect(pasteaction, SIGNAL(triggered()), &calc, SLOT(paste()));
     QMenu *testmenu = menubar->addMenu("Test");
     QAction *testaction = testmenu->addAction("&Test");
     testaction->setShortcut(QString("Ctrl+T"));
