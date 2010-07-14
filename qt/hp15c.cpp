@@ -324,11 +324,10 @@ void CalcWidget::start_tests()
 
 void CalcWidget::keyPress(const QString &key)
 {
-    QString k = key;
-    if (k == "\r") {
-        k = "\\r";
-    }
-    script->evaluate(QString("key('%1')").arg(k));
+    QScriptValueList args;
+    args << key;
+    QScriptValue r = script->evaluate("key").call(QScriptValue(), args);
+    checkError(r);
 }
 
 void CalcWidget::keyPressEvent(QKeyEvent *event)
@@ -341,12 +340,9 @@ void CalcWidget::keyPressEvent(QKeyEvent *event)
             }
         }
     } else if (s != "") {
-        if (s == "\b") {
-            s = "\\b";
-        } else if (s == "\r") {
-            s = "\\r";
-        }
-        QScriptValue r = script->evaluate(QString("key('%1')").arg(s));
+        QScriptValueList args;
+        args << s;
+        QScriptValue r = script->evaluate("key").call(QScriptValue(), args);
         checkError(r);
     }
 }
