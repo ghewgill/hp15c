@@ -123,7 +123,7 @@ CalcWidget *g_CalcWidget;
 
 CalcWidget::CalcWidget(QWidget *parent)
  : QWidget(parent),
-   face(":/15.jpg"),
+   face(":/15.png"),
    calc(parent),
    neg(parent),
    user("USER", parent),
