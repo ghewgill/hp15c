@@ -140,8 +140,6 @@ CalcWidget::CalcWidget(QWidget *parent)
     g_CalcWidget = this;
     calc.setPixmap(face);
     setMinimumSize(face.size());
-    // http://lists.trolltech.com/qt-interest/2008-05/thread00137-0.html
-    calc.setAttribute(Qt::WA_TransparentForMouseEvents);
     for (int i = 0; i < 10; i++) {
         digit[i] = new QLabel(parent);
         digit[i]->move(175 + i * 27, 67);
