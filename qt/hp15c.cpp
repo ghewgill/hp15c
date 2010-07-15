@@ -5,6 +5,7 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QMainWindow>
+#include <QMap>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPainter>
@@ -108,6 +109,7 @@ protected:
     virtual void keyPressEvent(QKeyEvent *event);
 private:
     QPixmap face;
+    QMap<char, QPixmap> pixmaps;
     QLabel calc;
     QLabel *digit[10];
     QLabel *decimal[10];
@@ -145,6 +147,13 @@ CalcWidget::CalcWidget(QWidget *parent)
     calc.resize(face.size());
 
     setMinimumSize(face.size());
+
+    const char *pixmap_chars = "0123456789-ABCDEoru";
+    for (const char *p = pixmap_chars; *p != 0; p++) {
+        pixmaps[*p] = QPixmap(QString(":/%1.png").arg(*p));
+    }
+    pixmaps['.'] = QPixmap(":/decimal.png");
+    pixmaps[','] = QPixmap(":/comma.png");
 
     for (int i = 0; i < 10; i++) {
         digit[i] = new QLabel(parent);
@@ -285,7 +294,7 @@ void CalcWidget::clear_shift()
 
 void CalcWidget::set_comma(int i)
 {
-    decimal[i]->setPixmap(QPixmap(":/comma.png"));
+    decimal[i]->setPixmap(pixmaps[',']);
     decimal[i]->setVisible(true);
 }
 
@@ -296,13 +305,13 @@ void CalcWidget::set_complex(int on)
 
 void CalcWidget::set_decimal(int i)
 {
-    decimal[i]->setPixmap(QPixmap(":/decimal.png"));
+    decimal[i]->setPixmap(pixmaps['.']);
     decimal[i]->setVisible(true);
 }
 
 void CalcWidget::set_digit(int i, char d)
 {
-    digit[i]->setPixmap(QPixmap(QString().sprintf(":/%c.png", d)));
+    digit[i]->setPixmap(pixmaps[d]);
     digit[i]->setVisible(true);
 }
 
