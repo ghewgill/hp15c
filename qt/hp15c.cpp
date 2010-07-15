@@ -2,9 +2,9 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QFile>
-#include <QFrame>
 #include <QKeyEvent>
 #include <QLabel>
+#include <QMainWindow>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPainter>
@@ -65,6 +65,7 @@ CalcButton::CalcButton(QWidget *parent, QPixmap &b, int r, int c, int h)
     size(39, h)
 {
     move(pos);
+    resize(size);
 }
 
 void CalcButton::paintEvent(QPaintEvent *event)
@@ -138,29 +139,51 @@ CalcWidget::CalcWidget(QWidget *parent)
    mapper(this)
 {
     g_CalcWidget = this;
+
     calc.setPixmap(face);
+    calc.setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    calc.resize(face.size());
+
     setMinimumSize(face.size());
+
     for (int i = 0; i < 10; i++) {
         digit[i] = new QLabel(parent);
+        digit[i]->setAlignment(Qt::AlignLeft | Qt::AlignTop);
         digit[i]->move(175 + i * 27, 67);
         decimal[i] = new QLabel(parent);
+        decimal[i]->setAlignment(Qt::AlignLeft | Qt::AlignTop);
         decimal[i]->move(194 + i * 27, 91);
     }
+
     neg.setPixmap(QPixmap(":/neg.png"));
+    neg.setAlignment(Qt::AlignLeft | Qt::AlignTop);
     neg.move(158, 80);
+
     QFont font("sans", 10);
-    user.setFont(font);
-    f.setFont(font);
-    g.setFont(font);
-    trigmode.setFont(font);
-    complex.setFont(font);
-    prgm.setFont(font);
+
+    user.setAlignment(Qt::AlignLeft | Qt::AlignTop);
     user.move(190, 100);
+    user.setFont(font);
+
+    f.setAlignment(Qt::AlignLeft | Qt::AlignTop);
     f.move(230, 100);
+    f.setFont(font);
+
+    g.setAlignment(Qt::AlignLeft | Qt::AlignTop);
     g.move(250, 100);
+    g.setFont(font);
+
+    trigmode.setAlignment(Qt::AlignLeft | Qt::AlignTop);
     trigmode.move(300, 100);
+    trigmode.setFont(font);
+
+    complex.setAlignment(Qt::AlignLeft | Qt::AlignTop);
     complex.move(390, 100);
+    complex.setFont(font);
+
+    prgm.setAlignment(Qt::AlignLeft | Qt::AlignTop);
     prgm.move(410, 100);
+    prgm.setFont(font);
 
     QPalette helpPalette;
     helpPalette.setColor(QPalette::Window, Qt::yellow);
@@ -528,22 +551,24 @@ int main(int argc, char **argv)
 {
     HP15C a(argc, argv);
 
-    QFrame frame;
+    QMainWindow frame;
     frame.setWindowTitle("HP 15C");
-    CalcWidget calc(&frame);
+    CalcWidget *calc = new CalcWidget(&frame);
+    frame.setCentralWidget(calc);
+    frame.setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-    QMenuBar *menubar = new QMenuBar(&frame);
+    QMenuBar *menubar = frame.menuBar();
     QMenu *editmenu = menubar->addMenu("Edit");
     QAction *copyaction = editmenu->addAction("Copy");
     copyaction->setShortcuts(QKeySequence::Copy);
-    QObject::connect(copyaction, SIGNAL(triggered()), &calc, SLOT(copy()));
+    QObject::connect(copyaction, SIGNAL(triggered()), calc, SLOT(copy()));
     QAction *pasteaction = editmenu->addAction("Paste");
     pasteaction->setShortcuts(QKeySequence::Paste);
-    QObject::connect(pasteaction, SIGNAL(triggered()), &calc, SLOT(paste()));
+    QObject::connect(pasteaction, SIGNAL(triggered()), calc, SLOT(paste()));
     QMenu *testmenu = menubar->addMenu("Test");
     QAction *testaction = testmenu->addAction("&Test");
     testaction->setShortcut(QString("Ctrl+T"));
-    QObject::connect(testaction, SIGNAL(triggered()), &calc, SLOT(start_tests()));
+    QObject::connect(testaction, SIGNAL(triggered()), calc, SLOT(start_tests()));
 
     a.init();
 
