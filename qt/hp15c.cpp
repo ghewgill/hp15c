@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QKeyEvent>
 #include <QLabel>
+#include <QLayout>
 #include <QMainWindow>
 #include <QMap>
 #include <QMenuBar>
@@ -144,6 +145,7 @@ CalcWidget::CalcWidget(QWidget *parent)
 
     calc.setPixmap(face);
     calc.setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    calc.move(0, 0);
     calc.resize(face.size());
 
     setMinimumSize(face.size());
@@ -562,21 +564,23 @@ int main(int argc, char **argv)
 
     QMainWindow frame;
     frame.setWindowTitle("HP 15C");
-    CalcWidget *calc = new CalcWidget(&frame);
-    frame.setCentralWidget(calc);
-    frame.setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
     QMenuBar *menubar = frame.menuBar();
     QMenu *editmenu = menubar->addMenu("Edit");
     QAction *copyaction = editmenu->addAction("Copy");
     copyaction->setShortcuts(QKeySequence::Copy);
-    QObject::connect(copyaction, SIGNAL(triggered()), calc, SLOT(copy()));
     QAction *pasteaction = editmenu->addAction("Paste");
     pasteaction->setShortcuts(QKeySequence::Paste);
-    QObject::connect(pasteaction, SIGNAL(triggered()), calc, SLOT(paste()));
     QMenu *testmenu = menubar->addMenu("Test");
     QAction *testaction = testmenu->addAction("&Test");
     testaction->setShortcut(QString("Ctrl+T"));
+
+    CalcWidget *calc = new CalcWidget(&frame);
+    frame.setCentralWidget(calc);
+    frame.layout()->setSizeConstraint(QLayout::SetFixedSize);
+
+    QObject::connect(copyaction, SIGNAL(triggered()), calc, SLOT(copy()));
+    QObject::connect(pasteaction, SIGNAL(triggered()), calc, SLOT(paste()));
     QObject::connect(testaction, SIGNAL(triggered()), calc, SLOT(start_tests()));
 
     a.init();
