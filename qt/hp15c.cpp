@@ -88,7 +88,7 @@ QSize CalcButton::sizeHint() const
 class CalcWidget: public QWidget {
     Q_OBJECT
 public:
-    CalcWidget(QMainWindow *parent = 0);
+    CalcWidget(QWidget *parent = 0);
     void clear_digit(int i);
     void clear_digits();
     void clear_shift();
@@ -104,6 +104,7 @@ public:
 public slots:
     void copy();
     void paste();
+    void set_full_keys(bool on);
     void start_tests();
     void keyPress(const QString &key);
 protected:
@@ -128,7 +129,7 @@ private:
 
 CalcWidget *g_CalcWidget;
 
-CalcWidget::CalcWidget(QMainWindow *parent)
+CalcWidget::CalcWidget(QWidget *parent)
  : QWidget(parent),
    face(":/15.png"),
    calc(this),
@@ -147,7 +148,7 @@ CalcWidget::CalcWidget(QMainWindow *parent)
     calc.setAlignment(Qt::AlignLeft | Qt::AlignTop);
     calc.resize(face.size());
 
-    setMinimumSize(face.size());
+    parent->resize(face.size());
 
     const char *pixmap_chars = "0123456789-ABCDEoru";
     for (const char *p = pixmap_chars; *p != 0; p++) {
@@ -365,6 +366,17 @@ void CalcWidget::paste()
     checkError(r);
 }
 
+void CalcWidget::set_full_keys(bool on)
+{
+    if (on) {
+        move(0, 0);
+        parentWidget()->resize(face.size());
+    } else {
+        move(-125, -50);
+        parentWidget()->resize(350, 80);
+    }
+}
+
 void CalcWidget::start_tests()
 {
     QScriptValue r = script->evaluate("start_tests()");
@@ -561,25 +573,31 @@ int main(int argc, char **argv)
 {
     HP15C a(argc, argv);
 
-    QMainWindow frame;
+    QFrame frame;
     frame.setWindowTitle("HP 15C");
 
-    QMenuBar *menubar = frame.menuBar();
+    QMenuBar *menubar = new QMenuBar(); //frame.menuBar();
     QMenu *editmenu = menubar->addMenu("Edit");
     QAction *copyaction = editmenu->addAction("Copy");
     copyaction->setShortcuts(QKeySequence::Copy);
     QAction *pasteaction = editmenu->addAction("Paste");
     pasteaction->setShortcuts(QKeySequence::Paste);
+    QMenu *viewmenu = menubar->addMenu("View");
+    QAction *keysaction = viewmenu->addAction("Full Keyboard");
+    keysaction->setShortcut(QString("Ctrl+K"));
+    keysaction->setCheckable(true);
+    keysaction->setChecked(true);
     QMenu *testmenu = menubar->addMenu("Test");
     QAction *testaction = testmenu->addAction("&Test");
     testaction->setShortcut(QString("Ctrl+T"));
 
     CalcWidget *calc = new CalcWidget(&frame);
-    frame.setCentralWidget(calc);
-    frame.layout()->setSizeConstraint(QLayout::SetFixedSize);
+    //frame.setCentralWidget(calc);
+    //frame.layout()->setSizeConstraint(QLayout::SetFixedSize);
 
     QObject::connect(copyaction, SIGNAL(triggered()), calc, SLOT(copy()));
     QObject::connect(pasteaction, SIGNAL(triggered()), calc, SLOT(paste()));
+    QObject::connect(keysaction, SIGNAL(toggled(bool)), calc, SLOT(set_full_keys(bool)));
     QObject::connect(testaction, SIGNAL(triggered()), calc, SLOT(start_tests()));
 
     a.init();
