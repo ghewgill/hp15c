@@ -88,7 +88,7 @@ QSize CalcButton::sizeHint() const
 class CalcWidget: public QWidget {
     Q_OBJECT
 public:
-    CalcWidget(QWidget *parent = 0);
+    CalcWidget(QMainWindow *parent = 0);
     void clear_digit(int i);
     void clear_digits();
     void clear_shift();
@@ -128,24 +128,23 @@ private:
 
 CalcWidget *g_CalcWidget;
 
-CalcWidget::CalcWidget(QWidget *parent)
+CalcWidget::CalcWidget(QMainWindow *parent)
  : QWidget(parent),
    face(":/15.png"),
-   calc(parent),
-   neg(parent),
-   user("USER", parent),
-   f("f", parent),
-   g("g", parent),
-   trigmode(parent),
-   complex("C", parent),
-   prgm("PRGM", parent),
+   calc(this),
+   neg(this),
+   user("USER", this),
+   f("f", this),
+   g("g", this),
+   trigmode(this),
+   complex("C", this),
+   prgm("PRGM", this),
    mapper(this)
 {
     g_CalcWidget = this;
 
     calc.setPixmap(face);
     calc.setAlignment(Qt::AlignLeft | Qt::AlignTop);
-    calc.move(0, 0);
     calc.resize(face.size());
 
     setMinimumSize(face.size());
@@ -158,10 +157,10 @@ CalcWidget::CalcWidget(QWidget *parent)
     pixmaps[','] = QPixmap(":/comma.png");
 
     for (int i = 0; i < 10; i++) {
-        digit[i] = new QLabel(parent);
+        digit[i] = new QLabel(this);
         digit[i]->setAlignment(Qt::AlignLeft | Qt::AlignTop);
         digit[i]->move(175 + i * 27, 67);
-        decimal[i] = new QLabel(parent);
+        decimal[i] = new QLabel(this);
         decimal[i]->setAlignment(Qt::AlignLeft | Qt::AlignTop);
         decimal[i]->move(194 + i * 27, 91);
     }
@@ -211,7 +210,7 @@ CalcWidget::CalcWidget(QWidget *parent)
                     continue;
                 }
             }
-            CalcButton *b = new CalcButton(parent, face, r, c, h);
+            CalcButton *b = new CalcButton(this, face, r, c, h);
             QString key = script->evaluate(QString("KeyTable[%1][%2]").arg(r).arg(c)).toString();
             mapper.setMapping(b, key);
             connect(b, SIGNAL(clicked()), &mapper, SLOT(map()));
@@ -223,7 +222,7 @@ CalcWidget::CalcWidget(QWidget *parent)
                 } else if (hk == "\r") {
                     hk = QChar(0x21b2);
                 }
-                QLabel *help = new QLabel(hk, parent);
+                QLabel *help = new QLabel(hk, this);
                 help->move(70 + 57 * c, 167 + 65 * r);
                 help->resize(16, 16);
                 help->setAutoFillBackground(true);
@@ -253,7 +252,7 @@ CalcWidget::CalcWidget(QWidget *parent)
         int top = 167 + 65*r + 20*f;
         int left = 70 + 57*c;
         QPalette &p = f == 1 ? helpPalette_g : helpPalette_f;
-        QLabel *help = new QLabel(s, parent);
+        QLabel *help = new QLabel(s, this);
         help->move(left, top);
         help->resize(16, 16);
         help->setAutoFillBackground(true);
