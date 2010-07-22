@@ -1,0 +1,493 @@
+<html>
+<head>
+<title>HP-15C</title>
+<style type="text/css">
+    body {
+        margin: 0;
+    }
+    #stack {
+        float: right;
+    }
+    .stacki {
+        display: none;
+    }
+    #reg {
+        clear: right;
+        float: right;
+    }
+    #test {
+        clear: right;
+        float: right;
+    }
+    #frame {
+        position: relative;
+        height: 450;
+    }
+    #calc {
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+    #press {
+        position: absolute;
+        width: 39;
+        height: 34;
+        overflow: hidden;
+        display: none;
+    }
+    #presskey {
+        position: absolute;
+    }
+    .preload {
+        display: none;
+    }
+    .lcd {
+        position: absolute;
+        display: none;
+    }
+    .indicator {
+        display: none;
+        position: absolute;
+        top: 100;
+        font-family: sans-serif;
+        font-size: 10px;
+    }
+    .indicator-on {
+        display: block;
+    }
+    #user {
+        left: 190;
+    }
+    #f {
+        left: 230;
+    }
+    #g {
+        left: 250;
+    }
+    #trigmode {
+        left: 300;
+    }
+    #complex {
+        left: 390;
+    }
+    #program {
+        left: 410;
+    }
+    .help {
+        position: absolute;
+        display: none;
+        padding-bottom: 1px;
+        border: thin solid black;
+        background: yellow;
+        color: black;
+        font-family: monospace;
+        width: 1em;
+        text-align: center;
+    }
+    .showhelp {
+        display: block;
+    }
+</style>
+<script type="text/javascript" src="sprintf-0.6.js"></script>
+<script type="text/javascript" src="jsmat/matrix.js"></script>
+<script type="text/javascript" src="hp15c.js"></script>
+<script type="text/javascript">
+//<![CDATA[
+    var Digits = [];
+    var UiDisplay = [];
+    var DisplayDecimal = [];
+    var MouseDown = false;
+    var JustSawKeydown8 = false;
+    var ShowFullKeys = true;
+
+    function foreach(els, fn) {
+        for (var i = 0; i < els.length; i++) {
+            fn(els[i]);
+        }
+    }
+
+    function hasClass(e, name) {
+        var classes = e.className.split(" ");
+        for (var i = 0; i < classes.length; i++) {
+            if (name === classes[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function getElementsByClassName(e, name) {
+        var r = [];
+        var children = e.childNodes;
+        for (var i = 0; i < children.length; i++) {
+            var e = children[i];
+            if (e.nodeType === Node.ELEMENT_NODE) {
+                if (hasClass(e, name)) {
+                    r = r.concat(e);
+                }
+                r = r.concat(getElementsByClassName(e, name));
+            }
+        }
+        return r;
+    }
+
+    function addClass(e, name) {
+        if (!hasClass(e, name)) {
+            e.className = e.className + " " + name;
+        }
+        return e;
+    }
+
+    function removeClass(e, name) {
+        var classes = e.className.split(" ");
+        for (var i = 0; i < classes.length; i++) {
+            if (name === classes[i]) {
+                classes.splice(i, 1);
+                e.className = classes.join(" ");
+                break;
+            }
+        }
+        return e;
+    }
+
+    function toggleClass(e, name, on) {
+        if (hasClass(e, name)) {
+            if (on === false || on === undefined) {
+                removeClass(e, name);
+            }
+        } else {
+            if (on === true || on == undefined) {
+                addClass(e, name);
+            }
+        }
+        return e;
+    }
+
+    function CalcDisplay() {
+        this.clear_digit = function(i) {
+            UiDisplay[i].style.display = "none";
+        }
+
+        this.clear_digits = function() {
+            var e = getElementsByClassName(document.documentElement, "lcd");
+            for (var i = 0; i < e.length; i++) {
+                e[i].style.display = "none";
+            }
+            document.getElementById("neg").style.display = "none";
+            /*
+            for (var i = 0; i < 4; i++) {
+                $("#stack_" + i).val(Stack[i]);
+            }
+            $("#last_x").val(LastX);
+            if (Flags[8]) {
+                for (var i = 0; i < 4; i++) {
+                    $("#stacki_" + i).val(StackI[i]);
+                }
+                $("#last_xi").val(LastXI);
+            }
+            for (var i = 0; i < 10; i++) {
+                $("#reg_" + i).val(Reg[i]);
+            }
+            $("#reg_I").val(Reg['I']);
+            $(".stacki").css("display", Flags[8] ? "inline" : "none");
+            */
+        }
+
+        this.clear_shift = function() {
+            foreach(getElementsByClassName(document.documentElement, "shift"), function(e) {
+                removeClass(e, "indicator-on");
+            });
+        }
+
+        this.set_complex = function(on) {
+            toggleClass(document.getElementById("complex"), "indicator-on", Flags[8]);
+        }
+
+        this.set_comma = function(i) {
+            DisplayDecimal[i].style.display = "inline";
+            DisplayDecimal[i].src = "comma.png";
+        }
+
+        this.set_decimal = function(i) {
+            DisplayDecimal[i].style.display = "inline";
+            DisplayDecimal[i].src = "decimal.png";
+        }
+
+        this.set_digit = function(i, d) {
+            UiDisplay[i].style.display = "inline";
+            UiDisplay[i].src = Digits[d].src;
+        }
+
+        this.set_neg = function() {
+            document.getElementById("neg").style.display = "inline";
+        }
+
+        this.set_prgm = function(on) {
+            toggleClass(document.getElementById("program"), "indicator-on", on);
+        }
+
+        this.set_shift = function(mode) {
+            addClass(document.getElementById(mode), "indicator-on");
+        }
+
+        this.set_trigmode = function(mode) {
+            if (mode === null) {
+                removeClass(document.getElementById("trigmode"), "indicator-on");
+            } else {
+                addClass(document.getElementById("trigmode"), "indicator-on").innerHTML = mode;
+            }
+        }
+
+        this.set_user = function(on) {
+            toggleClass(document.getElementById("user"), "indicator-on", on);
+        }
+    }
+
+    function help() {
+        if (getElementsByClassName(document.documentElement, "help").length === 0) {
+            var helpdiv = document.getElementById("help");
+            var html = "";
+            for (var i = 0; i < 4; i++) {
+                for (var j = 0; j < 10; j++) {
+                    if (i === 3 && (j === 0 || j === 5)) continue;
+                    var c = KeyTable[i][j];
+                    if (c === "\b") {
+                        c = "\u2190";
+                    } else if (c === "\r") {
+                        c = "\u21b2";
+                    }
+                    var top = 167 + 65*i;
+                    var left = 70 + 57*j;
+                    html += '<div class="help" style="top: ' + top + '; left: ' + left + '">' + c + '</div>';
+                }
+            }
+            for (var i in ExtraKeyTable) {
+                var top = 167 + 65*ExtraKeyTable[i][0] + 20*ExtraKeyTable[i][2];
+                var left = 70 + 57*ExtraKeyTable[i][1];
+                var colour = ["goldenrod", null, "lightblue"][ExtraKeyTable[i][2]+1];
+                html += '<div class="help" style="top: ' + top + '; left: ' + left + '; background: ' + colour + '">' + ExtraKeyTable[i][3] + '</div>';
+            }
+            helpdiv.innerHTML = html;
+        }
+        foreach(getElementsByClassName(document.documentElement, "help"), function(e) {
+            toggleClass(e, "showhelp");
+        });
+    }
+
+    function ready() {
+        var digits = "0123456789-ABCDEoru";
+        for (var i = 0; i < digits.length; i++) {
+            var c = digits.substr(i, 1);
+            Digits[c] = new Image(20, 30);
+            Digits[c].src = c + ".png";
+        }
+        for (var i = 0; i < 10; i++) {
+            var d = document.getElementById("dig"+i);
+            d.style.left = 175 + i * 27;
+            d.style.top = 67;
+            UiDisplay[UiDisplay.length] = d;
+        }
+        for (var i = 0; i < 10; i++) {
+            var d = document.getElementById("decimal"+i);
+            d.style.left = 194 + i * 27;
+            d.style.top = 91;
+            DisplayDecimal[DisplayDecimal.length] = d;
+        }
+        var neg = document.getElementById("neg");
+        neg.style.left = 158;
+        neg.style.top = 80;
+
+        Display = new CalcDisplay();
+
+        document.getElementById("calc").onmousedown = function(e) {
+            var calc = document.getElementById("calc");
+            var x = e.pageX - calc.style.left;
+            var y = e.pageY - calc.style.top;
+            if (x >= 65 && x < 645 && y >= 155 && y < 405) {
+                var c = Math.floor((x - 65) / 57);
+                var r = Math.floor((y - 155) / 65);
+                if (c >= 0 && c < 10 && r >= 0 && r < 4) {
+                    MouseDown = true;
+                    var h = 34;
+                    if (c == 5 && r >= 2) {
+                        r = 2;
+                        h = 99;
+                    }
+                    var keyx = 81 + c * 57;
+                    var keyy = 169 + r * 65;
+                    var press = document.getElementById("press");
+                    var presskey = document.getElementById("presskey");
+                    press.style.left = keyx;
+                    press.style.top = keyy;
+                    press.style.height = h;
+                    presskey.style.left = -keyx;
+                    presskey.style.top = -keyy - 1;
+                    press.style.display = "block";
+                    key(KeyTable[r][c]);
+                }
+            }
+            e.stopPropagation();
+            e.preventDefault();
+        };
+        document.getElementById("calc").ondblclick = function(e) {
+            var frame = document.getElementById("frame");
+            if (ShowFullKeys) {
+                frame.style.left = -125;
+                frame.style.top = -50;
+                resizeTo(350, 80);
+            } else {
+                frame.style.left = 0;
+                frame.style.top = 0;
+                resizeTo(692, 447);
+            }
+            ShowFullKeys = !ShowFullKeys;
+        };
+/*
+        document.getElementById("calc").onmouseup = function(e) {
+            if (MouseDown) {
+                document.getElementById("press").style.display = "none";
+                MouseDown = false;
+            }
+        });
+*/
+        document.getElementById("press").onmouseup = function(e) {
+            if (MouseDown) {
+                document.getElementById("press").style.display = "none";
+                MouseDown = false;
+            }
+        };
+/*
+        $(document).keydown(function(e) {
+            // backspace in IE isn't exposed in keypress()
+            // so we catch it here instead
+            // also, Opera fires keypress for backspace
+            // even though preventDefault() is called here,
+            // so ignore "\b" in keypress if we already
+            // handled it here
+            JustSawKeydown8 = false;
+            if (e.which == 8) {
+                key("\b");
+                e.preventDefault();
+                JustSawKeydown8 = true;
+            }
+        });
+*/
+        document.addEventListener("keypress", function(e) {
+            if (e.metaKey) {
+                return;
+            }
+            var c = String.fromCharCode(e.which);
+            if (CharTable[c]) {
+                if (c === "\b" && JustSawKeydown8) {
+                    // ignore
+                } else {
+                    key(c);
+                }
+            } else if (c === "h" || c === "?") {
+                help();
+            } else if (e.which == 20) {
+                run_test();
+            } else {
+                return;
+            }
+            e.preventDefault();
+            e.stopPropagation();
+        }, true);
+
+        window.onfocus = function() {
+            //alert("focus");
+        }
+
+        window.onblur = function() {
+            //alert("blur");
+        }
+
+        window.addEventListener("paste", function(e) {
+            //paste(event.clipboardData.getData("text/plain"));
+            paste("123");
+        });
+
+        init();
+    }
+//]]>
+</script>
+</head>
+<body onload="ready()">
+<!--
+<div id="stack">
+<table>
+<tr><td align="right">T</td><td><input id="stack_3" size="8"></td><td align="right" class="stacki">Ti</td><td class="stacki"><input id="stacki_3" size="8"></td></tr>
+<tr><td align="right">Z</td><td><input id="stack_2" size="8"></td><td align="right" class="stacki">Zi</td><td class="stacki"><input id="stacki_2" size="8"></td></tr>
+<tr><td align="right">Y</td><td><input id="stack_1" size="8"></td><td align="right" class="stacki">Yi</td><td class="stacki"><input id="stacki_1" size="8"></td></tr>
+<tr><td align="right">X</td><td><input id="stack_0" size="8"></td><td align="right" class="stacki">Xi</td><td class="stacki"><input id="stacki_0" size="8"></td></tr>
+<tr><td align="right">last X</td><td><input id="last_x" size="8"></td><td align="right" class="stacki">last Xi</td><td class="stacki"><input id="last_xi" size="8"></td></tr>
+</table>
+</div>
+<div id="reg">
+<table>
+<tr><td>0</td><td><input id="reg_0"></td></tr>
+<tr><td>1</td><td><input id="reg_1"></td></tr>
+<tr><td>2</td><td><input id="reg_2"></td></tr>
+<tr><td>3</td><td><input id="reg_3"></td></tr>
+<tr><td>4</td><td><input id="reg_4"></td></tr>
+<tr><td>5</td><td><input id="reg_5"></td></tr>
+<tr><td>6</td><td><input id="reg_6"></td></tr>
+<tr><td>7</td><td><input id="reg_7"></td></tr>
+<tr><td>8</td><td><input id="reg_8"></td></tr>
+<tr><td>9</td><td><input id="reg_9"></td></tr>
+<tr><td>I</td><td><input id="reg_I"></td></tr>
+</table>
+</div>
+-->
+<img class="preload" src="0.png">
+<img class="preload" src="1.png">
+<img class="preload" src="2.png">
+<img class="preload" src="3.png">
+<img class="preload" src="4.png">
+<img class="preload" src="5.png">
+<img class="preload" src="6.png">
+<img class="preload" src="7.png">
+<img class="preload" src="8.png">
+<img class="preload" src="9.png">
+<img class="preload" src="decimal.png">
+<img class="preload" src="comma.png">
+<img class="preload" src="neg.png">
+<div id="frame">
+<img id="calc" src="15.jpg">
+<div id="press"><img id="presskey" src="15.jpg"></div>
+<img id="dig0" class="lcd">
+<img id="dig1" class="lcd">
+<img id="dig2" class="lcd">
+<img id="dig3" class="lcd">
+<img id="dig4" class="lcd">
+<img id="dig5" class="lcd">
+<img id="dig6" class="lcd">
+<img id="dig7" class="lcd">
+<img id="dig8" class="lcd">
+<img id="dig9" class="lcd">
+<img id="decimal0" class="lcd">
+<img id="decimal1" class="lcd">
+<img id="decimal2" class="lcd">
+<img id="decimal3" class="lcd">
+<img id="decimal4" class="lcd">
+<img id="decimal5" class="lcd">
+<img id="decimal6" class="lcd">
+<img id="decimal7" class="lcd">
+<img id="decimal8" class="lcd">
+<img id="decimal9" class="lcd">
+<img id="neg" class="lcd" src="neg.png">
+<div id="user" class="indicator">USER</div>
+<div id="f" class="shift indicator">f</div>
+<div id="g" class="shift indicator">g</div>
+<div id="trigmode" class="indicator"></div>
+<div id="complex" class="indicator">C</div>
+<div id="program" class="indicator">PRGM</div>
+<div id="help"></div>
+</div>
+<!--
+<div id="test">
+<input type="button" onclick="run_test()" value="Test">
+</div>
+-->
+</body>
+</html>
