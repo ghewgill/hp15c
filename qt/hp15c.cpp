@@ -148,9 +148,6 @@ CalcWidget::CalcWidget(QWidget *parent)
     calc.setAlignment(Qt::AlignLeft | Qt::AlignTop);
     calc.resize(face.size());
 
-    // resize holder widget to our size
-    parent->parentWidget()->resize(face.size());
-
     const char *pixmap_chars = "0123456789-ABCDEoru";
     for (const char *p = pixmap_chars; *p != 0; p++) {
         pixmaps[*p] = QPixmap(QString(":/%1.png").arg(*p));
@@ -369,12 +366,15 @@ void CalcWidget::paste()
 
 void CalcWidget::set_full_keys(bool on)
 {
+    QMenuBar *menu = static_cast<QMainWindow *>(parentWidget()->parentWidget())->menuBar();
     if (on) {
         move(0, 0);
-        parentWidget()->parentWidget()->resize(face.size());
+        parentWidget()->move(0, 0);
+        parentWidget()->parentWidget()->resize(face.size() + QSize(0, menu->height()));
     } else {
         move(-125, -50);
-        parentWidget()->parentWidget()->resize(350, 80);
+        parentWidget()->move(0, menu->height());
+        parentWidget()->parentWidget()->resize(350, 80 + menu->height());
     }
 }
 
@@ -603,6 +603,8 @@ int main(int argc, char **argv)
     QObject::connect(testaction, SIGNAL(triggered()), calc, SLOT(start_tests()));
 
     a.init();
+
+    g_CalcWidget->set_full_keys(true);
 
     mainwin.show();
     return a.exec();
