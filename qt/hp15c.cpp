@@ -148,7 +148,8 @@ CalcWidget::CalcWidget(QWidget *parent)
     calc.setAlignment(Qt::AlignLeft | Qt::AlignTop);
     calc.resize(face.size());
 
-    parent->resize(face.size());
+    // resize holder widget to our size
+    parent->parentWidget()->resize(face.size());
 
     const char *pixmap_chars = "0123456789-ABCDEoru";
     for (const char *p = pixmap_chars; *p != 0; p++) {
@@ -370,10 +371,10 @@ void CalcWidget::set_full_keys(bool on)
 {
     if (on) {
         move(0, 0);
-        parentWidget()->resize(face.size());
+        parentWidget()->parentWidget()->resize(face.size());
     } else {
         move(-125, -50);
-        parentWidget()->resize(350, 80);
+        parentWidget()->parentWidget()->resize(350, 80);
     }
 }
 
@@ -573,10 +574,10 @@ int main(int argc, char **argv)
 {
     HP15C a(argc, argv);
 
-    QFrame frame;
-    frame.setWindowTitle("HP 15C");
+    QMainWindow mainwin;
+    mainwin.setWindowTitle("HP 15C");
 
-    QMenuBar *menubar = new QMenuBar(); //frame.menuBar();
+    QMenuBar *menubar = mainwin.menuBar();
     QMenu *editmenu = menubar->addMenu("Edit");
     QAction *copyaction = editmenu->addAction("Copy");
     copyaction->setShortcuts(QKeySequence::Copy);
@@ -591,9 +592,10 @@ int main(int argc, char **argv)
     QAction *testaction = testmenu->addAction("&Test");
     testaction->setShortcut(QString("Ctrl+T"));
 
-    CalcWidget *calc = new CalcWidget(&frame);
-    //frame.setCentralWidget(calc);
-    //frame.layout()->setSizeConstraint(QLayout::SetFixedSize);
+    QWidget holder(&mainwin);
+    CalcWidget *calc = new CalcWidget(&holder);
+    mainwin.setCentralWidget(&holder);
+    //mainwin.layout()->setSizeConstraint(QLayout::SetFixedSize);
 
     QObject::connect(copyaction, SIGNAL(triggered()), calc, SLOT(copy()));
     QObject::connect(pasteaction, SIGNAL(triggered()), calc, SLOT(paste()));
@@ -602,7 +604,7 @@ int main(int argc, char **argv)
 
     a.init();
 
-    frame.show();
+    mainwin.show();
     return a.exec();
 }
 
