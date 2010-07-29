@@ -2704,6 +2704,9 @@ function decode(k) {
         d = CharTable[k][s];
     } else {
         d = CharTable[k];
+        if (d === undefined) {
+            return null;
+        }
     }
     OldPrefix = Prefix;
     Prefix = null;
