@@ -186,6 +186,11 @@ class CalcFrame extends JFrame {
         return baos.toByteArray();
     }
 
+    void jsCall(String name, Object... args) {
+        Function fn = (Function) cx.evaluateString(scope, name, null, 1, null);
+        fn.call(cx, scope, null, args);
+    }
+
     public CalcFrame() {
         super("HP 15C");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -213,7 +218,7 @@ class CalcFrame extends JFrame {
         testitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, ActionEvent.CTRL_MASK));
         testitem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Object r = cx.evaluateString(scope, "start_tests()", null, 1, null);
+                jsCall("start_tests");
             }
         });
         testmenu.add(testitem);
@@ -311,24 +316,20 @@ class CalcFrame extends JFrame {
         display.clear_shift();
         display.set_trigmode(null);
 
-        Object d = Context.javaToJS(new Display(), scope);
-        ScriptableObject.putProperty(scope, "Display", d);
+        ScriptableObject.putProperty(scope, "Display", Context.javaToJS(new Display(), scope));
         ScriptableObject.putProperty(scope, "window", Context.javaToJS(new Window(), scope));
         ScriptableObject.putProperty(scope, "console", Context.javaToJS(new Console(), scope));
 
-        Object r = cx.evaluateString(scope, "init()", null, 1, null);
+        jsCall("init");
 
         addKeyListener(new KeyAdapter() {
             public void keyTyped(KeyEvent e) {
-                String k = Character.toString(e.getKeyChar());
-                switch (e.getKeyChar()) {
-                    case '\n':
-                        k = "\\r";
-                        break;
-                    case 0x14: // ^T
-                        return;
+                char c = e.getKeyChar();
+                if (c == 0x14) {
+                    return;
                 }
-                Object r = cx.evaluateString(scope, "key('"+k+"')", null, 1, null);
+                String k = Character.toString(c);
+                jsCall("key", k);
             }
         });
 
