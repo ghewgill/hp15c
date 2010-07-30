@@ -185,6 +185,7 @@ var CharTable = {
     'x': [_(OpXy), _(OpClearReg), _(OpRnd)],
     '\b': [_(OpBack), _(OpClearPrefix), _(OpClx)],
     '\r': [_(OpEnter), _(OpRand), _(OpLastx)],
+    '\n': [_(OpEnter), _(OpRand), _(OpLastx)],
     '1': [_(Op1), _(OpToR), _(OpToP)],
     '2': [_(Op2), _(OpToHms), _(OpToH)],
     '3': [_(Op3), _(OpToRad), _(OpToDeg)],
