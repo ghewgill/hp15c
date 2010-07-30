@@ -9,6 +9,7 @@ public class HP15C {
     }
 
     public static void main(String[] args) {
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
         final HP15C app = new HP15C();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
