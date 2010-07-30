@@ -1,5 +1,7 @@
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -11,6 +13,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -309,6 +312,43 @@ class CalcFrame extends JFrame {
             }
         } catch (IOException e) {
         }
+
+        for (int r = 0; r < 4; r++) {
+            for (int c = 0; c < 10; c++) {
+                int i = r * 10 + c;
+                int th = 34;
+                if (c == 5 && r >= 2) {
+                    if (r == 2) {
+                        th = 99;
+                    } else {
+                        continue;
+                    }
+                }
+                final int bx = 81 + c * 57;
+                final int by = 169 + r * 65;
+                final int h = th;
+                ImageIcon bicon = new ImageIcon(face.getImage()) {
+                    public void paintIcon(Component c, Graphics g, int x, int y) {
+                        g.drawImage(getImage(), 0, 0, 39, h, bx, by, bx+39, by+h, null);
+                    }
+                };
+                JButton b = new JButton(bicon);
+                b.setPressedIcon(new ImageIcon(face.getImage()) {
+                    public void paintIcon(Component c, Graphics g, int x, int y) {
+                        g.drawImage(getImage(), 0, 0, 39, h, bx, by+1, bx+39, by+1+h, null);
+                    }
+                });
+                final String key = cx.evaluateString(scope, String.format("KeyTable[%1$d][%2$d]", r, c), null, 1, null).toString();
+                b.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        jsCall("key", key);
+                    }
+                });
+                b.setBounds(bx, by, 39, h);
+                pane.add(b, 0);
+            }
+        }
+
         Display display = new Display();
 
         display.clear_digits();
