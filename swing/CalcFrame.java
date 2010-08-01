@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
@@ -12,15 +13,18 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
@@ -41,6 +45,7 @@ class CalcFrame extends JFrame {
     private JLabel trigmode;
     private JLabel complex;
     private JLabel prgm;
+    private JLabel[] helplabels = new JLabel[40*3];
 
     private Context cx;
     private Scriptable scope;
@@ -197,7 +202,8 @@ class CalcFrame extends JFrame {
     public CalcFrame() {
         super("HP 15C");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        Container pane = getContentPane();
+        JPanel pane = new JPanel();
+        setContentPane(pane);
         pane.setLayout(null);
 
         JMenuBar menubar = new JMenuBar();
@@ -346,7 +352,50 @@ class CalcFrame extends JFrame {
                 });
                 b.setBounds(bx, by, 39, h);
                 pane.add(b, 0);
+                if (!(r == 3 && (c == 0 || c == 5))) {
+                    String hk = key;
+                    if (hk == "\b") {
+                        hk = "\u2190";
+                    } else if (hk == "\r") {
+                        hk = "\u21b2";
+                    }
+                    JLabel help = new JLabel(hk);
+                    help.setBounds(70 + 57 * c, 167 + 65 * r, 16, 16);
+                    help.setOpaque(true);
+                    help.setBackground(Color.yellow);
+                    help.setHorizontalAlignment(SwingConstants.CENTER);
+                    help.setFont(new Font("Courier", 0, 14));
+                    help.setVisible(false);
+                    pane.add(help, 0);
+                    helplabels[i] = help;
+                }
             }
+        }
+        Color goldenrod = new Color(218, 165, 32);
+        Color lightblue = new Color(173, 216, 230);
+        int i = 0;
+        while (true) {
+            Object inf = cx.evaluateString(scope, String.format("ExtraKeyTable[%1$d]", i), null, 1, null);
+            if (inf == Context.getUndefinedValue()) {
+                break;
+            }
+            Scriptable info = (Scriptable) inf;
+            int r = ((Number) info.get(0, info)).intValue();
+            int c = ((Number) info.get(1, info)).intValue();
+            int f = ((Number) info.get(2, info)).intValue();
+            String s = info.get(3, info).toString();
+            int top = 167 + 65*r + 20*f;
+            int left = 70 + 57*c;
+            JLabel help = new JLabel(s);
+            help.setBounds(left, top, 16, 16);
+            help.setOpaque(true);
+            help.setBackground(f == 1 ? lightblue : goldenrod);
+            help.setHorizontalAlignment(SwingConstants.CENTER);
+            help.setFont(new Font("Courier", 0, 14));
+            help.setVisible(false);
+            pane.add(help, 0);
+            helplabels[40+r*10+c+(f>0 ? 40 : 0)] = help;
+            i++;
         }
 
         Display display = new Display();
@@ -362,6 +411,16 @@ class CalcFrame extends JFrame {
 
         jsCall("init");
 
+        pane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke('h'), "help");
+        pane.getActionMap().put("help", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                for (JLabel hl : helplabels) {
+                    if (hl != null) {
+                        hl.setVisible(!hl.isVisible());
+                    }
+                }
+            }
+        });
         addKeyListener(new KeyAdapter() {
             public void keyTyped(KeyEvent e) {
                 char c = e.getKeyChar();
