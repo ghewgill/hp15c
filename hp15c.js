@@ -190,7 +190,7 @@ var CharTable = {
     '2': [_(Op2), _(OpToHms), _(OpToH)],
     '3': [_(Op3), _(OpToRad), _(OpToDeg)],
     '-': [_(OpSub), _(OpReIm), decode_test],
-    '': [_(OpOn), _(OpOn), _(OpOn)],
+    '\x1b': [_(OpOn), _(OpOn), _(OpOn)],
     'f': [decode_f, decode_f, decode_f],
     'g': [decode_g, decode_g, decode_g],
     'S': [decode_sto, _(OpFrac), _(OpInt)],
