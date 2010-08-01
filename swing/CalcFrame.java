@@ -421,16 +421,16 @@ class CalcFrame extends JFrame {
                 }
             }
         });
-        addKeyListener(new KeyAdapter() {
-            public void keyTyped(KeyEvent e) {
-                char c = e.getKeyChar();
-                if (c == 0x14) {
-                    return;
+        Scriptable chartable = (Scriptable) cx.evaluateString(scope, "CharTable", null, 1, null);
+        for (Object id : chartable.getIds()) {
+            final String k = id.toString();
+            pane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(k.charAt(0)), k);
+            pane.getActionMap().put(k, new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    jsCall("key", k);
                 }
-                String k = Character.toString(c);
-                jsCall("key", k);
-            }
-        });
+            });
+        }
 
         //Display the window.
         //frame.pack();
