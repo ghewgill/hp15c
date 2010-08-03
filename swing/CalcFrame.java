@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
@@ -433,7 +434,8 @@ class CalcFrame extends JFrame {
         }
 
         //Display the window.
-        //frame.pack();
-        setSize(face.getIconWidth(), face.getIconHeight());
+        pane.setPreferredSize(new Dimension(face.getIconWidth(), face.getIconHeight()));
+        setResizable(false);
+        pack();
     }
 }
