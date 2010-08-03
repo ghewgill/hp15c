@@ -4,6 +4,10 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -216,9 +220,25 @@ class CalcFrame extends JFrame {
         menubar.add(editmenu);
         JMenuItem copyitem = new JMenuItem("Copy");
         copyitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_COPY, 0));
+        copyitem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String s = cx.evaluateString(scope, "Stack[0]", null, 1, null).toString();
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(s), null);
+            }
+        });
         editmenu.add(copyitem);
         JMenuItem pasteitem = new JMenuItem("Paste");
         pasteitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PASTE, 0));
+        pasteitem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    Object s = Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+                    jsCall("paste", s.toString());
+                } catch (UnsupportedFlavorException x) {
+                } catch (IOException x) {
+                }
+            }
+        });
         editmenu.add(pasteitem);
         JMenu viewmenu = new JMenu("View");
         menubar.add(viewmenu);
