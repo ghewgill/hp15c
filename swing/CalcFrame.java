@@ -203,8 +203,12 @@ class CalcFrame extends JFrame {
     public CalcFrame() {
         super("HP 15C");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        JPanel pane = new JPanel();
-        setContentPane(pane);
+        final JPanel outerpane = new JPanel();
+        setContentPane(outerpane);
+        outerpane.setLayout(null);
+
+        final JPanel pane = new JPanel();
+        outerpane.add(pane);
         pane.setLayout(null);
 
         JMenuBar menubar = new JMenuBar();
@@ -218,7 +222,7 @@ class CalcFrame extends JFrame {
         editmenu.add(pasteitem);
         JMenu viewmenu = new JMenu("View");
         menubar.add(viewmenu);
-        JCheckBoxMenuItem keysitem = new JCheckBoxMenuItem("Full Keyboard");
+        final JCheckBoxMenuItem keysitem = new JCheckBoxMenuItem("Full Keyboard");
         keysitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, ActionEvent.CTRL_MASK));
         keysitem.setSelected(true);
         viewmenu.add(keysitem);
@@ -234,10 +238,25 @@ class CalcFrame extends JFrame {
         testmenu.add(testitem);
         setJMenuBar(menubar);
 
-        ImageIcon face = new ImageIcon(loadFile("../15.jpg"));
+        final ImageIcon face = new ImageIcon(loadFile("../15.jpg"));
         JLabel facelabel = new JLabel(face);
         pane.add(facelabel);
         facelabel.setBounds(0, 0, face.getIconWidth(), face.getIconHeight());
+        pane.setBounds(0, 0, face.getIconWidth(), face.getIconHeight());
+
+        keysitem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (keysitem.getState()) {
+                    pane.setLocation(0, 0);
+                    outerpane.setPreferredSize(new Dimension(face.getIconWidth(), face.getIconHeight()));
+                    pack();
+                } else {
+                    pane.setLocation(-125, -50);
+                    outerpane.setPreferredSize(new Dimension(350, 80));
+                    pack();
+                }
+            }
+        });
 
         final String pixmap_chars = "0123456789-ABCDEoru";
         for (int i = 0; i < pixmap_chars.length(); i++) {
@@ -434,7 +453,7 @@ class CalcFrame extends JFrame {
         }
 
         //Display the window.
-        pane.setPreferredSize(new Dimension(face.getIconWidth(), face.getIconHeight()));
+        outerpane.setPreferredSize(new Dimension(face.getIconWidth(), face.getIconHeight()));
         setResizable(false);
         pack();
     }
