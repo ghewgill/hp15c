@@ -75,14 +75,14 @@ class CalcFrame extends JFrame {
 
         private Scriptable func;
 
-        Timeout(int delay, final Scriptable func) {
+        Timeout(int delay, final Scriptable func, boolean repeats) {
             super(delay, new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     Function f = (Function) func;
                     f.call(cx, scope, null, new Object[] {});
                 }
             });
-            setRepeats(false);
+            setRepeats(repeats);
         }
 
         static void init(Context cx, Scriptable scope) {
@@ -90,10 +90,21 @@ class CalcFrame extends JFrame {
             Timeout.scope = scope;
         }
 
-        static Scriptable setTimeout(Scriptable f, int ms) {
-            Timeout t = new Timeout(ms, f);
+        static Scriptable setInterval(Scriptable f, int ms) {
+            Timeout t = new Timeout(ms, f, true);
             t.start();
             return (Scriptable) Context.javaToJS(t, scope);
+        }
+
+        static Scriptable setTimeout(Scriptable f, int ms) {
+            Timeout t = new Timeout(ms, f, false);
+            t.start();
+            return (Scriptable) Context.javaToJS(t, scope);
+        }
+
+        static void clearInterval(Scriptable s) {
+            Timeout t = (Timeout) Context.jsToJava(s, Timeout.class);
+            t.stop();
         }
 
         static void clearTimeout(Scriptable s) {
@@ -341,6 +352,8 @@ class CalcFrame extends JFrame {
         try {
             ScriptableObject.putProperty(scope, "setTimeout", new FunctionObject("setTimeout", Timeout.class.getDeclaredMethod("setTimeout", new Class[] {Scriptable.class, int.class}), scope));
             ScriptableObject.putProperty(scope, "clearTimeout", new FunctionObject("clearTimeout", Timeout.class.getDeclaredMethod("clearTimeout", new Class[] {Scriptable.class}), scope));
+            ScriptableObject.putProperty(scope, "setInterval", new FunctionObject("setInterval", Timeout.class.getDeclaredMethod("setInterval", new Class[] {Scriptable.class, int.class}), scope));
+            ScriptableObject.putProperty(scope, "clearInterval", new FunctionObject("clearInterval", Timeout.class.getDeclaredMethod("clearInterval", new Class[] {Scriptable.class}), scope));
             ScriptableObject.putProperty(scope, "alert", new AlertFunction());
         } catch (NoSuchMethodException e) {
             System.err.println(e);

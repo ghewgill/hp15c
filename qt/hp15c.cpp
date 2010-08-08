@@ -26,17 +26,17 @@ void checkError(QScriptValue r)
 class Timeout: public QTimer {
     Q_OBJECT
 public:
-    Timeout(QScriptValue f, int ms);
+    Timeout(QScriptValue f, int ms, bool single);
 public slots:
     void onTimeout();
 private:
     QScriptValue func;
 };
 
-Timeout::Timeout(QScriptValue f, int ms)
+Timeout::Timeout(QScriptValue f, int ms, bool single)
  : func(f)
 {
-    setSingleShot(true);
+    setSingleShot(single);
     connect(this, SIGNAL(timeout()), this, SLOT(onTimeout()));
     start(ms);
 }
@@ -435,11 +435,25 @@ QScriptValue mylert(QScriptContext *context, QScriptEngine *engine)
     return QScriptValue(QScriptValue::UndefinedValue);
 }
 
+QScriptValue setInterval(QScriptContext *context, QScriptEngine *engine)
+{
+    QScriptValue func = context->argument(0);
+    int ms = context->argument(1).toInt32();
+    return script->newQObject(new Timeout(func, ms, false), QScriptEngine::ScriptOwnership);
+}
+
 QScriptValue setTimeout(QScriptContext *context, QScriptEngine *engine)
 {
     QScriptValue func = context->argument(0);
     int ms = context->argument(1).toInt32();
-    return script->newQObject(new Timeout(func, ms), QScriptEngine::ScriptOwnership);
+    return script->newQObject(new Timeout(func, ms, true), QScriptEngine::ScriptOwnership);
+}
+
+QScriptValue clearInterval(QScriptContext *context, QScriptEngine *engine)
+{
+    QScriptValue timer = context->argument(0);
+    static_cast<Timeout *>(timer.toQObject())->stop();
+    return QScriptValue(QScriptValue::UndefinedValue);
 }
 
 QScriptValue clearTimeout(QScriptContext *context, QScriptEngine *engine)
@@ -537,6 +551,8 @@ void HP15C::init()
 {
     script->globalObject().setProperty("setTimeout", script->newFunction(setTimeout));
     script->globalObject().setProperty("clearTimeout", script->newFunction(clearTimeout));
+    script->globalObject().setProperty("setInterval", script->newFunction(setInterval));
+    script->globalObject().setProperty("clearInterval", script->newFunction(clearInterval));
 
     QObject *disp = new Display();
     QScriptValue dispval = script->newQObject(disp);
