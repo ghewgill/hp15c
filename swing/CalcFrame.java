@@ -13,8 +13,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -192,13 +193,12 @@ class CalcFrame extends JFrame {
         }
     }
 
-    byte[] loadFile(String fn) {
+    byte[] loadFile(InputStream in) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            FileInputStream f = new FileInputStream(fn);
             byte[] buf = new byte[16384];
             while (true) {
-                int n = f.read(buf, 0, buf.length);
+                int n = in.read(buf, 0, buf.length);
                 if (n <= 0) {
                     break;
                 }
@@ -269,7 +269,7 @@ class CalcFrame extends JFrame {
         testmenu.add(testitem);
         setJMenuBar(menubar);
 
-        final ImageIcon face = new ImageIcon(loadFile("../15.jpg"));
+        final ImageIcon face = new ImageIcon(loadFile(getClass().getResourceAsStream("/15.jpg")));
         JLabel facelabel = new JLabel(face);
         pane.add(facelabel);
         facelabel.setBounds(0, 0, face.getIconWidth(), face.getIconHeight());
@@ -292,10 +292,10 @@ class CalcFrame extends JFrame {
         final String pixmap_chars = "0123456789-ABCDEoru";
         for (int i = 0; i < pixmap_chars.length(); i++) {
             char c = pixmap_chars.charAt(i);
-            pixmaps.put(c, new ImageIcon(loadFile("../"+c+".png")));
+            pixmaps.put(c, new ImageIcon(loadFile(getClass().getResourceAsStream("/"+c+".png"))));
         }
-        pixmaps.put('.', new ImageIcon(loadFile("../"+"decimal.png")));
-        pixmaps.put(',', new ImageIcon(loadFile("../"+"comma.png")));
+        pixmaps.put('.', new ImageIcon(loadFile(getClass().getResourceAsStream("/"+"decimal.png"))));
+        pixmaps.put(',', new ImageIcon(loadFile(getClass().getResourceAsStream("/"+"comma.png"))));
 
         digit = new JLabel[10];
         decimal = new JLabel[10];
@@ -309,7 +309,7 @@ class CalcFrame extends JFrame {
             decimal[i].setVerticalAlignment(SwingConstants.TOP);
         }
 
-        neg = new JLabel(new ImageIcon(loadFile("../neg.png")));
+        neg = new JLabel(new ImageIcon(loadFile(getClass().getResourceAsStream("/neg.png"))));
         pane.add(neg, 0);
         neg.setBounds(158, 80, 12, 3);
 
@@ -361,13 +361,13 @@ class CalcFrame extends JFrame {
 
         try {
             String[] files = {
-                "../sprintf-0.6.js",
-                "../jsmat/matrix.js",
-                "../hp15c.js",
-                "../test.js",
+                "/sprintf-0.6.js",
+                "/matrix.js",
+                "/hp15c.js",
+                "/test.js",
             };
             for (String fn : files) {
-                cx.evaluateReader(scope, new FileReader(fn), fn, 1, null);
+                cx.evaluateReader(scope, new InputStreamReader(getClass().getResourceAsStream(fn)), fn, 1, null);
             }
         } catch (IOException e) {
         }

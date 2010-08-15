@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<project name="HP15C" default="dist">
+    <property name="build" location="build" />
+
+    <target name="init">
+        <mkdir dir="${build}" />
+        <delete file="HP15C.jar" />
+    </target>
+
+    <target name="compile" depends="init">
+        <javac
+            srcdir="."
+            destdir="${build}"
+            classpath="external/js.jar"
+        />
+    </target>
+
+    <target name="dist" depends="compile">
+        <copy file="../sprintf-0.6.js" todir="${build}" />
+        <copy file="../jsmat/matrix.js" todir="${build}" />
+        <copy file="../hp15c.js" todir="${build}" />
+        <copy file="../test.js" todir="${build}" />
+        <copy file="../15.jpg" todir="${build}" />
+        <copy file="../0.png" todir="${build}" />
+        <copy file="../1.png" todir="${build}" />
+        <copy file="../2.png" todir="${build}" />
+        <copy file="../3.png" todir="${build}" />
+        <copy file="../4.png" todir="${build}" />
+        <copy file="../5.png" todir="${build}" />
+        <copy file="../6.png" todir="${build}" />
+        <copy file="../7.png" todir="${build}" />
+        <copy file="../8.png" todir="${build}" />
+        <copy file="../9.png" todir="${build}" />
+        <copy file="../-.png" todir="${build}" />
+        <copy file="../A.png" todir="${build}" />
+        <copy file="../B.png" todir="${build}" />
+        <copy file="../C.png" todir="${build}" />
+        <copy file="../D.png" todir="${build}" />
+        <copy file="../E.png" todir="${build}" />
+        <copy file="../o.png" todir="${build}" />
+        <copy file="../r.png" todir="${build}" />
+        <copy file="../u.png" todir="${build}" />
+        <copy file="../decimal.png" todir="${build}" />
+        <copy file="../comma.png" todir="${build}" />
+        <copy file="../neg.png" todir="${build}" />
+        <unjar src="external/js.jar" dest="${build}" />
+        <jar
+            jarfile="HP15C.jar"
+            basedir="${build}"
+            whenmanifestonly="fail"
+            manifest="META-INF/MANIFEST.MF"
+        />
+    </target>
+
+    <target name="clean">
+        <delete dir="${build}" />
+    </target>
+</project>
