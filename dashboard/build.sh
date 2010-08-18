@@ -12,3 +12,5 @@ cp ../jsmat/matrix.js $DEST/jsmat/
 cp Default.png $DEST/
 cp Info.plist $DEST/
 cp hp15c.html $DEST/
+rm $DEST.zip
+zip -r $DEST.zip $DEST
