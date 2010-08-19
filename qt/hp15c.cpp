@@ -611,7 +611,6 @@ int main(int argc, char **argv)
     QWidget holder(&mainwin);
     CalcWidget *calc = new CalcWidget(&holder);
     mainwin.setCentralWidget(&holder);
-    //mainwin.layout()->setSizeConstraint(QLayout::SetFixedSize);
 
     QObject::connect(copyaction, SIGNAL(triggered()), calc, SLOT(copy()));
     QObject::connect(pasteaction, SIGNAL(triggered()), calc, SLOT(paste()));
@@ -623,6 +622,10 @@ int main(int argc, char **argv)
     g_CalcWidget->set_full_keys(true);
 
     mainwin.show();
+
+    // set the final size after showing the window
+    g_CalcWidget->set_full_keys(true);
+
     return a.exec();
 }
 
