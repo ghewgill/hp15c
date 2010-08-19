@@ -226,11 +226,16 @@ class CalcFrame extends JFrame {
         outerpane.add(pane);
         pane.setLayout(null);
 
+        int keymask = ActionEvent.CTRL_MASK;
+        if (System.getProperty("os.name").equals("Mac OS X")) {
+            keymask = ActionEvent.META_MASK;
+        }
+
         JMenuBar menubar = new JMenuBar();
         JMenu editmenu = new JMenu("Edit");
         menubar.add(editmenu);
         JMenuItem copyitem = new JMenuItem("Copy");
-        copyitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_COPY, 0));
+        copyitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, keymask));
         copyitem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String s = cx.evaluateString(scope, "Stack[0]", null, 1, null).toString();
@@ -239,7 +244,7 @@ class CalcFrame extends JFrame {
         });
         editmenu.add(copyitem);
         JMenuItem pasteitem = new JMenuItem("Paste");
-        pasteitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PASTE, 0));
+        pasteitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, keymask));
         pasteitem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -254,13 +259,13 @@ class CalcFrame extends JFrame {
         JMenu viewmenu = new JMenu("View");
         menubar.add(viewmenu);
         final JCheckBoxMenuItem keysitem = new JCheckBoxMenuItem("Full Keyboard");
-        keysitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, ActionEvent.CTRL_MASK));
+        keysitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, keymask));
         keysitem.setSelected(true);
         viewmenu.add(keysitem);
         JMenu testmenu = new JMenu("Test");
         menubar.add(testmenu);
         JMenuItem testitem = new JMenuItem("Test");
-        testitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, ActionEvent.CTRL_MASK));
+        testitem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, keymask));
         testitem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 jsCall("start_tests");
