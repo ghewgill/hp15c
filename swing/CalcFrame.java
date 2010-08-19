@@ -392,6 +392,7 @@ class CalcFrame extends JFrame {
                     }
                 };
                 JButton b = new JButton(bicon);
+                b.setBorderPainted(false);
                 b.setPressedIcon(new ImageIcon(face.getImage()) {
                     public void paintIcon(Component c, Graphics g, int x, int y) {
                         g.drawImage(getImage(), 0, 0, 39, h, bx, by+1, bx+39, by+1+h, null);
