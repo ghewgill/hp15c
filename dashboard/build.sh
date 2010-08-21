@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+set -e
+
 DEST=HP15C.wdgt
 
 rm -rf $DEST
