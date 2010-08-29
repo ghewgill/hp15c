@@ -370,11 +370,11 @@ void CalcWidget::set_full_keys(bool on)
     if (on) {
         move(0, 0);
         parentWidget()->move(0, 0);
-        parentWidget()->parentWidget()->resize(face.size() + QSize(0, menu->height()));
+        parentWidget()->parentWidget()->setFixedSize(face.size() + QSize(0, menu->height()));
     } else {
         move(-125, -50);
         parentWidget()->move(0, menu->height());
-        parentWidget()->parentWidget()->resize(350, 80 + menu->height());
+        parentWidget()->parentWidget()->setFixedSize(350, 80 + menu->height());
     }
 }
 
