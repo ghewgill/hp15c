@@ -14,6 +14,7 @@ OutputBaseFilename=HP15C-win32-install
 OutputDir=.
 Compression=lzma
 SolidCompression=yes
+PrivilegesRequired=lowest
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
