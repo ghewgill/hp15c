@@ -16,33 +16,33 @@
     </target>
 
     <target name="dist" depends="compile">
-        <copy file="../sprintf-0.6.js" todir="${build}" />
-        <copy file="../jsmat/matrix.js" todir="${build}" />
-        <copy file="../hp15c.js" todir="${build}" />
-        <copy file="../test.js" todir="${build}" />
-        <copy file="../15.jpg" todir="${build}" />
-        <copy file="../0.png" todir="${build}" />
-        <copy file="../1.png" todir="${build}" />
-        <copy file="../2.png" todir="${build}" />
-        <copy file="../3.png" todir="${build}" />
-        <copy file="../4.png" todir="${build}" />
-        <copy file="../5.png" todir="${build}" />
-        <copy file="../6.png" todir="${build}" />
-        <copy file="../7.png" todir="${build}" />
-        <copy file="../8.png" todir="${build}" />
-        <copy file="../9.png" todir="${build}" />
-        <copy file="../-.png" todir="${build}" />
-        <copy file="../A.png" todir="${build}" />
-        <copy file="../B.png" todir="${build}" />
-        <copy file="../C.png" todir="${build}" />
-        <copy file="../D.png" todir="${build}" />
-        <copy file="../E.png" todir="${build}" />
-        <copy file="../o.png" todir="${build}" />
-        <copy file="../r.png" todir="${build}" />
-        <copy file="../u.png" todir="${build}" />
-        <copy file="../decimal.png" todir="${build}" />
-        <copy file="../comma.png" todir="${build}" />
-        <copy file="../neg.png" todir="${build}" />
+        <copy file="../common/sprintf-0.6.js" todir="${build}" />
+        <copy file="../common/jsmat/matrix.js" todir="${build}" />
+        <copy file="../common/hp15c.js" todir="${build}" />
+        <copy file="../common/test.js" todir="${build}" />
+        <copy file="../images/15.jpg" todir="${build}" />
+        <copy file="../images/0.png" todir="${build}" />
+        <copy file="../images/1.png" todir="${build}" />
+        <copy file="../images/2.png" todir="${build}" />
+        <copy file="../images/3.png" todir="${build}" />
+        <copy file="../images/4.png" todir="${build}" />
+        <copy file="../images/5.png" todir="${build}" />
+        <copy file="../images/6.png" todir="${build}" />
+        <copy file="../images/7.png" todir="${build}" />
+        <copy file="../images/8.png" todir="${build}" />
+        <copy file="../images/9.png" todir="${build}" />
+        <copy file="../images/-.png" todir="${build}" />
+        <copy file="../images/A.png" todir="${build}" />
+        <copy file="../images/B.png" todir="${build}" />
+        <copy file="../images/C.png" todir="${build}" />
+        <copy file="../images/D.png" todir="${build}" />
+        <copy file="../images/E.png" todir="${build}" />
+        <copy file="../images/o.png" todir="${build}" />
+        <copy file="../images/r.png" todir="${build}" />
+        <copy file="../images/u.png" todir="${build}" />
+        <copy file="../images/decimal.png" todir="${build}" />
+        <copy file="../images/comma.png" todir="${build}" />
+        <copy file="../images/neg.png" todir="${build}" />
         <unjar src="external/js.jar" dest="${build}" />
         <jar
             jarfile="HP15C.jar"

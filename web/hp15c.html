@@ -90,9 +90,9 @@
 </style>
 <!--script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script-->
 <script type="text/javascript" src="jquery-1.4.2.min.js"></script>
-<script type="text/javascript" src="sprintf-0.6.js"></script>
-<script type="text/javascript" src="jsmat/matrix.js"></script>
-<script type="text/javascript" src="hp15c.js"></script>
+<script type="text/javascript" src="../common/sprintf-0.6.js"></script>
+<script type="text/javascript" src="../common/jsmat/matrix.js"></script>
+<script type="text/javascript" src="../common/hp15c.js"></script>
 <script type="text/javascript">
 //<![CDATA[
     var Digits = [];
@@ -136,12 +136,12 @@
 
         this.set_comma = function(i) {
             DisplayDecimal[i].css("display", "inline");
-            DisplayDecimal[i].attr("src", "comma.png");
+            DisplayDecimal[i].attr("src", "../images/comma.png");
         }
 
         this.set_decimal = function(i) {
             DisplayDecimal[i].css("display", "inline");
-            DisplayDecimal[i].attr("src", "decimal.png");
+            DisplayDecimal[i].attr("src", "../images/decimal.png");
         }
 
         this.set_digit = function(i, d) {
@@ -175,7 +175,7 @@
     }
 
     function run_test() {
-        $.getScript("test.js", function() {
+        $.getScript("../common/test.js", function() {
             start_tests();
         });
     }
@@ -213,7 +213,7 @@
         for (var i = 0; i < digits.length; i++) {
             var c = digits.substr(i, 1);
             Digits[c] = new Image(20, 30);
-            Digits[c].src = c + ".png";
+            Digits[c].src = "../images/" + c + ".png";
         }
         for (var i = 0; i < 10; i++) {
             var d = $("#dig"+i);
@@ -335,22 +335,22 @@
 <tr><td>I</td><td><input id="reg_I"></td></tr>
 </table>
 </div>
-<img class="preload" src="0.png">
-<img class="preload" src="1.png">
-<img class="preload" src="2.png">
-<img class="preload" src="3.png">
-<img class="preload" src="4.png">
-<img class="preload" src="5.png">
-<img class="preload" src="6.png">
-<img class="preload" src="7.png">
-<img class="preload" src="8.png">
-<img class="preload" src="9.png">
-<img class="preload" src="decimal.png">
-<img class="preload" src="comma.png">
-<img class="preload" src="neg.png">
+<img class="preload" src="../images/0.png">
+<img class="preload" src="../images/1.png">
+<img class="preload" src="../images/2.png">
+<img class="preload" src="../images/3.png">
+<img class="preload" src="../images/4.png">
+<img class="preload" src="../images/5.png">
+<img class="preload" src="../images/6.png">
+<img class="preload" src="../images/7.png">
+<img class="preload" src="../images/8.png">
+<img class="preload" src="../images/9.png">
+<img class="preload" src="../images/decimal.png">
+<img class="preload" src="../images/comma.png">
+<img class="preload" src="../images/neg.png">
 <div id="frame">
-<img id="calc" src="15.jpg">
-<div id="press"><img id="presskey" src="15.jpg"></div>
+<img id="calc" src="../images/15.jpg">
+<div id="press"><img id="presskey" src="../images/15.jpg"></div>
 <img id="dig0" class="lcd">
 <img id="dig1" class="lcd">
 <img id="dig2" class="lcd">
@@ -371,7 +371,7 @@
 <img id="decimal7" class="lcd">
 <img id="decimal8" class="lcd">
 <img id="decimal9" class="lcd">
-<img id="neg" class="lcd" src="neg.png">
+<img id="neg" class="lcd" src="../images/neg.png">
 <div id="user" class="indicator">USER</div>
 <div id="f" class="shift indicator">f</div>
 <div id="g" class="shift indicator">g</div>

@@ -6,11 +6,11 @@ DEST=HP15C.wdgt
 
 rm -rf $DEST
 mkdir $DEST
-cp ../15.jpg $DEST/
-cp ../*.png $DEST/
-cp ../sprintf-0.6.js ../hp15c.js $DEST/
+cp ../images/15.jpg $DEST/
+cp ../images/*.png $DEST/
+cp ../common/sprintf-0.6.js ../common/hp15c.js $DEST/
 mkdir $DEST/jsmat
-cp ../jsmat/matrix.js $DEST/jsmat/
+cp ../common/jsmat/matrix.js $DEST/jsmat/
 cp Default.png $DEST/
 cp Info.plist $DEST/
 cp hp15c.html $DEST/
