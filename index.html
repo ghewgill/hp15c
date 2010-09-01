@@ -2,6 +2,9 @@
 <head>
 <title>HP-15C Calculator</title>
 <style type="text/css">
+    #calcframe {
+        float: right;
+    }
     #calc {
         border-style: none;
     }
@@ -30,12 +33,48 @@
 <body>
 <h1>HP-15C Calculator</h1>
 <p>Home | <a href="about.html">About</a> | <a href="http://github.com/ghewgill/hp15c">Source</a></p>
-<div><a href="web/hp15c.html" id="calc"><img src="images/15-small.jpg" width="346" height="224"></a></div>
+<div id="calcframe"><a href="web/hp15c.html" id="calc"><img src="images/15-small.jpg" width="346" height="224"></a></div>
+<h2>Online version</h2>
 <noscript>This calculator requires Javascript to be enabled in your browser.</noscript>
+
 <p>Click on the calculator image to open the calculator window.</p>
 <ul>
 <li><kbd>h</kbd> shows help labels for keyboard use</li>
 </ul>
-<p><small>This calculator application should be considered experimental and its results should not be used for anything important. In particular, there are situations where the numeric display is known to be totally wrong.</small></p>
+
+<h2>Download</h2>
+
+<p>
+The calculator is also avalable as a desktop application for various platforms.
+The desktop version is (usually) faster than the web version and supports clipboard copy and paste.
+</p>
+
+<h3>Windows</h3>
+<li><a href="HP15C-win32-install.exe">Windows EXE Installer (and uninstaller)</a> (5 MB)</li>
+<li><a href="HP15C.zip">Windows zip file of executables only (no installer)</a> (6 MB)</li>
+
+<h3>Mac OS X</h3>
+<li><a href="HP15C.dmg">Mac OS X disk image</a> (10 MB)</li>
+<li><a href="HP15C.wdgt.zip">Mac OS X dashboard widget</a> (0.5 MB)</li>
+
+<h3>Java</h3>
+<li><a href="HP15C.jar">Java Swing desktop app (JAR)</a> (1 MB)</li>
+
+<h3>Other</h3>
+<p>
+For other platforms, you can download the <a href="http://github.com/ghewgill/hp15c">source code</a> and build it yourself.
+The Qt version is portable to any platform which supports Qt.
+</p>
+
+<h2>Disclaimer</h2>
+<p>
+<small>This calculator application should be considered experimental and its results should not be used for anything important.
+In particular, there are situations where the numeric display is known to be totally wrong.</small>
+</p>
+
+<p>
+<small>This web site and software is not associated with HP or is subsidiaries. HP and the HP logo are trademarks of HP.</small>
+</p>
+
 </body>
 </html>
