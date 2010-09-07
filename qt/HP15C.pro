@@ -13,3 +13,4 @@ QT += script
 SOURCES += hp15c.cpp
 RESOURCES += hp15c.qrc
 ICON = hp15c.icns
+RC_FILE = hp15c.rc
