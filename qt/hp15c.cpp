@@ -538,6 +538,8 @@ QScriptValue set_user(QScriptContext *context, QScriptEngine *engine)
 HP15C::HP15C(int argc, char *argv[])
  : QApplication(argc, argv)
 {
+    setWindowIcon(QIcon(":/15-128.png"));
+
     script = new QScriptEngine();
     script->globalObject().setProperty("alert", script->newFunction(mylert));
 

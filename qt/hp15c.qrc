@@ -2,6 +2,7 @@
 <RCC version="1.0">
     <qresource>
         <file alias="15.png">15.png</file>
+        <file alias="15-128.png">15-128.png</file>
         <file alias="0.png">../images/0.png</file>
         <file alias="1.png">../images/1.png</file>
         <file alias="2.png">../images/2.png</file>
