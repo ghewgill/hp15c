@@ -43,6 +43,7 @@
         <copy file="../images/decimal.png" todir="${build}" />
         <copy file="../images/comma.png" todir="${build}" />
         <copy file="../images/neg.png" todir="${build}" />
+        <copy file="15-128.png" todir="${build}" />
         <unjar src="external/js.jar" dest="${build}" />
         <jar
             jarfile="HP15C.jar"

@@ -40,7 +40,7 @@ import org.mozilla.javascript.FunctionObject;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Scriptable;
 
-class CalcFrame extends JFrame {
+public class CalcFrame extends JFrame {
     private Map<Character, ImageIcon> pixmaps = new HashMap<Character, ImageIcon>();
     private JLabel digit[];
     private JLabel decimal[];
@@ -215,9 +215,23 @@ class CalcFrame extends JFrame {
         fn.call(cx, scope, null, args);
     }
 
+    public void about() {
+        JOptionPane.showMessageDialog(this, "HP-15C Simulator\nCopyright \u00a9 2010 Greg Hewgill\nhttp://hp15c.com", "About HP-15C", JOptionPane.PLAIN_MESSAGE, new ImageIcon(loadFile(getClass().getResourceAsStream("/15-128.png"))));
+    }
+
+    public boolean quit() {
+        return true;
+    }
+
     public CalcFrame() {
         super("HP 15C");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        try {
+            apple.dts.samplecode.osxadapter.OSXAdapter.setAboutHandler(this, getClass().getDeclaredMethod("about", (Class[])null));
+            apple.dts.samplecode.osxadapter.OSXAdapter.setQuitHandler(this, getClass().getDeclaredMethod("quit", (Class[])null));
+        } catch (NoSuchMethodException x) {
+        }
+
         final JPanel outerpane = new JPanel();
         setContentPane(outerpane);
         outerpane.setLayout(null);

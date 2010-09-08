@@ -106,6 +106,7 @@ public slots:
     void paste();
     void set_full_keys(bool on);
     void start_tests();
+    void about();
     void keyPress(const QString &key);
 protected:
     virtual void keyPressEvent(QKeyEvent *event);
@@ -384,6 +385,11 @@ void CalcWidget::start_tests()
     checkError(r);
 }
 
+void CalcWidget::about()
+{
+    QMessageBox::about(this, "HP15C", "HP-15C Simulator\n\nCopyright \xa9 2010 Greg Hewgill\n\nhttp://hp15c.com");
+}
+
 void CalcWidget::keyPress(const QString &key)
 {
     QScriptValueList args;
@@ -609,6 +615,8 @@ int main(int argc, char **argv)
     QMenu *testmenu = menubar->addMenu("Test");
     QAction *testaction = testmenu->addAction("&Test");
     testaction->setShortcut(QString("Ctrl+T"));
+    QMenu *helpmenu = menubar->addMenu("Help");
+    QAction *aboutaction = helpmenu->addAction("About");
 
     QWidget holder(&mainwin);
     CalcWidget *calc = new CalcWidget(&holder);
@@ -618,6 +626,7 @@ int main(int argc, char **argv)
     QObject::connect(pasteaction, SIGNAL(triggered()), calc, SLOT(paste()));
     QObject::connect(keysaction, SIGNAL(toggled(bool)), calc, SLOT(set_full_keys(bool)));
     QObject::connect(testaction, SIGNAL(triggered()), calc, SLOT(start_tests()));
+    QObject::connect(aboutaction, SIGNAL(triggered()), calc, SLOT(about()));
 
     a.init();
 
