@@ -226,11 +226,6 @@ public class CalcFrame extends JFrame {
     public CalcFrame() {
         super("HP 15C");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        try {
-            apple.dts.samplecode.osxadapter.OSXAdapter.setAboutHandler(this, getClass().getDeclaredMethod("about", (Class[])null));
-            apple.dts.samplecode.osxadapter.OSXAdapter.setQuitHandler(this, getClass().getDeclaredMethod("quit", (Class[])null));
-        } catch (NoSuchMethodException x) {
-        }
 
         final JPanel outerpane = new JPanel();
         setContentPane(outerpane);
@@ -286,6 +281,23 @@ public class CalcFrame extends JFrame {
             }
         });
         testmenu.add(testitem);
+        if (System.getProperty("os.name").equals("Mac OS X")) {
+            try {
+                apple.dts.samplecode.osxadapter.OSXAdapter.setAboutHandler(this, getClass().getDeclaredMethod("about", (Class[])null));
+                apple.dts.samplecode.osxadapter.OSXAdapter.setQuitHandler(this, getClass().getDeclaredMethod("quit", (Class[])null));
+            } catch (NoSuchMethodException x) {
+            }
+        } else {
+            JMenu helpmenu = new JMenu("Help");
+            menubar.add(helpmenu);
+            JMenuItem aboutitem = new JMenuItem("About");
+            aboutitem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    about();
+                }
+            });
+            helpmenu.add(aboutitem);
+        }
         setJMenuBar(menubar);
 
         final ImageIcon face = new ImageIcon(loadFile(getClass().getResourceAsStream("/15.jpg")));
