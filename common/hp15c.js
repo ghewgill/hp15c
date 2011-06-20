@@ -1,3 +1,4 @@
+var On = true;
 var Display;
 var Stack = [0, 0, 0, 0];
 var StackI = [0, 0, 0, 0];
@@ -220,7 +221,7 @@ var KeyTable = [
     ['q', 'E', ')', '^', '\\','_', '7', '8', '9', '/'],
     ['T', 'G', 's', 'c', 't', 'e', '4', '5', '6', '*'],
     ['P', 'U', 'r', 'x', '\b','\r','1', '2', '3', '-'],
-    [' ', 'f', 'g', 'S', 'R', '\r','0', '.', ';', '+']
+    ['\x1b', 'f', 'g', 'S', 'R', '\r','0', '.', ';', '+']
 ];
 var ExtraKeyTable = [
     [3, 6, -1, '!'],
@@ -570,6 +571,9 @@ function log10int(x) {
 function update_lcd(s) {
     LcdDisplay = s;
     Display.clear_digits();
+    if (!On) {
+        return;
+    }
     if (Flags[9] && !BlinkOn) {
         return;
     }
@@ -1869,7 +1873,7 @@ function op_test(t) {
 }
 
 function op_on() {
-    alert("Unimplemented: ON");
+    On = !On;
 }
 
 function op_sto_reg(n) {
@@ -2754,6 +2758,9 @@ function run() {
 }
 
 function key(k, override) {
+    if (!On && k != '\x1b') {
+        return;
+    }
     if (DisableKeys && !override) {
         return;
     }

@@ -215,16 +215,20 @@ CalcWidget::CalcWidget(QWidget *parent)
             mapper.setMapping(b, key);
             connect(b, SIGNAL(clicked()), &mapper, SLOT(map()));
             buttons[i] = b;
-            if (!(r == 3 && (c == 0 || c == 5))) {
+            if (!(r == 3 && c == 5)) {
                 QString hk = key;
+                int w = 16;
                 if (hk == "\b") {
                     hk = QChar(0x2190);
                 } else if (hk == "\r") {
                     hk = QChar(0x21b2);
+                } else if (hk == "\x1b") {
+                    hk = "esc";
+                    w = 32;
                 }
                 QLabel *help = new QLabel(hk, this);
                 help->move(70 + 57 * c, 167 + 65 * r);
-                help->resize(16, 16);
+                help->resize(w, 16);
                 help->setAutoFillBackground(true);
                 help->setPalette(helpPalette);
                 help->setMargin(1);

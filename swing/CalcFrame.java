@@ -437,15 +437,19 @@ public class CalcFrame extends JFrame {
                 });
                 b.setBounds(bx, by, 39, h);
                 pane.add(b, 0);
-                if (!(r == 3 && (c == 0 || c == 5))) {
+                if (!(r == 3 && c == 5)) {
                     String hk = key;
+                    int w = 16;
                     if (hk == "\b") {
                         hk = "\u2190";
                     } else if (hk == "\r") {
                         hk = "\u21b2";
+                    } else if (hk == "\u001b") {
+                        hk = "esc";
+                        w = 32;
                     }
                     JLabel help = new JLabel(hk);
-                    help.setBounds(70 + 57 * c, 167 + 65 * r, 16, 16);
+                    help.setBounds(70 + 57 * c, 167 + 65 * r, w, 16);
                     help.setOpaque(true);
                     help.setBackground(Color.yellow);
                     help.setHorizontalAlignment(SwingConstants.CENTER);
