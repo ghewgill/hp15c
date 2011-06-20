@@ -1183,10 +1183,6 @@ function op_sst() {
     StackLift = OldStackLift;
 }
 
-function op_lbl() {
-    alert("Unimplemented: LBL");
-}
-
 function op_bst() {
     if (PC > 0) {
         PC--;
