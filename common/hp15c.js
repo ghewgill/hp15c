@@ -676,6 +676,7 @@ function update_display_num(n) {
             break;
         case 2:
             var x = Math.round(n * Math.pow(10, DisplayDigits - mag));
+            // Not sure what case the following loop addresses
             while (log10int(x) > DisplayDigits) {
                 if (mag >= MAX_MAG) {
                     x = Math.floor(n * Math.pow(10, DisplayDigits - mag));
@@ -692,6 +693,21 @@ function update_display_num(n) {
             s += "e" + mag;
             break;
         case 3:
+            var x = Math.round(n * Math.pow(10, DisplayDigits - mag));
+            s = x.toString();
+            while (s.length < DisplayDigits+1) {
+                s = '0' + s;
+            }
+            var ilen = 1;
+            while (mag % 3) {
+                ilen++;
+                if (s.length < ilen) {
+                    s += '0';
+                }
+                mag--;
+            }
+            s = s.substr(0, ilen) + '.' + s.substr(ilen);
+            s += "e" + mag;
             break;
         }
         update_lcd(sign + s);
@@ -1076,7 +1092,8 @@ function op_rad() {
 }
 
 function op_eng(n) {
-    alert("Unimplemented: ENG");
+    DisplayMode = 3;
+    DisplayDigits = n;
     StackLift = OldStackLift;
 }
 
