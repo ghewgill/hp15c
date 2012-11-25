@@ -41,33 +41,35 @@
     }
     images[@"."] = [UIImage imageNamed:@"decimal.png"];
     images[@","] = [UIImage imageNamed:@"comma.png"];
+
+    self.view.backgroundColor = [UIColor blackColor];
     
-    calc = [[UIImageView alloc] initWithFrame:self.view.bounds];
-    calc.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    calc = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 480, 300)];
+    calc.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
     [self.view addSubview:calc];
-    //calc.contentMode = UIViewContentModeScaleAspectFit;
+    calc.contentMode = UIViewContentModeTopLeft;
     calc.image = [UIImage imageNamed:@"calc.jpg"];
     calc.userInteractionEnabled = YES;
     
     for (int i = 0; i < 10; i++) {
         digit[i] = [[UIImageView alloc] initWithFrame:CGRectMake(65+22 + i * 23, 11+9, 18, 24)];
         digit[i].contentMode = UIViewContentModeTopLeft;
-        [self.view addSubview:digit[i]];
+        [calc addSubview:digit[i]];
         decimal[i] = [[UIImageView alloc] initWithFrame:CGRectMake(65+39 + i * 23, 11+29, 5, 8)];
         decimal[i].contentMode = UIViewContentModeTopLeft;
-        [self.view addSubview:decimal[i]];
+        [calc addSubview:decimal[i]];
     }
     
     neg = [[UIImageView alloc] initWithFrame:CGRectMake(65+6, 11+19, 11, 3)];
     neg.hidden = YES;
     neg.contentMode = UIViewContentModeTopLeft;
     neg.image = [UIImage imageNamed:@"neg.png"];
-    [self.view addSubview:neg];
+    [calc addSubview:neg];
     
     UIFont *font = [UIFont systemFontOfSize:9];
     
     user = [[UILabel alloc] initWithFrame:CGRectMake(65+33, 11+37, 26, 8)];
-    [self.view addSubview:user];
+    [calc addSubview:user];
     user.hidden = YES;
     user.backgroundColor = nil;
     user.opaque = NO;
@@ -75,7 +77,7 @@
     user.text = @"USER";
     
     f = [[UILabel alloc] initWithFrame:CGRectMake(65+70, 11+37, 4, 8)];
-    [self.view addSubview:f];
+    [calc addSubview:f];
     f.hidden = YES;
     f.backgroundColor = nil;
     f.opaque = NO;
@@ -83,7 +85,7 @@
     f.text = @"f";
     
     g = [[UILabel alloc] initWithFrame:CGRectMake(65+84, 11+37, 6, 10)];
-    [self.view addSubview:g];
+    [calc addSubview:g];
     g.hidden = YES;
     g.backgroundColor = nil;
     g.opaque = NO;
@@ -91,7 +93,7 @@
     g.text = @"g";
     
     trigmode = [[UILabel alloc] initWithFrame:CGRectMake(65+142, 11+37, 27, 8)];
-    [self.view addSubview:trigmode];
+    [calc addSubview:trigmode];
     trigmode.hidden = YES;
     trigmode.backgroundColor = nil;
     trigmode.opaque = NO;
@@ -99,7 +101,7 @@
     trigmode.text = @"";
     
     complex = [[UILabel alloc] initWithFrame:CGRectMake(65+205, 11+37, 7, 8)];
-    [self.view addSubview:complex];
+    [calc addSubview:complex];
     complex.hidden = YES;
     complex.backgroundColor = nil;
     complex.opaque = NO;
@@ -107,7 +109,7 @@
     complex.text = @"C";
     
     prgm = [[UILabel alloc] initWithFrame:CGRectMake(65+222, 11+37, 27, 8)];
-    [self.view addSubview:prgm];
+    [calc addSubview:prgm];
     prgm.hidden = YES;
     prgm.backgroundColor = nil;
     prgm.opaque = NO;
