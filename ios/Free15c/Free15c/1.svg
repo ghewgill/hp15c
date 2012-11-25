@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+        <svg width="200" height="300">
+            <g fill="black">
+<path d="M 180 30 L 180 140 140 100 140 70 Z" />
+<path d="M 180 150 L 180 260 140 220 140 190 Z" />
+ </g>
+        </svg>
