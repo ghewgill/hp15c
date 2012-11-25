@@ -256,6 +256,9 @@
 {
     CGPoint p = [sender locationInView:calc];
     //NSLog(@"tap %g,%g", p.x, p.y);
+    if (p.y < 88) {
+        return;
+    }
     int r = (p.y - 88) * 4 / (300-88);
     int c = (p.x - 0) * 10 / (480-0);
     //NSLog(@"rc %d,%d", r, c);
