@@ -1,0 +1,56 @@
+<html>
+<head>
+<script type="text/javascript">
+    function callback(name, args) {
+        var iframe = document.createElement("iframe");
+        iframe.setAttribute("src", "callback://" + name + "?" + JSON.stringify(Array.prototype.slice.call(args)));
+        document.documentElement.appendChild(iframe);
+        iframe.parentNode.removeChild(iframe);
+    }
+    
+    var Display = {
+        clear_digit: function(i) {
+            callback("clear_digit", arguments);
+        },
+        clear_digits: function() {
+            callback("clear_digits", arguments);
+        },
+        clear_shift: function() {
+            callback("clear_shift", arguments);
+        },
+        set_comma: function(i) {
+            callback("set_comma", arguments);
+        },
+        set_complex: function(on) {
+            callback("set_complex", arguments);
+        },
+        set_decimal: function(i) {
+            callback("set_decimal", arguments);
+        },
+        set_digit: function(i, d) {
+            callback("set_digit", arguments);
+        },
+        set_neg: function() {
+            callback("set_neg", arguments);
+        },
+        set_prgm: function(on) {
+            callback("set_prgm", arguments);
+        },
+        set_shift: function(mode) {
+            callback("set_shift", arguments);
+        },
+        set_trigmode: function(mode) {
+            callback("set_trigmode", arguments);
+        },
+        set_user: function(on) {
+            callback("set_user", arguments);
+        }
+    };
+</script>
+<script type="text/javascript" src="sprintf-0.6.js"></script>
+<script type="text/javascript" src="matrix.js"></script>
+<script type="text/javascript" src="hp15c.js"></script>
+</head>
+<body
+</body>
+</html>

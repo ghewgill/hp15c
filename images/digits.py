@@ -33,6 +33,8 @@ for i in range(len(Digits[0])):
         </svg>"""
     f.close()
     os.system("convert -background none %s.svg %s.png" % (name, name))
+    os.system("convert -background none -geometry 18x24 %s.svg ios/%s.png" % (name, name))
+    os.system("convert -background none -geometry 36x48 %s.svg ios/%s@2x.png" % (name, name))
 
 f = open("decimal.svg", "w")
 print >>f, """<?xml version="1.0"?>
@@ -41,15 +43,19 @@ print >>f, """<?xml version="1.0"?>
     </svg>"""
 f.close()
 os.system("convert -background none decimal.svg decimal.png")
+os.system("convert -background none -geometry 5x3 decimal.svg ios/decimal.png")
+os.system("convert -background none -geometry 10x6 decimal.svg ios/decimal@2x.png")
 
 f = open("comma.svg", "w")
 print >>f, """<?xml version="1.0"?>
     <svg width="6" height="10">
         <rect x="2" width="4" height="4" fill="black" />
-        <path d="M 2 5 L 6 5 1 9 0 9" fill="black" />
+        <path d="M 2 6 L 6 6 1 9 0 9" fill="black" />
     </svg>"""
 f.close()
 os.system("convert -background none comma.svg comma.png")
+os.system("convert -background none -geometry 5x8 comma.svg ios/comma.png")
+os.system("convert -background none -geometry 10x16 comma.svg ios/comma@2x.png")
 
 f = open("neg.svg", "w")
 print >>f, """<?xml version="1.0"?>
@@ -58,3 +64,5 @@ print >>f, """<?xml version="1.0"?>
     </svg>"""
 f.close()
 os.system("convert -background none neg.svg neg.png")
+os.system("convert -background none -geometry 11x3 neg.svg ios/neg.png")
+os.system("convert -background none -geometry 22x6 neg.svg ios/neg@2x.png")
