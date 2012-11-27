@@ -33,6 +33,8 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     
+    [UIApplication sharedApplication].statusBarHidden = NO;
+    
     NSString *chars = @"0123456789-ABCDEoru";
     images = [[NSMutableDictionary alloc] initWithCapacity:chars.length];
     for (int i = 0; i < chars.length; i++) {
