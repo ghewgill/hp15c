@@ -8,6 +8,8 @@
 
 #import "ViewController.h"
 
+#import "MenuViewController.h"
+
 @interface ViewController ()
 
 @end
@@ -267,7 +269,17 @@
     if (r < 0 || r > 4 || c < 0 || c > 9) {
         return;
     }
+    if (r == 3 && c == 0) {
+        [self showMenu];
+        return;
+    }
     [core stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"key(KeyTable[%d][%d])", r, c]];
+}
+
+- (void)showMenu
+{
+    MenuViewController *menu = [[MenuViewController alloc] init];
+    [self presentModalViewController:menu animated:YES];
 }
 
 - (void)runSelfTest

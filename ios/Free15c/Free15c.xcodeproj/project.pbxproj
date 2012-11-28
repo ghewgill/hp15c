@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		37AF804D166495CA0087DCB1 /* test.js in Sources */ = {isa = PBXBuildFile; fileRef = 37AF804C166495CA0087DCB1 /* test.js */; };
 		37AF804F166496B60087DCB1 /* test.js in Resources */ = {isa = PBXBuildFile; fileRef = 37AF804C166495CA0087DCB1 /* test.js */; };
+		37AF805B1665E8E50087DCB1 /* MenuViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37AF805A1665E8E50087DCB1 /* MenuViewController.m */; };
+		37AF805D1665F41D0087DCB1 /* about.html in Resources */ = {isa = PBXBuildFile; fileRef = 37AF805C1665F41D0087DCB1 /* about.html */; };
 		37BB745F1660497100F15B71 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37BB745E1660497100F15B71 /* UIKit.framework */; };
 		37BB74611660497100F15B71 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37BB74601660497100F15B71 /* Foundation.framework */; };
 		37BB74631660497100F15B71 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37BB74621660497100F15B71 /* CoreGraphics.framework */; };
@@ -81,6 +83,9 @@
 
 /* Begin PBXFileReference section */
 		37AF804C166495CA0087DCB1 /* test.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = test.js; path = ../../../common/test.js; sourceTree = "<group>"; };
+		37AF80591665E8E50087DCB1 /* MenuViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuViewController.h; sourceTree = "<group>"; };
+		37AF805A1665E8E50087DCB1 /* MenuViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MenuViewController.m; sourceTree = "<group>"; };
+		37AF805C1665F41D0087DCB1 /* about.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = about.html; sourceTree = "<group>"; };
 		37BB745A1660497100F15B71 /* Free15c.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Free15c.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		37BB745E1660497100F15B71 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		37BB74601660497100F15B71 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -202,6 +207,8 @@
 				37BB74761660497100F15B71 /* ViewController.h */,
 				37BB74771660497100F15B71 /* ViewController.m */,
 				37BB74791660497100F15B71 /* ViewController.xib */,
+				37AF80591665E8E50087DCB1 /* MenuViewController.h */,
+				37AF805A1665E8E50087DCB1 /* MenuViewController.m */,
 				37BB75341661C4D600F15B71 /* calc.jpg */,
 				37BB75351661C4D600F15B71 /* calc@2x.jpg */,
 				37BB754B1661E50C00F15B71 /* Icon-72.png */,
@@ -225,6 +232,7 @@
 				37BB74701660497100F15B71 /* Default.png */,
 				37BB74721660497100F15B71 /* Default@2x.png */,
 				37BB74741660497100F15B71 /* Default-568h@2x.png */,
+				37AF805C1665F41D0087DCB1 /* about.html */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -403,6 +411,7 @@
 				37BB75501661E50C00F15B71 /* Icon-72@2x.png in Resources */,
 				37BB75511661E50C00F15B71 /* Icon.png in Resources */,
 				37BB75521661E50C00F15B71 /* Icon@2x.png in Resources */,
+				37AF805D1665F41D0087DCB1 /* about.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -420,6 +429,7 @@
 				37BB748616604B7500F15B71 /* matrix.js in Sources */,
 				37BB748816604B9100F15B71 /* hp15c.js in Sources */,
 				37AF804D166495CA0087DCB1 /* test.js in Sources */,
+				37AF805B1665E8E50087DCB1 /* MenuViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
