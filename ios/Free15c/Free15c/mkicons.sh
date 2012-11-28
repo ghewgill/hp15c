@@ -7,7 +7,12 @@ go() {
 convert -background none -geometry 300x450 1.svg 1.tmp.png
 convert -background none -geometry 300x450 5.svg 5.tmp.png
 convert -background none -geometry 300x450 C.svg C.tmp.png
-convert -size 1024x1024 xc:lightgray \
+
+convert 1.tmp.png \( +clone -background black -shadow 60x3+20+30 \) +swap -background none -layers merge +repage 1.tmp.png
+convert 5.tmp.png \( +clone -background black -shadow 60x3+20+30 \) +swap -background none -layers merge +repage 5.tmp.png
+convert C.tmp.png \( +clone -background black -shadow 60x3+20+30 \) +swap -background none -layers merge +repage C.tmp.png
+
+convert icon-base.jpg \
     1.tmp.png -geometry -100+300 -composite \
     5.tmp.png -geometry +300+300 -composite \
     C.tmp.png -geometry +700+300 -composite \
