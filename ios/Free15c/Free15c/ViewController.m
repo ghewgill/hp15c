@@ -270,4 +270,11 @@
     [core stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"key(KeyTable[%d][%d])", r, c]];
 }
 
+- (void)runSelfTest
+{
+    NSString *test = [NSString stringWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"test.js" ofType:nil] encoding:NSUTF8StringEncoding error:nil];
+    [core stringByEvaluatingJavaScriptFromString:test];
+    [core stringByEvaluatingJavaScriptFromString:@"start_tests()"];
+}
+
 @end

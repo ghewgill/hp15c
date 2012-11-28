@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		37AF804D166495CA0087DCB1 /* test.js in Sources */ = {isa = PBXBuildFile; fileRef = 37AF804C166495CA0087DCB1 /* test.js */; };
+		37AF804F166496B60087DCB1 /* test.js in Resources */ = {isa = PBXBuildFile; fileRef = 37AF804C166495CA0087DCB1 /* test.js */; };
 		37BB745F1660497100F15B71 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37BB745E1660497100F15B71 /* UIKit.framework */; };
 		37BB74611660497100F15B71 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37BB74601660497100F15B71 /* Foundation.framework */; };
 		37BB74631660497100F15B71 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37BB74621660497100F15B71 /* CoreGraphics.framework */; };
@@ -78,6 +80,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		37AF804C166495CA0087DCB1 /* test.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = test.js; path = ../../../common/test.js; sourceTree = "<group>"; };
 		37BB745A1660497100F15B71 /* Free15c.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Free15c.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		37BB745E1660497100F15B71 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		37BB74601660497100F15B71 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -233,6 +236,7 @@
 				37BB748316604B5800F15B71 /* sprintf-0.6.js */,
 				37BB748516604B7500F15B71 /* matrix.js */,
 				37BB748716604B9100F15B71 /* hp15c.js */,
+				37AF804C166495CA0087DCB1 /* test.js */,
 			);
 			name = Core;
 			sourceTree = "<group>";
@@ -339,6 +343,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37AF804F166496B60087DCB1 /* test.js in Resources */,
 				37BB748916604C8B00F15B71 /* sprintf-0.6.js in Resources */,
 				37BB748A16604C8B00F15B71 /* matrix.js in Resources */,
 				37BB748B16604C8B00F15B71 /* hp15c.js in Resources */,
@@ -414,6 +419,7 @@
 				37BB748416604B5800F15B71 /* sprintf-0.6.js in Sources */,
 				37BB748616604B7500F15B71 /* matrix.js in Sources */,
 				37BB748816604B9100F15B71 /* hp15c.js in Sources */,
+				37AF804D166495CA0087DCB1 /* test.js in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
