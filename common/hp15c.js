@@ -2763,7 +2763,7 @@ function key(k, override) {
     }
     var op = decode(k);
     if (op === undefined) {
-        alert("undefined decode: "+k);
+        //console.log("undefined decode: "+k);
         return;
     }
     if (op !== null) {
