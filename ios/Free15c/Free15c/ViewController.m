@@ -18,6 +18,7 @@
     UIWebView *core;
     NSMutableDictionary *images;
     UIImageView *calc;
+    UIImageView *back;
     UIImageView *digit[10];
     UIImageView *decimal[10];
     UIImageView *neg;
@@ -28,6 +29,8 @@
     UILabel *complex;
     UILabel *prgm;
     UITapGestureRecognizer *tapper;
+    UISwipeGestureRecognizer *swipe_left;
+    UISwipeGestureRecognizer *swipe_right;
 }
 
 - (void)viewDidLoad
@@ -54,6 +57,13 @@
     calc.contentMode = UIViewContentModeTopLeft;
     calc.image = [UIImage imageNamed:@"calc.jpg"];
     calc.userInteractionEnabled = YES;
+    
+    back = [[UIImageView alloc] initWithFrame:self.view.bounds];
+    back.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    back.hidden = YES;
+    [self.view addSubview:back];
+    back.contentMode = UIViewContentModeScaleAspectFit;
+    back.image = [UIImage imageNamed:@"back.jpg"];
     
     for (int i = 0; i < 10; i++) {
         digit[i] = [[UIImageView alloc] initWithFrame:CGRectMake(65+22 + i * 23, 11+9, 18, 24)];
@@ -122,6 +132,14 @@
     
     tapper = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
     [calc addGestureRecognizer:tapper];
+    
+    swipe_left = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeLeft:)];
+    swipe_left.direction = UISwipeGestureRecognizerDirectionLeft;
+    [self.view addGestureRecognizer:swipe_left];
+    
+    swipe_right = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeRight:)];
+    swipe_right.direction = UISwipeGestureRecognizerDirectionRight;
+    [self.view addGestureRecognizer:swipe_right];
     
     core = [[UIWebView alloc] init];
     core.delegate = self;
@@ -276,6 +294,24 @@
         return;
     }
     [core stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"key(KeyTable[%d][%d])", r, c]];
+}
+
+- (void)handleSwipeLeft:(UIGestureRecognizer *)sender
+{
+    if (!calc.hidden) {
+        [UIView transitionFromView:calc toView:back duration:0.5 options:UIViewAnimationOptionShowHideTransitionViews | UIViewAnimationOptionTransitionFlipFromBottom completion:NULL];
+    } else {
+        [UIView transitionFromView:back toView:calc duration:0.5 options:UIViewAnimationOptionShowHideTransitionViews | UIViewAnimationOptionTransitionFlipFromBottom completion:NULL];
+    }
+}
+
+- (void)handleSwipeRight:(UIGestureRecognizer *)sender
+{
+    if (!calc.hidden) {
+        [UIView transitionFromView:calc toView:back duration:0.5 options:UIViewAnimationOptionShowHideTransitionViews | UIViewAnimationOptionTransitionFlipFromTop completion:NULL];
+    } else {
+        [UIView transitionFromView:back toView:calc duration:0.5 options:UIViewAnimationOptionShowHideTransitionViews | UIViewAnimationOptionTransitionFlipFromTop completion:NULL];
+    }
 }
 
 - (void)showMenu
