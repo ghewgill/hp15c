@@ -48,6 +48,7 @@
     [frame addSubview:decimal_style];*/
     
     UIWebView *about = [[UIWebView alloc] initWithFrame:CGRectMake(20, 120, 440, 200)];
+    about.backgroundColor = [UIColor lightGrayColor];
     [about loadHTMLString:[NSString stringWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"about.html" ofType:nil] encoding:NSUTF8StringEncoding error:nil] baseURL:nil];
     about.delegate = self;
     [frame addSubview:about];
