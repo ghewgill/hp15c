@@ -1,4 +1,5 @@
 var Display;
+var DecimalSwap;
 var Stack = [0, 0, 0, 0];
 var StackI = [0, 0, 0, 0];
 var LastX = 0;
@@ -631,6 +632,15 @@ function insert_commas(s) {
             break;
         }
         s = s.substr(0, d) + "," + s.substr(d);
+    }
+    if (DecimalSwap) {
+        for (var i = 0; i < s.length; i++) {
+            if (s.charAt(i) === ".") {
+                s = s.substr(0, i) + "," + s.substr(i+1);
+            } else if (s.charAt(i) === ",") {
+                s = s.substr(0, i) + "." + s.substr(i+1);
+            }
+        }
     }
     return sign + s;
 }

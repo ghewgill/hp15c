@@ -10,4 +10,6 @@
 
 @interface MenuViewController : UIViewController <UIWebViewDelegate>
 
+- (id)initWithCore:(UIWebView *)core;
+
 @end

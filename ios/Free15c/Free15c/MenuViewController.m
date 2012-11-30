@@ -13,6 +13,17 @@
 @end
 
 @implementation MenuViewController {
+    UIWebView *core;
+    UISegmentedControl *decimal_style;
+}
+
+- (id)initWithCore:(UIWebView *)core_
+{
+    self = [super init];
+    if (self) {
+        core = core_;
+    }
+    return self;
 }
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -36,16 +47,17 @@
     item.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(done)];
     [navbar pushNavigationItem:item animated:NO];
     
-    /*UILabel *decimal_label = [[UILabel alloc] initWithFrame:CGRectMake(20, 60, 140, 44)];
+    UILabel *decimal_label = [[UILabel alloc] initWithFrame:CGRectMake(20, 60, 140, 44)];
     decimal_label.text = @"Decimal style";
     decimal_label.backgroundColor = [UIColor lightGrayColor];
     decimal_label.font = [UIFont boldSystemFontOfSize:16];
     [frame addSubview:decimal_label];
     
-    UISegmentedControl *decimal_style = [[UISegmentedControl alloc] initWithItems:@[@"1,234.56", @"1.234,56"]];
+    decimal_style = [[UISegmentedControl alloc] initWithItems:@[@"1,234.56", @"1.234,56"]];
     decimal_style.frame = CGRectMake(140, 60, 320, 44);
     decimal_style.selectedSegmentIndex = 0;
-    [frame addSubview:decimal_style];*/
+    [decimal_style addTarget:nil action:@selector(decimalStyleChanged) forControlEvents:UIControlEventValueChanged];
+    [frame addSubview:decimal_style];
     
     UIWebView *about = [[UIWebView alloc] initWithFrame:CGRectMake(20, 120, 440, 200)];
     about.backgroundColor = [UIColor lightGrayColor];
@@ -60,6 +72,9 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
+    if ([[core stringByEvaluatingJavaScriptFromString:@"DecimalSwap"] isEqualToString:@"1"]) {
+        decimal_style.selectedSegmentIndex = 1;
+    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -81,6 +96,13 @@
         return NO;
     }
     return YES;
+}
+
+- (void)decimalStyleChanged
+{
+    [core stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"DecimalSwap = %d; update_display();", decimal_style.selectedSegmentIndex]];
+    [[NSUserDefaults standardUserDefaults] setInteger:decimal_style.selectedSegmentIndex forKey:@"DecimalStyle"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (void)done
