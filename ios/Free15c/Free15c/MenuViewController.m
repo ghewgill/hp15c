@@ -62,6 +62,7 @@
     UIWebView *about = [[UIWebView alloc] initWithFrame:CGRectMake(20, 120, 440, 200)];
     about.backgroundColor = [UIColor lightGrayColor];
     [about loadHTMLString:[NSString stringWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"about.html" ofType:nil] encoding:NSUTF8StringEncoding error:nil] baseURL:nil];
+    about.hidden = YES;
     about.delegate = self;
     [frame addSubview:about];
     
@@ -96,6 +97,11 @@
         return NO;
     }
     return YES;
+}
+
+- (void)webViewDidFinishLoad:(UIWebView *)webView
+{
+    webView.hidden = NO;
 }
 
 - (void)decimalStyleChanged
