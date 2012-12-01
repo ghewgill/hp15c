@@ -23,7 +23,6 @@
 		37BB74731660497100F15B71 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 37BB74721660497100F15B71 /* Default@2x.png */; };
 		37BB74751660497100F15B71 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 37BB74741660497100F15B71 /* Default-568h@2x.png */; };
 		37BB74781660497100F15B71 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37BB74771660497100F15B71 /* ViewController.m */; };
-		37BB747B1660497100F15B71 /* ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37BB74791660497100F15B71 /* ViewController.xib */; };
 		37BB748216604A1E00F15B71 /* core.html in Resources */ = {isa = PBXBuildFile; fileRef = 37BB748116604A1E00F15B71 /* core.html */; };
 		37BB748416604B5800F15B71 /* sprintf-0.6.js in Sources */ = {isa = PBXBuildFile; fileRef = 37BB748316604B5800F15B71 /* sprintf-0.6.js */; };
 		37BB748616604B7500F15B71 /* matrix.js in Sources */ = {isa = PBXBuildFile; fileRef = 37BB748516604B7500F15B71 /* matrix.js */; };
@@ -105,7 +104,6 @@
 		37BB74741660497100F15B71 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		37BB74761660497100F15B71 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		37BB74771660497100F15B71 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
-		37BB747A1660497100F15B71 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController.xib; sourceTree = "<group>"; };
 		37BB748116604A1E00F15B71 /* core.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = core.html; sourceTree = "<group>"; };
 		37BB748316604B5800F15B71 /* sprintf-0.6.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "sprintf-0.6.js"; path = "../../../common/sprintf-0.6.js"; sourceTree = "<group>"; };
 		37BB748516604B7500F15B71 /* matrix.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = matrix.js; path = ../../../common/jsmat/matrix.js; sourceTree = "<group>"; };
@@ -210,7 +208,6 @@
 				37BB746E1660497100F15B71 /* AppDelegate.m */,
 				37BB74761660497100F15B71 /* ViewController.h */,
 				37BB74771660497100F15B71 /* ViewController.m */,
-				37BB74791660497100F15B71 /* ViewController.xib */,
 				37AF80591665E8E50087DCB1 /* MenuViewController.h */,
 				37AF805A1665E8E50087DCB1 /* MenuViewController.m */,
 				37BB75341661C4D600F15B71 /* calc.jpg */,
@@ -365,7 +362,6 @@
 				37BB74711660497100F15B71 /* Default.png in Resources */,
 				37BB74731660497100F15B71 /* Default@2x.png in Resources */,
 				37BB74751660497100F15B71 /* Default-568h@2x.png in Resources */,
-				37BB747B1660497100F15B71 /* ViewController.xib in Resources */,
 				37BB748216604A1E00F15B71 /* core.html in Resources */,
 				37BB750E1661C46B00F15B71 /* -.png in Resources */,
 				37BB750F1661C46B00F15B71 /* -@2x.png in Resources */,
@@ -450,14 +446,6 @@
 				37BB74681660497100F15B71 /* en */,
 			);
 			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		37BB74791660497100F15B71 /* ViewController.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				37BB747A1660497100F15B71 /* en */,
-			);
-			name = ViewController.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
