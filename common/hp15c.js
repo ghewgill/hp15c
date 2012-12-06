@@ -804,8 +804,13 @@ function unopc(f) {
     LastX = Stack[0];
     LastXI = StackI[0];
     var r = f(new Complex(Stack[0], StackI[0]));
-    Stack[0] = r.re;
-    StackI[0] = r.im;
+    if (r instanceof Complex) {
+        Stack[0] = r.re;
+        StackI[0] = r.im;
+    } else {
+        Stack[0] = r;
+        StackI[0] = 0;
+    }
 }
 
 function binopc(f) {
