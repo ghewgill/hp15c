@@ -2090,6 +2090,10 @@ function op_mem() {
 function op_fact() {
     unop(function(x) {
         if (x >= 0 && x === Math.floor(x)) {
+            if (x > 69) {
+                Flags[9] = true;
+                return MAX;
+            }
             var r = 1;
             while (x > 1) {
                 r *= x;
@@ -2099,21 +2103,34 @@ function op_fact() {
         } else {
             x += 1;
             var gamma = function(z) {
-                // Lanczos approximation
-                // from http://en.wikipedia.org/wiki/Lanczos_approximation
-                var g = 7;
-                var p = [0.99999999999980993, 676.5203681218851, -1259.1392167224028,
-                         771.32342877765313, -176.61502916214059, 12.507343278686905,
-                         -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
-                z -= 1;
-                var r = p[0];
-                for (var i = 1; i < g+2; i++) {
-                    r += p[i] / (z + i);
+                // Spouge approximation
+                // https://en.wikipedia.org/wiki/Spouge's_approximation
+                var kc = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+                var kf = 1.0;
+                kc[0] = Math.sqrt(2.0 * Math.PI);
+                for (var k = 1; k < 12; k++) {
+                    kc[k] = Math.exp(12.0 - k) * Math.pow(12.0 - k, k - 0.5) / kf;
+                    kf *= -k;
                 }
-                var t = z + g + 0.5;
-                return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * r;
+                var acc = kc[0];
+                for (k = 1; k < 12; k++) {
+                    acc += kc[k] / (z + k);
+                }
+                acc *= Math.exp(-(z + 12)) * Math.pow(z + 12, z + 0.5);
+                return acc / z;
             };
-            if (x >= 0.5) {
+            if (x <= 0 && x === Math.floor(x)) {
+                Flags[9] = true;
+                return -MAX;
+            }
+            if (x < -70.06400563) {
+                return 0;
+            }
+            if (x > 70.95757445) {
+                Flags[9] = true;
+                return MAX;
+            }
+            if (x >= -10) {
                 return gamma(x);
             } else {
                 return Math.PI / (gamma(1-x) * Math.sin(Math.PI * x));
