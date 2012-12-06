@@ -1468,7 +1468,10 @@ function run_tests() {
                 }
                 for (var i in expected) {
                     if (!verify(test, Stack[i], StackI[i], expected[i])) {
-                        alert("fail: " + keys + "\nresult: " + Stack[i] + "\nexpected: " + expected[i] + "\ndiff: " + Math.abs(Stack[i] / expected[i] - 1));
+                        alert("fail: " + keys + "\n" +
+                            "result: " + (Flags[8] ? new Complex(Stack[i], StackI[i]) : Stack[i]) + "\n" +
+                            "expected: " + expected[i] + "\n" +
+                            "diff: " + Math.abs(Stack[i] / expected[i] - 1));
                         TestPass = false;
                     }
                 }
