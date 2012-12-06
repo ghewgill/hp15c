@@ -1342,7 +1342,29 @@ var Tests = [
     ["5\r2/1-f0", 1.329, 0.001],
     ["2f0", 2, 0.001],
     ["7\r2/1-f0", 3.323, 0.001],
-    ["3f0", 6, 0.001]
+    ["3f0", 6, 0.001],
+
+    // Test cases from Barry Mead
+    ["g58"],
+    // asinh(sinh(-100)) (Should be -100)
+    ["100_fGsgGs", -100],
+    // asinh(sinh(-200 + i1)) (Complex Mode) (Should be -200 + i1)
+    ["200_\r1IfGsgGs", new Complex(-200, 1), 1e-9],
+    // asinh(sinh(-100 + i1)) (Complex Mode) (Should be -100 + i1)
+    ["100_\r1IfGsgGs", new Complex(-100, 1), 1e-9],
+    // atanh(1 + i0) (Complex Mode) (Should show blinking positive infinity)
+    ["1gGt", "9.9999e99"],
+    // asin(-10000 + i1) (Should be -1.570696327 + i9.903487555)
+    ["10000_\r1Igs", new Complex(-1.570696327, 9.903487555), 1e-9],
+    // sin(asin(-10000 + i1) (Should be -10000 + i1)
+    ["10000_\r1Igss", new Complex(-10000, 1), 1e-8],
+    // acosh(-100000 + i1) (Should be 12.20607265 + i3.141582654)
+    ["100000_\r1IgGc", new Complex(12.20607265, 3.141582654), 1e-9],
+    // cosh(acosh(-100000 + i1)) (Should be about -100000 + i1)
+    ["100000_\r1IgGcfGc", new Complex(-100000, 1), 1e-6],
+
+    // reset complex mode
+    ["g58"]
 ];
 
 var TestStart;

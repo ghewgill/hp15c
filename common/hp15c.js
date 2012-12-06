@@ -239,6 +239,13 @@ var ExtraKeyTable = [
     [1, 5,  1, 'p']
 ];
 
+function sign(x) {
+    if (x === 0) {
+        return 0;
+    }
+    return (x > 0) ? 1 : -1;
+}
+
 function sinh(x) {
     return (Math.exp(x) - Math.exp(-x)) / 2;
 }
@@ -256,13 +263,21 @@ function Complex(re, im) {
     this.im = im;
 
     this.acos = function() {
-        var u = Complex.one.add(this).mul(Complex.one.sub(this));
-        var w = u.sqrt().mul(Complex.i).add(this).log();
-        return new Complex(w.im, -w.re);
+        var s1 = new Complex(1 - this.re, -this.im).sqrt();
+        var s2 = new Complex(1 + this.re, this.im).sqrt();
+        var r1 = 2 * Math.atan2(s1.re, s2.re);
+        var i1 = (s2.re*s1.im) - (s2.im*s1.re);
+        i1 = sign(i1) * Math.log(Math.abs(i1) + Math.sqrt(i1*i1 + 1));
+        return new Complex(r1, i1);
     }
 
     this.acosh = function() {
-        return this.add(Complex.one).mul(this.sub(Complex.one)).sqrt().add(this).log();
+        var s1 = new Complex(this.re - 1, this.im).sqrt();
+        var s2 = new Complex(this.re + 1, this.im).sqrt();
+        var r1 = (s1.re*s2.re) + (s1.im*s2.im);
+        r1 = sign(r1) * Math.log(Math.abs(r1) + Math.sqrt(r1*r1 + 1));
+        var i1 = 2 * Math.atan2(s1.im, s2.re);
+        return new Complex(r1, i1);
     }
 
     this.abs = function() {
@@ -278,13 +293,22 @@ function Complex(re, im) {
     }
 
     this.asin = function() {
-        var u = Complex.one.add(this).mul(Complex.one.sub(this));
-        var w = new Complex(-this.im, this.re).add(u.sqrt()).log();
-        return new Complex(w.im, -w.re);
+        var s1 = new Complex(1 + this.re, this.im).sqrt();
+        var s2 = new Complex(1 - this.re, -this.im).sqrt();
+        var r1 = (s1.re*s2.im) - (s2.re*s1.im);
+        r1 = sign(r1) * Math.log(Math.abs(r1) + Math.sqrt(r1*r1 + 1));
+        var i1 = Math.atan2(this.re, (s1.re*s2.re) - (s1.im*s2.im));
+        return new Complex(i1, -r1);
     }
 
     this.asinh = function() {
-        return this.add(this.square().add(Complex.one).sqrt()).log();
+        var s1 = new Complex(1 + this.im, -this.re).sqrt();
+        var s2 = new Complex(1 - this.im, this.re).sqrt();
+        var r1 = (s1.re * s2.im) - (s2.re * s1.im);
+        var sr1 = (r1 >= 0) ? 1 : -1;
+        r1 = sr1 * Math.log(Math.abs(r1) + Math.sqrt(r1 * r1 + 1));
+        var i1 = Math.atan2(this.im, (s1.re * s2.re) - (s1.im * s2.im));
+        return new Complex(r1, i1);
     }
 
     this.atan = function() {
@@ -294,6 +318,10 @@ function Complex(re, im) {
     }
 
     this.atanh = function() {
+        if (this.im === 0 && Math.abs(this.re) >= 1) {
+            Flags[9] = true;
+            return sign(this.re) * MAX;
+        }
         var u = Complex.one.add(this).div(Complex.one.sub(this)).log();
         return new Complex(u.re/2, u.im/2);
     }
@@ -1284,7 +1312,7 @@ function op_asinh() {
         });
     } else {
         unop(function(x) {
-            return Math.log(x + Math.sqrt(x*x + 1));
+            return sign(x) * Math.log(Math.abs(x) + Math.sqrt(x*x + 1));
         });
     }
 }
