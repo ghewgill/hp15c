@@ -28,7 +28,6 @@
     UILabel *trigmode;
     UILabel *complex;
     UILabel *prgm;
-    UITapGestureRecognizer *tapper;
     UISwipeGestureRecognizer *swipe_left;
     UISwipeGestureRecognizer *swipe_right;
 }
@@ -129,9 +128,6 @@
     prgm.opaque = NO;
     prgm.font = font;
     prgm.text = @"PRGM";
-    
-    tapper = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
-    [calc addGestureRecognizer:tapper];
     
     swipe_left = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeLeft:)];
     swipe_left.direction = UISwipeGestureRecognizerDirectionLeft;
@@ -276,24 +272,44 @@
     user.hidden = !on;
 }
 
-- (void)handleTap:(UIGestureRecognizer *)sender
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    CGPoint p = [sender locationInView:calc];
-    //NSLog(@"tap %g,%g", p.x, p.y);
-    if (p.y < 88) {
-        return;
+    //NSLog(@"touches began %f", event.timestamp);
+    if (event.allTouches.count == 1) {
+        CGPoint p = [event.allTouches.anyObject locationInView:calc];
+        //NSLog(@"tap %g,%g", p.x, p.y);
+        if (p.y < 88) {
+            return;
+        }
+        int r = (p.y - 88) * 4 / (300-88);
+        int c = (p.x - 0) * 10 / (480-0);
+        //NSLog(@"rc %d,%d", r, c);
+        if (r < 0 || r > 4 || c < 0 || c > 9) {
+            return;
+        }
+        if (r == 3 && c == 0) {
+            [self showMenu];
+            return;
+        }
+        [core stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"key_down(KeyTable[%d][%d])", r, c]];
     }
-    int r = (p.y - 88) * 4 / (300-88);
-    int c = (p.x - 0) * 10 / (480-0);
-    //NSLog(@"rc %d,%d", r, c);
-    if (r < 0 || r > 4 || c < 0 || c > 9) {
-        return;
-    }
-    if (r == 3 && c == 0) {
-        [self showMenu];
-        return;
-    }
-    [core stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"key(KeyTable[%d][%d])", r, c]];
+}
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    //NSLog(@"touches moved %f", event.timestamp);
+}
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    //NSLog(@"touches ended %f", event.timestamp);
+    [core stringByEvaluatingJavaScriptFromString:@"key_up()"];
+}
+
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    //NSLog(@"touches cancelled %f", event.timestamp);
+    [core stringByEvaluatingJavaScriptFromString:@"key_up()"];
 }
 
 - (void)handleSwipeLeft:(UIGestureRecognizer *)sender

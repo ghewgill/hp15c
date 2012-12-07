@@ -12,6 +12,8 @@ var NewDigitEntry;
 var StackLift = false;
 var OldStackLift, NewStackLift;
 var DelayUpdate = 0;
+var DisplayTimeout = 0;
+var TemporaryDisplay = false;
 var Shift = 0;
 var Prefix;
 var OldPrefix;
@@ -2817,7 +2819,23 @@ function run() {
     }
 }
 
-function key(k, override) {
+function delay_update_timeout() {
+    if (!TemporaryDisplay) {
+        update_display();
+    }
+    DisplayTimeout = 0;
+}
+
+function key_up() {
+    if (TemporaryDisplay) {
+        TemporaryDisplay = false;
+        if (DisplayTimeout === 0) {
+            delay_update_timeout();
+        }
+    }
+}
+
+function key_down(k, override) {
     if (DisableKeys && !override) {
         return;
     }
@@ -2850,10 +2868,16 @@ function key(k, override) {
         update_display();
     } else {
         if (DelayUpdate > 0) {
-            setTimeout(update_display, DelayUpdate);
+            TemporaryDisplay = true;
+            DisplayTimeout = setTimeout(delay_update_timeout, DelayUpdate);
         }
         DelayUpdate = 0;
     }
+}
+
+function key(k, override) {
+    key_down(k, override);
+    key_up();
 }
 
 function paste(s) {
