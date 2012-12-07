@@ -1,3 +1,4 @@
+var On = true;
 var Display;
 var DecimalSwap;
 var Stack = [0, 0, 0, 0];
@@ -223,7 +224,7 @@ var KeyTable = [
     ['q', 'E', ')', '^', '\\','_', '7', '8', '9', '/'],
     ['T', 'G', 's', 'c', 't', 'e', '4', '5', '6', '*'],
     ['P', 'U', 'r', 'x', '\b','\r','1', '2', '3', '-'],
-    [' ', 'f', 'g', 'S', 'R', '\r','0', '.', ';', '+']
+    ['\x1b', 'f', 'g', 'S', 'R', '\r','0', '.', ';', '+']
 ];
 var ExtraKeyTable = [
     [3, 6, -1, '!'],
@@ -601,6 +602,9 @@ function log10int(x) {
 function update_lcd(s) {
     LcdDisplay = s;
     Display.clear_digits();
+    if (!On) {
+        return;
+    }
     if (Flags[9] && !BlinkOn) {
         return;
     }
@@ -712,6 +716,7 @@ function update_display_num(n) {
             break;
         case 2:
             var x = Math.round(n * Math.pow(10, DisplayDigits - mag));
+            // Not sure what case the following loop addresses
             while (log10int(x) > DisplayDigits) {
                 if (mag >= MAX_MAG) {
                     x = Math.floor(n * Math.pow(10, DisplayDigits - mag));
@@ -728,6 +733,21 @@ function update_display_num(n) {
             s += "e" + mag;
             break;
         case 3:
+            var x = Math.round(n * Math.pow(10, DisplayDigits - mag));
+            s = x.toString();
+            while (s.length < DisplayDigits+1) {
+                s = '0' + s;
+            }
+            var ilen = 1;
+            while (mag % 3) {
+                ilen++;
+                if (s.length < ilen) {
+                    s += '0';
+                }
+                mag--;
+            }
+            s = s.substr(0, ilen) + '.' + s.substr(ilen);
+            s += "e" + mag;
             break;
         }
         update_lcd(sign + s);
@@ -1117,7 +1137,8 @@ function op_rad() {
 }
 
 function op_eng(n) {
-    alert("Unimplemented: ENG");
+    DisplayMode = 3;
+    DisplayDigits = n;
     StackLift = OldStackLift;
 }
 
@@ -1226,10 +1247,6 @@ function op_sst() {
         step();
     }
     StackLift = OldStackLift;
-}
-
-function op_lbl() {
-    alert("Unimplemented: LBL");
 }
 
 function op_bst() {
@@ -1910,7 +1927,7 @@ function op_test(t) {
 }
 
 function op_on() {
-    alert("Unimplemented: ON");
+    On = !On;
 }
 
 function op_sto_reg(n) {
@@ -2828,6 +2845,9 @@ function key_up() {
 }
 
 function key_down(k, override) {
+    if (!On && k != '\x1b') {
+        return;
+    }
     if (DisableKeys && !override) {
         return;
     }

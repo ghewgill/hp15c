@@ -185,16 +185,20 @@
             var frame = $("#frame");
             for (var i = 0; i < 4; i++) {
                 for (var j = 0; j < 10; j++) {
-                    if (i === 3 && (j === 0 || j === 5)) continue;
+                    if (i === 3 && j === 5) continue;
                     var c = KeyTable[i][j];
+                    var w = "1em";
                     if (c === "\b") {
                         c = "\u2190";
                     } else if (c === "\r") {
                         c = "\u21b2";
+                    } else if (c === "\u001b") {
+                        c = "esc";
+                        w = "2em";
                     }
                     var top = 167 + 65*i;
                     var left = 70 + 57*j;
-                    frame.append('<div class="help" style="top: ' + top + '; left: ' + left + '">' + c + '</div>');
+                    frame.append('<div class="help" style="top: ' + top + '; left: ' + left + '; width: ' + w + '">' + c + '</div>');
                 }
             }
             for (var i in ExtraKeyTable) {
