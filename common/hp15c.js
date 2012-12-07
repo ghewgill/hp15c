@@ -1762,15 +1762,7 @@ function op_back() {
 function op_clear_prefix() {
     Prefix = null;
     var x = Math.abs(Stack[0]);
-    if (x !== 0) {
-        while (x >= 10) {
-            x /= 10;
-        }
-        while (x < 1) {
-            x *= 10;
-        }
-    }
-    var s = x.toString().replace(".", "");
+    var s = sprintf("%.9e", x).replace(".", "").substr(0, 10);
     while (s.length < 10) {
         s += '0';
     }
