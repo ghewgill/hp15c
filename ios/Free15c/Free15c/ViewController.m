@@ -275,6 +275,9 @@
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     //NSLog(@"touches began %f", event.timestamp);
+    if (calc.hidden) {
+        return;
+    }
     if (event.allTouches.count == 1) {
         CGPoint p = [event.allTouches.anyObject locationInView:calc];
         //NSLog(@"tap %g,%g", p.x, p.y);
