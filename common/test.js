@@ -1362,6 +1362,12 @@ var Tests = [
     ["100000_\r1IgGc", new Complex(12.20607265, 3.141582654), 1e-9],
     // cosh(acosh(-100000 + i1)) (Should be about -100000 + i1)
     ["100000_\r1IgGcfGc", new Complex(-100000, 1), 1e-6],
+    ["g58"],
+
+    // Test rounding issues in DSE/ISG
+    ["gPfr"],
+    ["gS.001+S00S1fTq1S+1f50GqgUgPfr"],
+    ["10PR1", 9],
 
     // reset complex mode
     ["g58"]

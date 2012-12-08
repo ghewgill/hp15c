@@ -1519,8 +1519,9 @@ function op_sf_index() {
 function op_dse(r) {
     var n = trunc(Reg[r]);
     var f = Reg[r] - n;
-    var x = Math.floor(f * 1000);
-    var y = Math.round((Reg[r] * 1000 - trunc(Reg[r] * 1000)) * 100);
+    var s = sprintf("%.5f", f);
+    var x = +s.substr(2, 3);
+    var y = +s.substr(5, 2);
     if (y === 0) {
         y = 1;
     }
@@ -1546,8 +1547,9 @@ function op_cf_index() {
 function op_isg(r) {
     var n = trunc(Reg[r]);
     var f = Reg[r] - n;
-    var x = Math.floor(f * 1000);
-    var y = Math.round((Reg[r] * 1000 - trunc(Reg[r] * 1000)) * 100);
+    var s = sprintf("%.5f", f);
+    var x = +s.substr(2, 3);
+    var y = +s.substr(5, 2);
     if (y === 0) {
         y = 1;
     }
