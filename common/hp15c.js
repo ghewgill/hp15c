@@ -2775,6 +2775,12 @@ function decode(k) {
     if (Prefix != null) {
         d = Prefix;
     } else if (typeof(CharTable[k]) === "object") {
+        if (User && "qE)^\\".indexOf(k) >= 0) {
+            switch (s) {
+                case 0: s = 1; break;
+                case 1: s = 0; break;
+            }
+        }
         d = CharTable[k][s];
     } else {
         d = CharTable[k];
