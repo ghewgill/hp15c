@@ -1493,7 +1493,9 @@ function run_tests() {
                         alert("fail: " + keys + "\n" +
                             "result: " + (Flags[8] ? new Complex(Stack[i], StackI[i]) : Stack[i]) + "\n" +
                             "expected: " + expected[i] + "\n" +
-                            "diff: " + Math.abs(Stack[i] / expected[i] - 1));
+                            "diff: " + Math.abs(Stack[i] / expected[i] - 1) + "\n" +
+                            "modes: " + (User ? "USER " : "") + (Flags[8] ? "C " : "")
+                        );
                         TestPass = false;
                     }
                 }
