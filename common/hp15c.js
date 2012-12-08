@@ -2061,6 +2061,8 @@ function op_rcl_matrix(m, user) {
         Stack[0] = g_Matrix[m].get(Reg[0], Reg[1]);
         StackLift = true;
     }
+    update_lcd(sprintf("%c %2d,%d", "A".charCodeAt(0) + m, Reg[0], Reg[1]));
+    DelayUpdate = 1000;
     if (user) {
         if (Reg[1] < g_Matrix[m].cols) {
             Reg[1]++;
