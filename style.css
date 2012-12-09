@@ -1,0 +1,34 @@
+body {
+    font-family: sans-serif;
+}
+
+#navbar {
+    padding: 0.3em 0em;
+    background: steelblue;
+    color: white;
+}
+
+#navbar ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+#navbar ul li { display: inline; }
+#navbar ul li a {
+    text-decoration: none;
+    padding: .2em 1em;
+}
+
+#navbar a:link { color: white; }
+#navbar a:visited { color: white; }
+#navbar a:hover { background: black; }
+
+.platform {
+    margin: 1em 1em 0em 0em;
+    padding: 1em;
+    border: 2px solid steelblue;
+}
+
+.platform h3 {
+    margin: 0em 0em 1em 0em;
+}
