@@ -419,13 +419,13 @@ void CalcWidget::keyPressEvent(QKeyEvent *event)
     }
 }
 
-class Display: public QObject {
+class CalcDisplay: public QObject {
     Q_OBJECT
 public:
-    Display();
+    CalcDisplay();
 };
 
-Display::Display()
+CalcDisplay::CalcDisplay()
 {
 }
 
@@ -566,7 +566,7 @@ void HP15C::init()
     script->globalObject().setProperty("setInterval", script->newFunction(setInterval));
     script->globalObject().setProperty("clearInterval", script->newFunction(clearInterval));
 
-    QObject *disp = new Display();
+    QObject *disp = new CalcDisplay();
     QScriptValue dispval = script->newQObject(disp);
     dispval.setProperty("clear_digit", script->newFunction(clear_digit));
     dispval.setProperty("clear_digits", script->newFunction(clear_digits));
