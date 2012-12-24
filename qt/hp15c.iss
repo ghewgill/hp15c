@@ -24,11 +24,11 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "release\hp15c.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "c:\qt\2010.02.1\qt\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "c:\qt\2010.02.1\qt\bin\mingwm10.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "c:\qt\2010.02.1\qt\bin\QtCore4.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "c:\qt\2010.02.1\qt\bin\QtGui4.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "c:\qt\2010.02.1\qt\bin\QtScript4.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "msvcr100.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "msvcp100.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "c:\qt\4.8.4\bin\QtCore4.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "c:\qt\4.8.4\bin\QtGui4.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "c:\qt\4.8.4\bin\QtScript4.dll"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\HP15C"; Filename: "{app}\hp15c.exe"

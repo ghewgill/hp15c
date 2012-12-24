@@ -1,5 +1,12 @@
 Makefile
+Makefile.Debug
+Makefile.Release
 *.moc
 *.o
 qrc_*
 *.app
+vc100.pdb
+debug/
+release/
+HP15C-win32-install.exe
+HP15C.zip
