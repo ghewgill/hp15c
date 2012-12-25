@@ -25,10 +25,18 @@ body {
 
 .platform {
     margin: 1em 1em 0em 0em;
-    padding: 1em;
+    padding: 0;
     border: 2px solid steelblue;
 }
 
 .platform h3 {
     margin: 0em 0em 1em 0em;
+    color: white;
+    padding: 0.2em;
+    background: steelblue;
+    font-weight: normal;
+}
+
+.platbody {
+    margin: 1em;
 }
