@@ -308,8 +308,7 @@ function Complex(re, im) {
         var s1 = new Complex(1 + this.im, -this.re).sqrt();
         var s2 = new Complex(1 - this.im, this.re).sqrt();
         var r1 = (s1.re * s2.im) - (s2.re * s1.im);
-        var sr1 = (r1 >= 0) ? 1 : -1;
-        r1 = sr1 * Math.log(Math.abs(r1) + Math.sqrt(r1 * r1 + 1));
+        r1 = sign(r1) * Math.log(Math.abs(r1) + Math.sqrt(r1 * r1 + 1));
         var i1 = Math.atan2(this.im, (s1.re * s2.re) - (s1.im * s2.im));
         return new Complex(r1, i1);
     }
