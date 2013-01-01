@@ -21,6 +21,7 @@ var OldPrefix;
 var LcdDisplay;
 var DisplayMode = 1; // 1=FIX 2=SCI 3=ENG
 var DisplayDigits = 4;
+var FullCircle = 360;
 var TrigFactor = Math.PI / 180;
 var Flags = [false, false, false, false, false, false, false, false, false, false];
 var User = false;
@@ -1118,6 +1119,7 @@ function op_fix_index() {
 }
 
 function op_deg() {
+    FullCircle = 360;
     TrigFactor = Math.PI / 180;
     Display.set_trigmode(null);
     StackLift = OldStackLift;
@@ -1134,6 +1136,7 @@ function op_sci_index() {
 }
 
 function op_rad() {
+    FullCircle = Math.PI * 2; // for consistency, but we will not use this value
     TrigFactor = 1;
     Display.set_trigmode("RAD");
     StackLift = OldStackLift;
@@ -1150,6 +1153,7 @@ function op_eng_index() {
 }
 
 function op_grd() {
+    FullCircle = 400;
     TrigFactor = Math.PI / 200;
     Display.set_trigmode("GRAD");
     StackLift = OldStackLift;
@@ -1370,6 +1374,13 @@ function op_sin() {
         });
     } else {
         unop(function(x) {
+            if (FullCircle === 360 || FullCircle === 400) {
+                // check for exact values in deg/grad mode to avoid roundoff errors
+                var t = Math.abs(x % FullCircle);
+                if (t === 0 || t === FullCircle/2) {
+                    return 0;
+                }
+            }
             return Math.sin(x * TrigFactor);
         });
     }
@@ -1432,6 +1443,13 @@ function op_cos() {
         });
     } else {
         unop(function(x) {
+            if (FullCircle === 360 || FullCircle === 400) {
+                // check for exact values in deg/grad mode to avoid roundoff errors
+                var t = Math.abs(x % FullCircle);
+                if (t === FullCircle/4 || t === FullCircle*3/4) {
+                    return 0;
+                }
+            }
             return Math.cos(x * TrigFactor);
         });
     }
@@ -1464,6 +1482,14 @@ function op_tan() {
         });
     } else {
         unop(function(x) {
+            if (FullCircle === 360 || FullCircle === 400) {
+                // check for exact values in deg/grad mode to avoid roundoff errors
+                var t = Math.abs(x % FullCircle);
+                if (t === FullCircle/4 || t === FullCircle*3/4) {
+                    Flags[9] = true;
+                    return MAX;
+                }
+            }
             return Math.tan(x * TrigFactor);
         });
     }
