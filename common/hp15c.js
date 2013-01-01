@@ -314,6 +314,10 @@ function Complex(re, im) {
     }
 
     this.atan = function() {
+        if (this.re === 0 && Math.abs(this.im) === 1) {
+            Flags[9] = true;
+            return new Complex(0, sign(this.im) * MAX);
+        }
         var u = Complex.i.add(this).div(Complex.i.sub(this));
         var w = u.log();
         return new Complex(-w.im/2, w.re/2);
