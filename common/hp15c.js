@@ -321,7 +321,7 @@ function Complex(re, im) {
     }
 
     this.atanh = function() {
-        if (this.im === 0 && Math.abs(this.re) >= 1) {
+        if (this.im === 0 && Math.abs(this.re) === 1) {
             Flags[9] = true;
             return sign(this.re) * MAX;
         }
