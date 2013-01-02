@@ -1485,6 +1485,9 @@ function op_tan() {
             if (FullCircle === 360 || FullCircle === 400) {
                 // check for exact values in deg/grad mode to avoid roundoff errors
                 var t = Math.abs(x % FullCircle);
+                if (t === 0 || t === FullCircle/2) {
+                    return 0;
+                }
                 if (t === FullCircle/4 || t === FullCircle*3/4) {
                     Flags[9] = true;
                     return MAX;
