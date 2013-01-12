@@ -250,6 +250,43 @@ function sign(x) {
     return (x > 0) ? 1 : -1;
 }
 
+function sin_drg_mode(x) {
+    if (FullCircle === 360 || FullCircle === 400) {
+        // check for exact values in deg/grad mode to avoid roundoff errors
+        var t = Math.abs(x % FullCircle);
+        if (t === 0 || t === FullCircle/2) {
+            return 0;
+        }
+    }
+    return Math.sin(x * TrigFactor);
+}
+
+function cos_drg_mode(x) {
+    if (FullCircle === 360 || FullCircle === 400) {
+        // check for exact values in deg/grad mode to avoid roundoff errors
+        var t = Math.abs(x % FullCircle);
+        if (t === FullCircle/4 || t === FullCircle*3/4) {
+            return 0;
+        }
+    }
+    return Math.cos(x * TrigFactor);
+}
+
+function tan_drg_mode(x) {
+    if (FullCircle === 360 || FullCircle === 400) {
+        // check for exact values in deg/grad mode to avoid roundoff errors
+        var t = Math.abs(x % FullCircle);
+        if (t === 0 || t === FullCircle/2) {
+            return 0;
+        }
+        if (t === FullCircle/4 || t === FullCircle*3/4) {
+            Flags[9] = true;
+            return MAX;
+        }
+    }
+    return Math.tan(x * TrigFactor);
+}
+
 function sinh(x) {
     return (Math.exp(x) - Math.exp(-x)) / 2;
 }
@@ -1373,16 +1410,7 @@ function op_sin() {
             return x.sin();
         });
     } else {
-        unop(function(x) {
-            if (FullCircle === 360 || FullCircle === 400) {
-                // check for exact values in deg/grad mode to avoid roundoff errors
-                var t = Math.abs(x % FullCircle);
-                if (t === 0 || t === FullCircle/2) {
-                    return 0;
-                }
-            }
-            return Math.sin(x * TrigFactor);
-        });
+        unop(sin_drg_mode);
     }
 }
 
@@ -1442,16 +1470,7 @@ function op_cos() {
             return x.cos();
         });
     } else {
-        unop(function(x) {
-            if (FullCircle === 360 || FullCircle === 400) {
-                // check for exact values in deg/grad mode to avoid roundoff errors
-                var t = Math.abs(x % FullCircle);
-                if (t === FullCircle/4 || t === FullCircle*3/4) {
-                    return 0;
-                }
-            }
-            return Math.cos(x * TrigFactor);
-        });
+        unop(cos_drg_mode);
     }
 }
 
@@ -1481,20 +1500,7 @@ function op_tan() {
             return x.tan();
         });
     } else {
-        unop(function(x) {
-            if (FullCircle === 360 || FullCircle === 400) {
-                // check for exact values in deg/grad mode to avoid roundoff errors
-                var t = Math.abs(x % FullCircle);
-                if (t === 0 || t === FullCircle/2) {
-                    return 0;
-                }
-                if (t === FullCircle/4 || t === FullCircle*3/4) {
-                    Flags[9] = true;
-                    return MAX;
-                }
-            }
-            return Math.tan(x * TrigFactor);
-        });
+        unop(tan_drg_mode);
     }
 }
 
@@ -1850,13 +1856,13 @@ function op_to_r() {
     if (Flags[8]) {
         var t = StackI[0];
         var r = Stack[0];
-        StackI[0] = r * Math.sin(t * TrigFactor);
-        Stack[0] = r * Math.cos(t * TrigFactor);
+        StackI[0] = r * sin_drg_mode(t);
+        Stack[0] = r * cos_drg_mode(t);
     } else {
         var t = Stack[1];
         var r = Stack[0];
-        Stack[1] = r * Math.sin(t * TrigFactor);
-        Stack[0] = r * Math.cos(t * TrigFactor);
+        Stack[1] = r * sin_drg_mode(t);
+        Stack[0] = r * cos_drg_mode(t);
     }
 }
 
