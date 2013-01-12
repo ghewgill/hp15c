@@ -2908,6 +2908,11 @@ function key_down(k, override) {
         //console.log("undefined decode: "+k);
         return;
     }
+    if (Running) {
+        clearTimeout(RunTimer);
+        Running = false;
+        return;
+    }
     if (op !== null) {
         try {
             if (Prgm && op.info.programmable) {
