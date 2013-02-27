@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3701DBFB16DE00DD00896D7D /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3701DBFA16DE00DD00896D7D /* AudioToolbox.framework */; };
 		378D93C41669B057004A85DE /* back@2x.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 378D93C31669B057004A85DE /* back@2x.jpg */; };
 		37AF804D166495CA0087DCB1 /* test.js in Sources */ = {isa = PBXBuildFile; fileRef = 37AF804C166495CA0087DCB1 /* test.js */; };
 		37AF804F166496B60087DCB1 /* test.js in Resources */ = {isa = PBXBuildFile; fileRef = 37AF804C166495CA0087DCB1 /* test.js */; };
@@ -83,6 +84,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3701DBFA16DE00DD00896D7D /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		378D93C31669B057004A85DE /* back@2x.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = "back@2x.jpg"; path = "../../../images/back@2x.jpg"; sourceTree = "<group>"; };
 		37AF804C166495CA0087DCB1 /* test.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = test.js; path = ../../../common/test.js; sourceTree = "<group>"; };
 		37AF80591665E8E50087DCB1 /* MenuViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuViewController.h; sourceTree = "<group>"; };
@@ -165,6 +167,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3701DBFB16DE00DD00896D7D /* AudioToolbox.framework in Frameworks */,
 				37BB745F1660497100F15B71 /* UIKit.framework in Frameworks */,
 				37BB74611660497100F15B71 /* Foundation.framework in Frameworks */,
 				37BB74631660497100F15B71 /* CoreGraphics.framework in Frameworks */,
@@ -177,6 +180,7 @@
 		37BB744F1660497100F15B71 = {
 			isa = PBXGroup;
 			children = (
+				3701DBFA16DE00DD00896D7D /* AudioToolbox.framework */,
 				37BB74641660497100F15B71 /* Free15c */,
 				37BB745D1660497100F15B71 /* Frameworks */,
 				37BB745B1660497100F15B71 /* Products */,

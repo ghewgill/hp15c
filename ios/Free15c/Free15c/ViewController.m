@@ -8,6 +8,8 @@
 
 #import "ViewController.h"
 
+#import <AudioToolbox/AudioToolbox.h>
+
 #import "MenuViewController.h"
 
 @interface ViewController ()
@@ -289,6 +291,9 @@
         //NSLog(@"rc %d,%d", r, c);
         if (r < 0 || r > 4 || c < 0 || c > 9) {
             return;
+        }
+        if (CFPreferencesGetAppBooleanValue(CFSTR("keyboard"), CFSTR("/var/mobile/Library/Preferences/com.apple.preferences.sounds"), NULL)) {
+            AudioServicesPlaySystemSound(0x450); // standard key click
         }
         if (r == 3 && c == 0) {
             [self showMenu];
