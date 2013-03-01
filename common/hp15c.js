@@ -1156,7 +1156,7 @@ function op_fix(n) {
 }
 
 function op_fix_index() {
-    op_fix(trunc(Reg['I']));
+    op_fix(trunc(Reg.I));
 }
 
 function op_deg() {
@@ -1173,7 +1173,7 @@ function op_sci(n) {
 }
 
 function op_sci_index() {
-    op_sci(trunc(Reg['I']));
+    op_sci(trunc(Reg.I));
 }
 
 function op_rad() {
@@ -1190,7 +1190,7 @@ function op_eng(n) {
 }
 
 function op_eng_index() {
-    op_eng(trunc(Reg['I']));
+    op_eng(trunc(Reg.I));
 }
 
 function op_grd() {
@@ -1328,7 +1328,7 @@ function op_gto_label(n) {
 }
 
 function op_gto_index() {
-    var i = trunc(Reg['I']);
+    var i = trunc(Reg.I);
     if (i < 0) {
         PC = -i;
     } else if (i < 10) {
@@ -1547,7 +1547,7 @@ function op_xchg(r) {
 }
 
 function op_xchg_index() {
-    op_xchg(Math.floor(Math.abs(Reg['I'])));
+    op_xchg(Math.floor(Math.abs(Reg.I)));
 }
 
 function op_sf(f) {
@@ -1555,7 +1555,7 @@ function op_sf(f) {
 }
 
 function op_sf_index() {
-    op_sf(Math.floor(Math.abs(Reg['I'])));
+    op_sf(Math.floor(Math.abs(Reg.I)));
 }
 
 function op_dse(r) {
@@ -1575,7 +1575,7 @@ function op_dse(r) {
 }
 
 function op_dse_index() {
-    op_dse(Math.floor(Math.abs(Reg['I'])));
+    op_dse(Math.floor(Math.abs(Reg.I)));
 }
 
 function op_cf(f) {
@@ -1583,7 +1583,7 @@ function op_cf(f) {
 }
 
 function op_cf_index() {
-    op_cf(Math.floor(Math.abs(Reg['I'])));
+    op_cf(Math.floor(Math.abs(Reg.I)));
 }
 
 function op_isg(r) {
@@ -1603,7 +1603,7 @@ function op_isg(r) {
 }
 
 function op_isg_index() {
-    op_isg(Math.floor(Math.abs(Reg['I'])));
+    op_isg(Math.floor(Math.abs(Reg.I)));
 }
 
 function op_ftest(f) {
@@ -1613,7 +1613,7 @@ function op_ftest(f) {
 }
 
 function op_ftest_index() {
-    op_ftest(Math.floor(Math.abs(Reg['I'])));
+    op_ftest(Math.floor(Math.abs(Reg.I)));
 }
 
 function op_mul() {
@@ -1988,15 +1988,15 @@ function op_sto_op_reg(op, n) {
 }
 
 function op_sto_index(user) {
-    if (Reg['I'] instanceof Descriptor) {
-        op_sto_matrix(Reg['I'].label, user);
+    if (Reg.I instanceof Descriptor) {
+        op_sto_matrix(Reg.I.label, user);
     } else {
-        op_sto_reg(Math.floor(Math.abs(Reg['I'])));
+        op_sto_reg(Math.floor(Math.abs(Reg.I)));
     }
 }
 
 function op_sto_op_index(op) {
-    op_sto_op_reg(op, Math.floor(Math.abs(Reg['I'])));
+    op_sto_op_reg(op, Math.floor(Math.abs(Reg.I)));
 }
 
 function op_sto_matrix(m, user) {
@@ -2078,15 +2078,15 @@ function op_rcl_op_reg(op, r) {
 }
 
 function op_rcl_index(user) {
-    if (Reg['I'] instanceof Descriptor) {
-        op_rcl_matrix(Reg['I'].label, user);
+    if (Reg.I instanceof Descriptor) {
+        op_rcl_matrix(Reg.I.label, user);
     } else {
-        op_rcl_reg(Math.floor(Math.abs(Reg['I'])));
+        op_rcl_reg(Math.floor(Math.abs(Reg.I)));
     }
 }
 
 function op_rcl_op_index(op) {
-    op_rcl_op_reg(op, Math.floor(Math.abs(Reg['I'])));
+    op_rcl_op_reg(op, Math.floor(Math.abs(Reg.I)));
 }
 
 function op_rcl_descriptor(m) {
