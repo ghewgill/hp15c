@@ -310,7 +310,7 @@ function Complex(re, im) {
         var i1 = (s2.re*s1.im) - (s2.im*s1.re);
         i1 = sign(i1) * Math.log(Math.abs(i1) + Math.sqrt(i1*i1 + 1));
         return new Complex(r1, i1);
-    }
+    };
 
     this.acosh = function() {
         var s1 = new Complex(this.re - 1, this.im).sqrt();
@@ -319,19 +319,19 @@ function Complex(re, im) {
         r1 = sign(r1) * Math.log(Math.abs(r1) + Math.sqrt(r1*r1 + 1));
         var i1 = 2 * Math.atan2(s1.im, s2.re);
         return new Complex(r1, i1);
-    }
+    };
 
     this.abs = function() {
         return Math.sqrt(this.re*this.re + this.im*this.im);
-    }
+    };
 
     this.add = function(that) {
         return new Complex(this.re + that.re, this.im + that.im);
-    }
+    };
 
     this.arg = function() {
         return Math.atan2(this.im, this.re);
-    }
+    };
 
     this.asin = function() {
         var s1 = new Complex(1 + this.re, this.im).sqrt();
@@ -340,7 +340,7 @@ function Complex(re, im) {
         r1 = sign(r1) * Math.log(Math.abs(r1) + Math.sqrt(r1*r1 + 1));
         var i1 = Math.atan2(this.re, (s1.re*s2.re) - (s1.im*s2.im));
         return new Complex(i1, -r1);
-    }
+    };
 
     this.asinh = function() {
         var s1 = new Complex(1 + this.im, -this.re).sqrt();
@@ -349,7 +349,7 @@ function Complex(re, im) {
         r1 = sign(r1) * Math.log(Math.abs(r1) + Math.sqrt(r1 * r1 + 1));
         var i1 = Math.atan2(this.im, (s1.re * s2.re) - (s1.im * s2.im));
         return new Complex(r1, i1);
-    }
+    };
 
     this.atan = function() {
         if (this.re === 0 && Math.abs(this.im) === 1) {
@@ -363,7 +363,7 @@ function Complex(re, im) {
         var u = Complex.i.add(this).div(Complex.i.sub(this));
         var w = u.log();
         return new Complex(rsign * -w.im/2, w.re/2);
-    }
+    };
 
     this.atanh = function() {
         if (this.im === 0 && Math.abs(this.re) === 1) {
@@ -372,49 +372,49 @@ function Complex(re, im) {
         }
         var u = Complex.one.add(this).div(Complex.one.sub(this)).log();
         return new Complex(u.re/2, u.im/2);
-    }
+    };
 
     this.cos = function() {
         return new Complex(Math.cos(this.re)*cosh(this.im), -Math.sin(this.re)*sinh(this.im));
-    }
+    };
 
     this.cosh = function() {
         return new Complex(cosh(this.re)*Math.cos(this.im), sinh(this.re)*Math.sin(this.im));
-    }
+    };
 
     this.div = function(that) {
         var d = that.re*that.re + that.im*that.im;
         return new Complex((this.re*that.re + this.im*that.im) / d, (this.im*that.re - this.re*that.im) / d);
-    }
+    };
 
     this.exp = function() {
         var r = Math.exp(this.re);
         return new Complex(r * Math.cos(this.im), r * Math.sin(this.im));
-    }
+    };
 
     this.exp10 = function() {
         var r = Math.pow(10, this.re);
         var t = this.im * Math.LN10;
         return new Complex(r * Math.cos(t), r * Math.sin(t));
-    }
+    };
 
     this.inv = function() {
         var d = this.re*this.re + this.im*this.im;
         return new Complex(this.re/d, -this.im/d);
-    }
+    };
 
     this.log = function() {
         return new Complex(Math.log(this.re*this.re + this.im*this.im)/2, this.arg());
-    }
+    };
 
     this.log10 = function() {
         var u = this.log();
         return new Complex(u.re / Math.LN10, u.im / Math.LN10);
-    }
+    };
 
     this.mul = function(that) {
         return new Complex(this.re * that.re - this.im * that.im, this.re * that.im + this.im * that.re);
-    }
+    };
 
     this.pow = function(that) {
         var p = this.arg();
@@ -422,42 +422,42 @@ function Complex(re, im) {
         var r = Math.pow(a, that.re) * Math.exp(-that.im * p);
         var t = that.re * p + that.im * Math.log(a);
         return new Complex(r * Math.cos(t), r * Math.sin(t));
-    }
+    };
 
     this.sin = function() {
         return new Complex(Math.sin(this.re)*cosh(this.im), Math.cos(this.re)*sinh(this.im));
-    }
+    };
 
     this.sinh = function() {
         return new Complex(sinh(this.re)*Math.cos(this.im), cosh(this.re)*Math.sin(this.im));
-    }
+    };
 
     this.sub = function(that) {
         return new Complex(this.re - that.re, this.im - that.im);
-    }
+    };
 
     this.sqrt = function() {
         var a = this.abs();
         return new Complex(Math.sqrt((this.re + a) / 2), (this.im < 0 ? -1 : 1) * Math.sqrt((-this.re + a) / 2));
-    }
+    };
 
     this.square = function() {
         return new Complex(this.re*this.re - this.im*this.im, 2*this.re*this.im);
-    }
+    };
 
     this.tan = function() {
         var u = new Complex(Math.tan(this.re), tanh(this.im));
         return u.div(new Complex(1, -u.re*u.im));
-    }
+    };
 
     this.tanh = function() {
         var u = new Complex(tanh(this.re), Math.tan(this.im));
         return u.div(new Complex(1, u.re*u.im));
-    }
+    };
 
     this.toString = function() {
         return "(" + this.re + "," + this.im + ")";
-    }
+    };
 }
 
 Complex.one = new Complex(1, 0);
@@ -493,39 +493,39 @@ function Mat() {
             }
         }
         return new Mat(r);
-    }
+    };
 
     this.complex3 = function() {
         return new Mat(this.m.getMatrix(0, this.rows-1, 0, this.cols/2-1));
-    }
+    };
 
     this.copy = function() {
         return new Mat(this.m.copy());
-    }
+    };
 
     this.det = function() {
         return this.m.det();
-    }
+    };
 
     this.get = function(row, col) {
         return this.m.get(row-1, col-1);
-    }
+    };
 
     this.inverse = function() {
         return new Mat(this.m.inverse());
-    }
+    };
 
     this.minus = function(B) {
         return new Mat(this.m.minus(B.m));
-    }
+    };
 
     this.norm = function() {
         return this.m.normInf();
-    }
+    };
 
     this.normF = function() {
         return this.m.normF();
-    }
+    };
 
     this.partition = function() {
         var r = new Matrix(this.rows*2, this.cols/2);
@@ -536,15 +536,15 @@ function Mat() {
             }
         }
         return new Mat(r);
-    }
+    };
 
     this.plus = function(B) {
         return new Mat(this.m.plus(B.m));
-    }
+    };
 
     this.residual = function(Y, X) {
         return new Mat(this.m.minus(Y.m.times(X.m)));
-    }
+    };
 
     this.set = function(row, col, value) {
         this.m.set(row-1, col-1, value);
@@ -552,15 +552,15 @@ function Mat() {
 
     this.times = function(B) {
         return new Mat(this.m.times(B.m));
-    }
+    };
 
     this.timesScalar = function(s) {
         return new Mat(this.m.timesScalar(s));
-    }
+    };
 
     this.transpose = function() {
         return new Mat(this.m.transpose());
-    }
+    };
 
     this.toString = function() {
         return "<Mat " + this.rows + "," + this.cols + ">";
@@ -575,7 +575,7 @@ function Mat() {
             }
         }
         return new Mat(r);
-    }
+    };
 }
 
 var g_Matrix = [new Mat(0, 0),
@@ -616,7 +616,7 @@ function Opcode(info, fn) {
                 Stack[0] = Number(Entry);
             }
         }
-    }
+    };
 }
 
 function trunc(x) {
@@ -2425,7 +2425,7 @@ function decode_lbl(k) {
                 return new Opcode(new OpcodeInfo([42,21,11+i]), function() {});
             }
         }
-    }
+    };
     return null;
 }
 
@@ -2701,7 +2701,7 @@ function decode_sto(k) {
                 if (i >= 0) {
                     return new Opcode(new OpcodeInfo([44,16,11+i]), function() { op_sto_matrix_all(i); });
                 }
-            }
+            };
             return null;
         } else if (k === 'c') {
             if (op !== null) {
@@ -2766,7 +2766,7 @@ function decode_rcl(k) {
                 if (i >= 0) {
                     return new Opcode(new OpcodeInfo([45,16,11+i]), function() { op_rcl_descriptor(i); });
                 }
-            }
+            };
             return null;
         } else if (k === 's') {
             Prefix = function(k) {
@@ -2774,7 +2774,7 @@ function decode_rcl(k) {
                 if (i >= 0) {
                     return new Opcode(new OpcodeInfo([45,23,11+i]), function() { op_rcl_dim(i); });
                 }
-            }
+            };
             return null;
         } else if (k === 'c') {
             if (op !== null) {
