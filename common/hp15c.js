@@ -726,6 +726,57 @@ function insert_commas(s) {
     return sign + s;
 }
 
+function format_fix(n) {
+    var x = Math.round(n * Math.pow(10, DisplayDigits));
+    // TODO: var s
+    s = x.toString();
+    while (s.length < DisplayDigits+1) {
+        s = '0' + s;
+    }
+    s = s.substr(0, s.length-DisplayDigits) + '.' + s.substr(s.length-DisplayDigits);
+    s = insert_commas(s);
+    return s;
+}
+
+function format_sci(n, mag) {
+    var x = Math.round(n * Math.pow(10, DisplayDigits - mag));
+    // Not sure what case the following loop addresses
+    while (log10int(x) > DisplayDigits) {
+        if (mag >= MAX_MAG) {
+            x = Math.floor(n * Math.pow(10, DisplayDigits - mag));
+            break;
+        }
+        mag++;
+        x /= 10;
+    }
+    s = x.toString();
+    while (s.length < DisplayDigits+1) {
+        s = '0' + s;
+    }
+    s = s.substr(0, 1) + '.' + s.substr(1);
+    s += "e" + mag;
+    return s;
+}
+
+function format_eng(n, mag) {
+    var x = Math.round(n * Math.pow(10, DisplayDigits - mag));
+    s = x.toString();
+    while (s.length < DisplayDigits+1) {
+        s = '0' + s;
+    }
+    var ilen = 1;
+    while (mag % 3) {
+        ilen++;
+        if (s.length < ilen) {
+            s += '0';
+        }
+        mag--;
+    }
+    s = s.substr(0, ilen) + '.' + s.substr(ilen);
+    s += "e" + mag;
+    return s;
+}
+
 function update_display_num(n) {
     if (n instanceof Descriptor) {
         update_lcd(sprintf("%c    %2d %2d",
@@ -753,48 +804,13 @@ function update_display_num(n) {
         }
         switch (dm) {
         case 1:
-            var x = Math.round(n * Math.pow(10, DisplayDigits));
-            s = x.toString();
-            while (s.length < DisplayDigits+1) {
-                s = '0' + s;
-            }
-            s = s.substr(0, s.length-DisplayDigits) + '.' + s.substr(s.length-DisplayDigits);
-            s = insert_commas(s);
+            s = format_fix(n);
             break;
         case 2:
-            var x = Math.round(n * Math.pow(10, DisplayDigits - mag));
-            // Not sure what case the following loop addresses
-            while (log10int(x) > DisplayDigits) {
-                if (mag >= MAX_MAG) {
-                    x = Math.floor(n * Math.pow(10, DisplayDigits - mag));
-                    break;
-                }
-                mag++;
-                x /= 10;
-            }
-            s = x.toString();
-            while (s.length < DisplayDigits+1) {
-                s = '0' + s;
-            }
-            s = s.substr(0, 1) + '.' + s.substr(1);
-            s += "e" + mag;
+            s = format_sci(n, mag);
             break;
         case 3:
-            var x = Math.round(n * Math.pow(10, DisplayDigits - mag));
-            s = x.toString();
-            while (s.length < DisplayDigits+1) {
-                s = '0' + s;
-            }
-            var ilen = 1;
-            while (mag % 3) {
-                ilen++;
-                if (s.length < ilen) {
-                    s += '0';
-                }
-                mag--;
-            }
-            s = s.substr(0, ilen) + '.' + s.substr(ilen);
-            s += "e" + mag;
+            s = format_eng(n, mag);
             break;
         }
         update_lcd(sign + s);
