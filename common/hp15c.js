@@ -1299,7 +1299,9 @@ function op_solve(n) {
 }
 
 function op_le() {
-    if (!(Stack[0] <= Stack[1])) {
+    if (Stack[0] <= Stack[1]) {
+        // execute next opcode
+    } else {
         PC++;
     }
 }
@@ -1702,7 +1704,9 @@ function op_integrate(n) {
 }
 
 function op_eq() {
-    if (!(Stack[0] === 0)) {
+    if (Stack[0] === 0) {
+        // execute next opcode
+    } else {
         PC++;
     }
 }
