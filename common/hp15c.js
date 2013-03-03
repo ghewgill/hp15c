@@ -1982,7 +1982,7 @@ function op_re_im() {
 function op_test(t) {
     var b;
     switch (t) {
-        case 0: b = Stack[0] != 0; break;
+        case 0: b = Stack[0] !== 0; break;
         case 1: b = Stack[0]  > 0; break;
         case 2: b = Stack[0]  < 0; break;
         case 3: b = Stack[0] >= 0; break;
