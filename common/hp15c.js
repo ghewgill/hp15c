@@ -631,7 +631,7 @@ function trunc(x) {
 
 function log10int(x) {
     var mag = 0;
-    var x = Math.abs(x);
+    x = Math.abs(x);
     if (x >= 1) {
         while (x >= 10) {
             mag++;
@@ -870,7 +870,7 @@ function push(x, forcelift) {
 }
 
 function fill(x) {
-    for (i in Stack) {
+    for (var i in Stack) {
         Stack[i] = x;
     }
 }
@@ -1235,19 +1235,20 @@ function op_solve(n) {
     // This is http://mathworld.wolfram.com/SecantMethod.html
     var eps = 1e-9;
     var maxiter = 100;
-    var x0 = Stack[1];
-    var x1 = Stack[0];
+    var x0, x1, x2, y0, y1, y2;
+    x0 = Stack[1];
+    x1 = Stack[0];
     if (x1 === x0) {
         x1 = x0 * 1.01;
     }
     while (true) {
         fill(x0);
         call(n);
-        var y0 = Stack[0];
+        y0 = Stack[0];
         fill(x1);
         call(n);
-        var y1 = Stack[0];
-        var x2 = x1 - y1 * ((x1 - x0) / (y1 - y0));
+        y1 = Stack[0];
+        x2 = x1 - y1 * ((x1 - x0) / (y1 - y0));
         if (isNaN(x2) || x2 === Infinity || x2 === -Infinity) {
             if (Running) {
                 PC++;
@@ -1258,7 +1259,7 @@ function op_solve(n) {
         }
         fill(x2);
         call(n);
-        var y2 = Stack[0];
+        y2 = Stack[0];
         //alert("x0=" + x0 + " y0=" + y0 + "\n" +
         //      "x1=" + x1 + " y1=" + y1 + "\n" +
         //      "x2=" + x2 + " y2=" + y2 + "\n");
@@ -1424,14 +1425,15 @@ function op_dim(m) {
     var oldmat = g_Matrix[m].m;
     var r = Stack[1];
     var c = Stack[0];
+    var i;
     if (oldmat.getRowDimension() > 0 && r > 0 && c > 0) {
         var a = oldmat.getArray();
         if (c < a[0].length) {
-            for (var i = 0; i < a.length; i++) {
+            for (i = 0; i < a.length; i++) {
                 a[i] = a[i].slice(0, c);
             }
         } else if (c > a[0].length) {
-            for (var i = 0; i < a.length; i++) {
+            for (i = 0; i < a.length; i++) {
                 for (j = a[i].length; j < c; j++) {
                     a[i][j] = 0;
                 }
@@ -1442,7 +1444,7 @@ function op_dim(m) {
         } else {
             while (r > a.length) {
                 var b = new Array(a[0].length);
-                for (var i = 0; i < c; i++) {
+                for (i = 0; i < c; i++) {
                     b[i] = 0;
                 }
                 a[a.length] = b;
@@ -1655,8 +1657,9 @@ function op_integrate(n) {
     var d = 0;
     var prev = 0;
     var steps = 32;
+    var r;
     while (true) {
-        var r = 0;
+        r = 0;
         for (var j = 0; j < steps; j += 2) {
             fill(x0 + (x1-x0)*j/steps);
             call(n);
@@ -1729,10 +1732,11 @@ function op_gsb_index() {
 }
 
 function op_clear_stat() {
-    for (var i in Stack) {
+    var i;
+    for (i in Stack) {
         Stack[i] = 0;
     }
-    for (var i = 2; i <= 7; i++) {
+    for (i = 2; i <= 7; i++) {
         Reg[i] = 0;
     }
     StackLift = OldStackLift;
@@ -1859,14 +1863,15 @@ function op_lastx() {
 function op_to_r() {
     LastX = Stack[0];
     LastXI = StackI[0];
+    var t, r;
     if (Flags[8]) {
-        var t = StackI[0];
-        var r = Stack[0];
+        t = StackI[0];
+        r = Stack[0];
         StackI[0] = r * sin_drg_mode(t);
         Stack[0] = r * cos_drg_mode(t);
     } else {
-        var t = Stack[1];
-        var r = Stack[0];
+        t = Stack[1];
+        r = Stack[0];
         Stack[1] = r * sin_drg_mode(t);
         Stack[0] = r * cos_drg_mode(t);
     }
@@ -1875,14 +1880,15 @@ function op_to_r() {
 function op_to_p() {
     LastX = Stack[0];
     LastXI = StackI[0];
+    var x, y;
     if (Flags[8]) {
-        var y = StackI[0];
-        var x = Stack[0];
+        y = StackI[0];
+        x = Stack[0];
         StackI[0] = Math.atan2(y, x) / TrigFactor;
         Stack[0] = Math.sqrt(x*x + y*y);
     } else {
-        var y = Stack[1];
-        var x = Stack[0];
+        y = Stack[1];
+        x = Stack[0];
         Stack[1] = Math.atan2(y, x) / TrigFactor;
         Stack[0] = Math.sqrt(x*x + y*y);
     }
@@ -2394,15 +2400,16 @@ function decode_eng(k) {
 function decode_solve(k) {
     var f = 1;
     Prefix = function(k) {
+        var i;
         if (k === '.') {
             f = 10;
             Prefix = OldPrefix;
             return null;
         } else if (k >= '0' && k <= '9') {
-            var i = Number(k) / f;
+            i = Number(k) / f;
             return new Opcode(new OpcodeInfo([42,10,i]), function() { op_solve(i); });
         } else {
-            var i = "qE)^\\".indexOf(k);
+            i = "qE)^\\".indexOf(k);
             if (i >= 0) {
                 return new Opcode(new OpcodeInfo([42,10,11+i]), function() { op_solve(11+i); });
             }
@@ -2414,15 +2421,16 @@ function decode_solve(k) {
 function decode_lbl(k) {
     var f = 1;
     Prefix = function(k) {
+        var i;
         if (k === '.') {
             f = 10;
             Prefix = OldPrefix;
             return null;
         } else if (k >= '0' && k <= '9') {
-            var i = Number(k) / f;
+            i = Number(k) / f;
             return new Opcode(new OpcodeInfo([42,21,i]), function() {});
         } else {
-            var i = "qE)^\\".indexOf(k);
+            i = "qE)^\\".indexOf(k);
             if (i >= 0) {
                 return new Opcode(new OpcodeInfo([42,21,11+i]), function() {});
             }
@@ -2437,6 +2445,7 @@ function decode_gto() {
     var n = 0;
     var i = 0;
     Prefix = function(k) {
+        var x;
         if (k === '_' && n === 0) {
             immediate = true;
             Prefix = OldPrefix;
@@ -2446,7 +2455,7 @@ function decode_gto() {
             Prefix = OldPrefix;
             return null;
         } else if (k >= '0' && k <= '9') {
-            var x = Number(k);
+            x = Number(k);
             if (immediate) {
                 n = n * 10 + x;
                 i++;
@@ -2462,7 +2471,7 @@ function decode_gto() {
         } else if (k === 't') {
             return new Opcode(new OpcodeInfo([22,25]), function() { op_gto_index(); });
         } else {
-            var x = "qE)^\\".indexOf(k);
+            x = "qE)^\\".indexOf(k);
             if (x >= 0) {
                 return new Opcode(new OpcodeInfo([22,11+x]), function() { op_gto_label(11+x); });
             }
@@ -2613,15 +2622,16 @@ function decode_ftest(k) {
 function decode_integrate(k) {
     var f = 1;
     Prefix = function(k) {
+        var i;
         if (k === '.') {
             f = 10;
             Prefix = OldPrefix;
             return null;
         } else if (k >= '0' && k <= '9') {
-            var i = Number(k) / f;
+            i = Number(k) / f;
             return new Opcode(new OpcodeInfo([42,20,i]), function() { op_integrate(i); });
         } else {
-            var i = "qE)^\\".indexOf(k);
+            i = "qE)^\\".indexOf(k);
             if (i >= 0) {
                 return new Opcode(new OpcodeInfo([42,20,11+i]), function() { op_integrate(11+i); });
             }
@@ -2633,17 +2643,18 @@ function decode_integrate(k) {
 function decode_gsb() {
     var f = 1;
     Prefix = function(k) {
+        var i;
         if (k === '.') {
             f = 10;
             Prefix = OldPrefix;
             return null;
         } else if (k >= '0' && k <= '9') {
-            var i = Number(k) / f;
+            i = Number(k) / f;
             return new Opcode(new OpcodeInfo([32,i]), function() { op_gsb(i); });
         } else if (k === 't') {
             return new Opcode(new OpcodeInfo([32,25]), function() { op_gsb_index(); });
         } else {
-            var i = "qE)^\\".indexOf(k);
+            i = "qE)^\\".indexOf(k);
             if (i >= 0) {
                 return new Opcode(new OpcodeInfo([32,11+i]), function() { op_gsb(11+i); });
             }
@@ -2681,12 +2692,13 @@ function decode_sto(k) {
     var op = null;
     var g = false;
     Prefix = function(k) {
+        var i, u;
         if (k === '.') {
             f = 10;
             Prefix = OldPrefix;
             return null;
         } else if (k >= '0' && k <= '9') {
-            var i = Number(k) + f;
+            i = Number(k) + f;
             if (op !== null) {
                 return new Opcode(new OpcodeInfo([44,OpcodeIndex[op],i]), function() { op_sto_op_reg(op, i); });
             } else {
@@ -2698,7 +2710,7 @@ function decode_sto(k) {
             return null;
         } else if (k === '_') {
             Prefix = function(k) {
-                var i = "qE)^\\".indexOf(k);
+                i = "qE)^\\".indexOf(k);
                 if (i >= 0) {
                     return new Opcode(new OpcodeInfo([44,16,11+i]), function() { op_sto_matrix_all(i); });
                 }
@@ -2708,7 +2720,7 @@ function decode_sto(k) {
             if (op !== null) {
                 return new Opcode(new OpcodeInfo([44,OpcodeIndex[op],24]), function() { op_sto_op_index(op); });
             } else {
-                var u = User;
+                u = User;
                 return new Opcode(new OpcodeInfo([44,24]), function() { op_sto_index(u); });
             }
         } else if (k === 't') {
@@ -2724,12 +2736,12 @@ function decode_sto(k) {
             Prefix = OldPrefix;
             return null;
         } else {
-            var i = "qE)^\\".indexOf(k);
+            i = "qE)^\\".indexOf(k);
             if (i >= 0) {
                 if (g) {
                     return new Opcode(new OpcodeInfo([44,43,11+i]), function() { op_sto_matrix_imm(i); });
                 } else {
-                    var u = User; // capture current value
+                    u = User; // capture current value
                     return new Opcode(new OpcodeInfo([44,11+i], null, true, User), function() { op_sto_matrix(i, u); });
                 }
             }
@@ -2743,12 +2755,13 @@ function decode_rcl(k) {
     var op = null;
     var g = false;
     Prefix = function(k) {
+        var i, u;
         if (k === '.') {
             f = 10;
             Prefix = OldPrefix;
             return null;
         } else if (k >= '0' && k <= '9') {
-            var i = Number(k) + f;
+            i = Number(k) + f;
             if (op !== null) {
                 return new Opcode(new OpcodeInfo([45,OpcodeIndex[op],i]), function() { op_rcl_op_reg(op, i); });
             } else {
@@ -2760,7 +2773,7 @@ function decode_rcl(k) {
             return null;
         } else if (k === '_') {
             Prefix = function(k) {
-                var i = "qE)^\\".indexOf(k);
+                i = "qE)^\\".indexOf(k);
                 if (i >= 0) {
                     return new Opcode(new OpcodeInfo([45,16,11+i]), function() { op_rcl_descriptor(i); });
                 }
@@ -2768,7 +2781,7 @@ function decode_rcl(k) {
             return null;
         } else if (k === 's') {
             Prefix = function(k) {
-                var i = "qE)^\\".indexOf(k);
+                i = "qE)^\\".indexOf(k);
                 if (i >= 0) {
                     return new Opcode(new OpcodeInfo([45,23,11+i]), function() { op_rcl_dim(i); });
                 }
@@ -2778,7 +2791,7 @@ function decode_rcl(k) {
             if (op !== null) {
                 return new Opcode(new OpcodeInfo([45,OpcodeIndex[op],24]), function() { op_rcl_op_index(op); });
             } else {
-                var u = User;
+                u = User;
                 return new Opcode(new OpcodeInfo([45,24]), function() { op_rcl_index(u); });
             }
         } else if (k === 't') {
@@ -2794,12 +2807,12 @@ function decode_rcl(k) {
             Prefix = OldPrefix;
             return null;
         } else {
-            var i = "qE)^\\".indexOf(k);
+            i = "qE)^\\".indexOf(k);
             if (i >= 0) {
                 if (g) {
                     return new Opcode(new OpcodeInfo([45,43,11+i]), function() { op_rcl_matrix_imm(i); });
                 } else {
-                    var u = User; // capture current value
+                    u = User; // capture current value
                     return new Opcode(new OpcodeInfo([45,11+i], null, true, User), function() { op_rcl_matrix(i, u); });
                 }
             }
