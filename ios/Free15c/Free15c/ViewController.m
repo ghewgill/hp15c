@@ -341,7 +341,7 @@
 - (void)showMenu
 {
     MenuViewController *menu = [[MenuViewController alloc] initWithCore:core];
-    [self presentModalViewController:menu animated:YES];
+    [self presentViewController:menu animated:YES completion:nil];
 }
 
 - (void)runSelfTest
