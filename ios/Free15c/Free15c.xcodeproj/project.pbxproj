@@ -335,6 +335,11 @@
 			attributes = {
 				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = "Greg Hewgill";
+				TargetAttributes = {
+					37BB74591660497100F15B71 = {
+						DevelopmentTeam = M55PJ83885;
+					};
+				};
 			};
 			buildConfigurationList = 37BB74541660497100F15B71 /* Build configuration list for PBXProject "Free15c" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -533,6 +538,7 @@
 		37BB747F1660497100F15B71 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				DEVELOPMENT_TEAM = M55PJ83885;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Free15c/Free15c-Prefix.pch";
 				INFOPLIST_FILE = "Free15c/Free15c-Info.plist";
@@ -545,6 +551,7 @@
 		37BB74801660497100F15B71 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				DEVELOPMENT_TEAM = M55PJ83885;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Free15c/Free15c-Prefix.pch";
 				INFOPLIST_FILE = "Free15c/Free15c-Info.plist";
