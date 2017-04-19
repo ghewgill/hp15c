@@ -53,14 +53,16 @@
     self.view.backgroundColor = [UIColor blackColor];
     
     calc = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 480, 300)];
-    calc.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
+    calc.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:calc];
     calc.contentMode = UIViewContentModeTopLeft;
     calc.image = [UIImage imageNamed:@"calc.jpg"];
     calc.userInteractionEnabled = YES;
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeCenterX relatedBy:0 toItem:calc attribute:NSLayoutAttributeCenterX multiplier:1 constant:0]];
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeCenterY relatedBy:0 toItem:calc attribute:NSLayoutAttributeCenterY multiplier:1 constant:0]];
     
     back = [[UIImageView alloc] initWithFrame:self.view.bounds];
-    back.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    back.translatesAutoresizingMaskIntoConstraints = NO;
     back.hidden = YES;
     [self.view addSubview:back];
     back.contentMode = UIViewContentModeScaleAspectFit;
