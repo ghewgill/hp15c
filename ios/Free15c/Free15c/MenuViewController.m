@@ -106,7 +106,7 @@
 
 - (void)decimalStyleChanged
 {
-    [core stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"DecimalSwap = %d; update_display();", decimal_style.selectedSegmentIndex]];
+    [core stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"DecimalSwap = %d; update_display();", (int)decimal_style.selectedSegmentIndex]];
     [[NSUserDefaults standardUserDefaults] setInteger:decimal_style.selectedSegmentIndex forKey:@"DecimalStyle"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }

@@ -179,8 +179,8 @@
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView
 {
-    int decimal_style = [[NSUserDefaults standardUserDefaults] integerForKey:@"DecimalStyle"];
-    [core stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"DecimalSwap = %d;", decimal_style]];
+    NSInteger decimal_style = [[NSUserDefaults standardUserDefaults] integerForKey:@"DecimalStyle"];
+    [core stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"DecimalSwap = %d;", (int)decimal_style]];
     [core stringByEvaluatingJavaScriptFromString:@"init()"];
 }
 
