@@ -325,18 +325,18 @@
 - (void)handleSwipeLeft:(UIGestureRecognizer *)sender
 {
     if (!calc.hidden) {
-        [UIView transitionFromView:calc toView:back duration:0.5 options:UIViewAnimationOptionShowHideTransitionViews | UIViewAnimationOptionTransitionFlipFromBottom completion:NULL];
+        [UIView transitionFromView:calc toView:back duration:0.5 options:UIViewAnimationOptionShowHideTransitionViews | UIViewAnimationOptionTransitionFlipFromRight completion:NULL];
     } else {
-        [UIView transitionFromView:back toView:calc duration:0.5 options:UIViewAnimationOptionShowHideTransitionViews | UIViewAnimationOptionTransitionFlipFromBottom completion:NULL];
+        [UIView transitionFromView:back toView:calc duration:0.5 options:UIViewAnimationOptionShowHideTransitionViews | UIViewAnimationOptionTransitionFlipFromRight completion:NULL];
     }
 }
 
 - (void)handleSwipeRight:(UIGestureRecognizer *)sender
 {
     if (!calc.hidden) {
-        [UIView transitionFromView:calc toView:back duration:0.5 options:UIViewAnimationOptionShowHideTransitionViews | UIViewAnimationOptionTransitionFlipFromTop completion:NULL];
+        [UIView transitionFromView:calc toView:back duration:0.5 options:UIViewAnimationOptionShowHideTransitionViews | UIViewAnimationOptionTransitionFlipFromLeft completion:NULL];
     } else {
-        [UIView transitionFromView:back toView:calc duration:0.5 options:UIViewAnimationOptionShowHideTransitionViews | UIViewAnimationOptionTransitionFlipFromTop completion:NULL];
+        [UIView transitionFromView:back toView:calc duration:0.5 options:UIViewAnimationOptionShowHideTransitionViews | UIViewAnimationOptionTransitionFlipFromLeft completion:NULL];
     }
 }
 
