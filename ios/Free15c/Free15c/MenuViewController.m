@@ -37,34 +37,47 @@
 
 - (void)loadView
 {
-    UIView *frame = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 480, 320)];
+    UIView *frame = [UIView new];
     frame.backgroundColor = [UIColor lightGrayColor];
     
-    UINavigationBar *navbar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, 480, 44)];
+    UINavigationBar *navbar = [UINavigationBar new];
+    navbar.translatesAutoresizingMaskIntoConstraints = NO;
     [frame addSubview:navbar];
     
     UINavigationItem *item = [[UINavigationItem alloc] initWithTitle:@"Free 15C"];
     item.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(done)];
     [navbar pushNavigationItem:item animated:NO];
-    
-    UILabel *decimal_label = [[UILabel alloc] initWithFrame:CGRectMake(20, 60, 140, 44)];
+
+    UILabel *decimal_label = [UILabel new];
+    decimal_label.translatesAutoresizingMaskIntoConstraints = NO;
     decimal_label.text = @"Decimal style";
     decimal_label.backgroundColor = [UIColor lightGrayColor];
     decimal_label.font = [UIFont boldSystemFontOfSize:16];
     [frame addSubview:decimal_label];
     
     decimal_style = [[UISegmentedControl alloc] initWithItems:@[@"1,234.56", @"1.234,56"]];
-    decimal_style.frame = CGRectMake(140, 60, 320, 44);
+    decimal_style.translatesAutoresizingMaskIntoConstraints = NO;
     decimal_style.selectedSegmentIndex = 0;
     [decimal_style addTarget:nil action:@selector(decimalStyleChanged) forControlEvents:UIControlEventValueChanged];
     [frame addSubview:decimal_style];
-    
-    UIWebView *about = [[UIWebView alloc] initWithFrame:CGRectMake(20, 120, 440, 200)];
+
+    UIWebView *about = [UIWebView new];
+    about.translatesAutoresizingMaskIntoConstraints = NO;
     about.backgroundColor = [UIColor lightGrayColor];
     [about loadHTMLString:[NSString stringWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"about.html" ofType:nil] encoding:NSUTF8StringEncoding error:nil] baseURL:nil];
     about.hidden = YES;
     about.delegate = self;
     [frame addSubview:about];
+
+    [frame addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[navbar(32)]-20-[decimal_style(44)]-[about]|" options:NSLayoutFormatDirectionLeadingToTrailing metrics:nil views:NSDictionaryOfVariableBindings(navbar, decimal_style, about)]];
+
+    [frame addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[navbar]|" options:NSLayoutFormatDirectionLeadingToTrailing metrics:nil views:NSDictionaryOfVariableBindings(navbar)]];
+
+    [frame addConstraint:[NSLayoutConstraint constraintWithItem:decimal_label attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:decimal_style attribute:NSLayoutAttributeCenterY multiplier:1 constant:0]];
+
+    [frame addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[decimal_label]-[decimal_style]" options:NSLayoutFormatDirectionLeadingToTrailing metrics:nil views:NSDictionaryOfVariableBindings(decimal_label, decimal_style)]];
+
+    [frame addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[about]|" options:NSLayoutFormatDirectionLeadingToTrailing metrics:nil views:NSDictionaryOfVariableBindings(about)]];
     
     self.view = frame;
 }
