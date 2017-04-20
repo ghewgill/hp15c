@@ -10,6 +10,25 @@
 
 #import "MenuViewController.h"
 
+#undef CLICK // Attempt to enable key clicks. Doesn't seem to work as enableInputClicksWhenVisible is not called.
+
+#ifdef CLICK
+@interface CalcView: UIImageView <UIInputViewAudioFeedback>
+@end
+
+@implementation CalcView
+
+- (BOOL)enableInputClicksWhenVisible
+{
+    NSLog(@"enableInputClickswhenVisible");
+    return YES;
+}
+
+@end
+#else
+#define CalcView UIImageView
+#endif
+
 @interface ViewController ()
 
 @end
@@ -50,7 +69,7 @@
 
     self.view.backgroundColor = [UIColor blackColor];
     
-    calc = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 480, 300)];
+    calc = [[CalcView alloc] initWithFrame:CGRectMake(0, 0, 480, 300)];
     calc.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:calc];
     calc.contentMode = UIViewContentModeTopLeft;
@@ -292,6 +311,9 @@
         if (r < 0 || r > 4 || c < 0 || c > 9) {
             return;
         }
+#ifdef CLICK
+        [[UIDevice currentDevice] playInputClick];
+#endif
         if (r == 3 && c == 0) {
             [self showMenu];
             return;
