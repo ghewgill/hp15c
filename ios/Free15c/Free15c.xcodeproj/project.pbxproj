@@ -80,6 +80,7 @@
 		37BB75501661E50C00F15B71 /* Icon-72@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 37BB754C1661E50C00F15B71 /* Icon-72@2x.png */; };
 		37BB75511661E50C00F15B71 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 37BB754D1661E50C00F15B71 /* Icon.png */; };
 		37BB75521661E50C00F15B71 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 37BB754E1661E50C00F15B71 /* Icon@2x.png */; };
+		37C878821EA8B4D000D0D5CE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 37C878811EA8B4CF00D0D5CE /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -158,6 +159,7 @@
 		37BB754C1661E50C00F15B71 /* Icon-72@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-72@2x.png"; sourceTree = "<group>"; };
 		37BB754D1661E50C00F15B71 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
 		37BB754E1661E50C00F15B71 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon@2x.png"; sourceTree = "<group>"; };
+		37C878811EA8B4CF00D0D5CE /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -221,6 +223,7 @@
 				37BB74B91660582000F15B71 /* Digits */,
 				37BB748C166057A800F15B71 /* Core */,
 				37BB74651660497100F15B71 /* Supporting Files */,
+				37C878811EA8B4CF00D0D5CE /* LaunchScreen.storyboard */,
 			);
 			path = Free15c;
 			sourceTree = "<group>";
@@ -377,6 +380,7 @@
 				37BB75141661C46B00F15B71 /* 2.png in Resources */,
 				37BB75151661C46B00F15B71 /* 2@2x.png in Resources */,
 				37BB75161661C46B00F15B71 /* 3.png in Resources */,
+				37C878821EA8B4D000D0D5CE /* LaunchScreen.storyboard in Resources */,
 				37BB75171661C46B00F15B71 /* 3@2x.png in Resources */,
 				37BB75181661C46B00F15B71 /* 4.png in Resources */,
 				37BB75191661C46B00F15B71 /* 4@2x.png in Resources */,
