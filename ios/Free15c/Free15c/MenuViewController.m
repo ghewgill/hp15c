@@ -86,6 +86,7 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
+    [UIApplication sharedApplication].statusBarHidden = YES;
     if ([[core stringByEvaluatingJavaScriptFromString:@"DecimalSwap"] isEqualToString:@"1"]) {
         decimal_style.selectedSegmentIndex = 1;
     }
@@ -126,6 +127,7 @@
 
 - (void)done
 {
+    [UIApplication sharedApplication].statusBarHidden = NO;
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
