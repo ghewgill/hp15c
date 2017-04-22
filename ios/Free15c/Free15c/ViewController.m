@@ -51,13 +51,11 @@
     UISwipeGestureRecognizer *swipe_right;
 }
 
-- (void)viewDidLoad
+- (void)loadView
 {
-    [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
-    
-    [UIApplication sharedApplication].statusBarHidden = NO;
-    
+    self.view = [UIView new];
+    self.view.backgroundColor = [UIColor blackColor];
+
     NSString *chars = @"0123456789-ABCDEoru";
     images = [[NSMutableDictionary alloc] initWithCapacity:chars.length];
     for (int i = 0; i < chars.length; i++) {
@@ -67,8 +65,6 @@
     images[@"."] = [UIImage imageNamed:@"decimal.png"];
     images[@","] = [UIImage imageNamed:@"comma.png"];
 
-    self.view.backgroundColor = [UIColor blackColor];
-    
     calc = [[CalcView alloc] initWithFrame:CGRectMake(0, 0, 480, 300)];
     calc.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:calc];
@@ -76,7 +72,7 @@
     calc.image = [UIImage imageNamed:@"calc.jpg"];
     calc.userInteractionEnabled = YES;
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeCenterX relatedBy:0 toItem:calc attribute:NSLayoutAttributeCenterX multiplier:1 constant:0]];
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeCenterY relatedBy:0 toItem:calc attribute:NSLayoutAttributeCenterY multiplier:1 constant:0]];
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeCenterY relatedBy:0 toItem:calc attribute:NSLayoutAttributeCenterY multiplier:1 constant:-10]];
     
     back = [[UIImageView alloc] initWithFrame:self.view.bounds];
     back.translatesAutoresizingMaskIntoConstraints = NO;
@@ -84,7 +80,9 @@
     [self.view addSubview:back];
     back.contentMode = UIViewContentModeScaleAspectFit;
     back.image = [UIImage imageNamed:@"back.jpg"];
-    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeCenterX relatedBy:0 toItem:back attribute:NSLayoutAttributeCenterX multiplier:1 constant:0]];
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeCenterY relatedBy:0 toItem:back attribute:NSLayoutAttributeCenterY multiplier:1 constant:-10]];
+
     for (int i = 0; i < 10; i++) {
         digit[i] = [[UIImageView alloc] initWithFrame:CGRectMake(65+22 + i * 23, 11+9, 18, 24)];
         digit[i].contentMode = UIViewContentModeTopLeft;
@@ -157,7 +155,15 @@
     swipe_right = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeRight:)];
     swipe_right.direction = UISwipeGestureRecognizerDirectionRight;
     [self.view addGestureRecognizer:swipe_right];
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+	// Do any additional setup after loading the view, typically from a nib.
     
+    [UIApplication sharedApplication].statusBarHidden = NO;
+
     core = [[UIWebView alloc] init];
     core.delegate = self;
     [core loadRequest:[NSURLRequest requestWithURL:[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"core.html" ofType:nil]]]];
