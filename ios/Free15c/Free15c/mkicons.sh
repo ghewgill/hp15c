@@ -19,7 +19,15 @@ convert icon-base.jpg \
     iTunesArtwork.png
 rm *.tmp.png
 #go 512
+go 180 Icon-60@3x.png
+go 152 Icon-76@2x.png
 go 144 Icon-72@2x.png
+go 120 Icon-120.png
+go 120 Icon-60@2x.png
+go 120 Icon-40@3x.png
 go 114 Icon@2x.png
+go 80 Icon-40@2x.png
+go 76 Icon-76.png
 go 72 Icon-72.png
 go 57 Icon.png
+go 40 Icon-40.png
