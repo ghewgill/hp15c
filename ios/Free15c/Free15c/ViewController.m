@@ -37,7 +37,9 @@
     UIWebView *core;
     NSMutableDictionary *images;
     UIImageView *calc;
+    CGAffineTransform original_calc_transform;
     UIImageView *back;
+    CGAffineTransform original_back_transform;
     UIImageView *digit[10];
     UIImageView *decimal[10];
     UIImageView *neg;
@@ -71,6 +73,7 @@
     calc.contentMode = UIViewContentModeTopLeft;
     calc.image = [UIImage imageNamed:@"calc.jpg"];
     calc.userInteractionEnabled = YES;
+    original_calc_transform = calc.transform;
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeCenterX relatedBy:0 toItem:calc attribute:NSLayoutAttributeCenterX multiplier:1 constant:0]];
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeCenterY relatedBy:0 toItem:calc attribute:NSLayoutAttributeCenterY multiplier:1 constant:-10]];
     
@@ -80,6 +83,7 @@
     [self.view addSubview:back];
     back.contentMode = UIViewContentModeScaleAspectFit;
     back.image = [UIImage imageNamed:@"back.jpg"];
+    original_back_transform = back.transform;
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeCenterX relatedBy:0 toItem:back attribute:NSLayoutAttributeCenterX multiplier:1 constant:0]];
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeCenterY relatedBy:0 toItem:back attribute:NSLayoutAttributeCenterY multiplier:1 constant:-10]];
 
@@ -173,6 +177,14 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)viewWillLayoutSubviews
+{
+    double scale = (self.view.bounds.size.height - 20) / 300;
+    NSLog(@"scale %g", scale);
+    calc.transform = CGAffineTransformScale(original_calc_transform, scale, scale);
+    back.transform = CGAffineTransformScale(original_back_transform, scale, scale);
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
