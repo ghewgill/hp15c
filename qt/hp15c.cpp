@@ -1,22 +1,46 @@
-#include <QAbstractButton>
-#include <QApplication>
-#include <QClipboard>
-#include <QFile>
-#include <QKeyEvent>
-#include <QLabel>
-#include <QLayout>
-#include <QMainWindow>
-#include <QMap>
-#include <QMenuBar>
-#include <QMessageBox>
-#include <QPainter>
-#include <QScriptEngine>
-#include <QSignalMapper>
-#include <QTimer>
+#include <cstring>           // for NULL, memset, size_t
+
+#include <QAbstractButton>   // for QAbstractButton
+#include <QAction>           // for QAction
+#include <QApplication>      // for QApplication
+#include <QByteArray>        // for QByteArray
+#include <QChar>             // for QChar
+#include <QCharRef>          // for operator+, QCharRef
+#include <QClipboard>        // for QClipboard
+#include <QColor>            // for QColor
+#include <QFile>             // for QFile
+#include <QFont>             // for QFont
+#include <QIODevice>         // for QIODevice, QIODevice::ReadOnly
+#include <QIcon>             // for QIcon
+#include <QKeyEvent>         // for QKeyEvent
+#include <QKeySequence>      // for QKeySequence, QKeySequence::Copy, QKeySequence::Paste
+#include <QLabel>            // for QLabel
+#include <QMainWindow>       // for QMainWindow
+#include <QMap>              // for QMap
+#include <QMenu>             // for QMenu
+#include <QMenuBar>          // for QMenuBar
+#include <QMessageBox>       // for QMessageBox
+#include <QObject>           // for QObject, Q_OBJECT, SIGNAL, SLOT, slots
+#include <QPainter>          // for QPainter
+#include <QPalette>          // for QPalette, QPalette::Window
+#include <QPixmap>           // for QPixmap
+#include <QPoint>            // for QPoint, operator+
+#include <QRect>             // for QRect
+#include <QScriptContext>    // for QScriptContext
+#include <QScriptEngine>     // for QScriptEngine, QScriptEngine::ScriptOwnership
+#include <QScriptValue>      // for QScriptValue, QScriptValue::UndefinedValue, QScriptValueList
+#include <QSignalMapper>     // for QSignalMapper
+#include <QSize>             // for QSize, operator+
+#include <QString>           // for QString
+#include <QTimer>            // for QTimer
+#include <QWidget>           // for QWidget
+#include <Qt>                // for operator|, AlignLeft, AlignTop, AlignHCenter, yellow
+#include <QtGlobal>          // for Q_UNUSED, qint32
+
 
 QScriptEngine *script;
 
-void checkError(QScriptValue r)
+void checkError(const QScriptValue &r)
 {
     if (r.isError()) {
         QMessageBox::warning(NULL, "error", r.toString() + r.property("lineNumber").toString());
@@ -26,14 +50,14 @@ void checkError(QScriptValue r)
 class Timeout: public QTimer {
     Q_OBJECT
 public:
-    Timeout(QScriptValue f, int ms, bool single);
+    Timeout(const QScriptValue &f, int ms, bool single);
 public slots:
     void onTimeout();
 private:
     QScriptValue func;
 };
 
-Timeout::Timeout(QScriptValue f, int ms, bool single)
+Timeout::Timeout(const QScriptValue &f, int ms, bool single)
  : func(f)
 {
     setSingleShot(single);
@@ -72,6 +96,8 @@ CalcButton::CalcButton(QWidget *parent, QPixmap &b, int r, int c, int h)
 
 void CalcButton::paintEvent(QPaintEvent *event)
 {
+    Q_UNUSED(event);
+
     QPainter painter(this);
     if (isDown()) {
         painter.drawPixmap(QPoint(0, 0), base, QRect(pos + QPoint(0, 1), size));
@@ -432,7 +458,7 @@ CalcDisplay::CalcDisplay()
 class HP15C: public QApplication {
     Q_OBJECT
 public:
-    HP15C(int argc, char *argv[]);
+    HP15C(int& argc, char *argv[]);
 
     void init();
 private:
@@ -441,12 +467,16 @@ private:
 
 QScriptValue mylert(QScriptContext *context, QScriptEngine *engine)
 {
+    Q_UNUSED(engine);
+
     QMessageBox::warning(NULL, "alert", context->argument(0).toString());
     return QScriptValue(QScriptValue::UndefinedValue);
 }
 
 QScriptValue setInterval(QScriptContext *context, QScriptEngine *engine)
 {
+    Q_UNUSED(engine);
+
     QScriptValue func = context->argument(0);
     int ms = context->argument(1).toInt32();
     return script->newQObject(new Timeout(func, ms, false), QScriptEngine::ScriptOwnership);
@@ -454,6 +484,8 @@ QScriptValue setInterval(QScriptContext *context, QScriptEngine *engine)
 
 QScriptValue setTimeout(QScriptContext *context, QScriptEngine *engine)
 {
+    Q_UNUSED(engine);
+
     QScriptValue func = context->argument(0);
     int ms = context->argument(1).toInt32();
     return script->newQObject(new Timeout(func, ms, true), QScriptEngine::ScriptOwnership);
@@ -461,6 +493,8 @@ QScriptValue setTimeout(QScriptContext *context, QScriptEngine *engine)
 
 QScriptValue clearInterval(QScriptContext *context, QScriptEngine *engine)
 {
+    Q_UNUSED(engine);
+
     QScriptValue timer = context->argument(0);
     static_cast<Timeout *>(timer.toQObject())->stop();
     return QScriptValue(QScriptValue::UndefinedValue);
@@ -468,6 +502,8 @@ QScriptValue clearInterval(QScriptContext *context, QScriptEngine *engine)
 
 QScriptValue clearTimeout(QScriptContext *context, QScriptEngine *engine)
 {
+    Q_UNUSED(engine);
+
     QScriptValue timer = context->argument(0);
     static_cast<Timeout *>(timer.toQObject())->stop();
     return QScriptValue(QScriptValue::UndefinedValue);
@@ -475,77 +511,104 @@ QScriptValue clearTimeout(QScriptContext *context, QScriptEngine *engine)
 
 QScriptValue clear_digit(QScriptContext *context, QScriptEngine *engine)
 {
+    Q_UNUSED(engine);
+
     g_CalcWidget->clear_digit(context->argument(0).toInt32());
     return QScriptValue(QScriptValue::UndefinedValue);
 }
 
 QScriptValue clear_digits(QScriptContext *context, QScriptEngine *engine)
 {
+    Q_UNUSED(context);
+    Q_UNUSED(engine);
+
     g_CalcWidget->clear_digits();
     return QScriptValue(QScriptValue::UndefinedValue);
 }
 
 QScriptValue clear_shift(QScriptContext *context, QScriptEngine *engine)
 {
+    Q_UNUSED(context);
+    Q_UNUSED(engine);
+
     g_CalcWidget->clear_shift();
     return QScriptValue(QScriptValue::UndefinedValue);
 }
 
 QScriptValue set_comma(QScriptContext *context, QScriptEngine *engine)
 {
+    Q_UNUSED(engine);
+
     g_CalcWidget->set_comma(context->argument(0).toInt32());
     return QScriptValue(QScriptValue::UndefinedValue);
 }
 
 QScriptValue set_complex(QScriptContext *context, QScriptEngine *engine)
 {
+    Q_UNUSED(engine);
+
     g_CalcWidget->set_complex(context->argument(0).toInt32());
     return QScriptValue(QScriptValue::UndefinedValue);
 }
 
 QScriptValue set_decimal(QScriptContext *context, QScriptEngine *engine)
 {
+    Q_UNUSED(engine);
+
     g_CalcWidget->set_decimal(context->argument(0).toInt32());
     return QScriptValue(QScriptValue::UndefinedValue);
 }
 
 QScriptValue set_digit(QScriptContext *context, QScriptEngine *engine)
 {
-    g_CalcWidget->set_digit(context->argument(0).toInt32(), context->argument(1).toString()[0].toAscii());
+    Q_UNUSED(engine);
+
+    g_CalcWidget->set_digit(context->argument(0).toInt32(), context->argument(1).toString()[0].toLatin1());
     return QScriptValue(QScriptValue::UndefinedValue);
 }
 
 QScriptValue set_neg(QScriptContext *context, QScriptEngine *engine)
 {
+    Q_UNUSED(context);
+    Q_UNUSED(engine);
+
     g_CalcWidget->set_neg();
     return QScriptValue(QScriptValue::UndefinedValue);
 }
 
 QScriptValue set_prgm(QScriptContext *context, QScriptEngine *engine)
 {
+    Q_UNUSED(engine);
+
     g_CalcWidget->set_prgm(context->argument(0).toInt32());
     return QScriptValue(QScriptValue::UndefinedValue);
 }
 
 QScriptValue set_shift(QScriptContext *context, QScriptEngine *engine)
 {
+    Q_UNUSED(engine);
+
     g_CalcWidget->set_shift(context->argument(0).toString());
     return QScriptValue(QScriptValue::UndefinedValue);
 }
 
 QScriptValue set_trigmode(QScriptContext *context, QScriptEngine *engine)
 {
+    Q_UNUSED(engine);
+
     g_CalcWidget->set_trigmode(context->argument(0).toString());
     return QScriptValue(QScriptValue::UndefinedValue);
 }
 
 QScriptValue set_user(QScriptContext *context, QScriptEngine *engine)
 {
+    Q_UNUSED(engine);
+
     g_CalcWidget->set_user(context->argument(0).toInt32());
     return QScriptValue(QScriptValue::UndefinedValue);
 }
 
-HP15C::HP15C(int argc, char *argv[])
+HP15C::HP15C(int& argc, char *argv[])
  : QApplication(argc, argv)
 {
     setWindowIcon(QIcon(":/15-128.png"));

@@ -3,11 +3,9 @@
 ######################################################################
 
 TEMPLATE = app
-TARGET = 
-DEPENDPATH += .
-INCLUDEPATH += .
 
 QT += script
+QT += widgets
 
 # Input
 SOURCES += hp15c.cpp
