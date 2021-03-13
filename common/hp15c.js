@@ -741,6 +741,7 @@ function format_fix(n) {
 function format_sci(n, mag) {
     var x = Math.round(n * Math.pow(10, DisplayDigits - mag));
     // Not sure what case the following loop addresses
+    // A: Carry will be ignored without this loop, causing issue #14
     while (log10int(x) > DisplayDigits) {
         if (mag >= MAX_MAG) {
             x = Math.floor(n * Math.pow(10, DisplayDigits - mag));
@@ -760,6 +761,15 @@ function format_sci(n, mag) {
 
 function format_eng(n, mag) {
     var x = Math.round(n * Math.pow(10, DisplayDigits - mag));
+    // Solves issue #14
+    while (log10int(x) > DisplayDigits) {
+        if (mag >= MAX_MAG) {
+            x = Math.floor(n * Math.pow(10, DisplayDigits - mag));
+            break;
+        }
+        mag++;
+        x /= 10;
+    }
     s = x.toString();
     while (s.length < DisplayDigits+1) {
         s = '0' + s;
