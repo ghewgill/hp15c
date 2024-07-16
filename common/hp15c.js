@@ -755,6 +755,7 @@ function format_sci(n, mag) {
     }
     s = s.substr(0, 1) + '.' + s.substr(1);
     s += "e" + mag;
+    s = insert_commas(s);
     return s;
 }
 
@@ -774,6 +775,7 @@ function format_eng(n, mag) {
     }
     s = s.substr(0, ilen) + '.' + s.substr(ilen);
     s += "e" + mag;
+    s = insert_commas(s);
     return s;
 }
 
